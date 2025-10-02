@@ -10,4 +10,10 @@
     <ProjectReference Include="..\ConsultaDocumentos.Domain\ConsultaDocumentos.Domain.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Context\" />
+    <Folder Include="EntitiesConfiguration\" />
+    <Folder Include="Repositories\" />
+  </ItemGroup>
+
 </Project>
