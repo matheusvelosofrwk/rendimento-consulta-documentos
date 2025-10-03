@@ -7,6 +7,8 @@ namespace ConsultaDocumentos.Infra.Data.Context
     {
         public DbSet<Cliente> Cliente { get; set; }
 
+        public DbSet<Aplicacao> Aplicacao { get; set; }
+
         public ApplicationDbContext(DbContextOptions options) : base(options) { }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)

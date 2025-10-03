@@ -20,9 +20,11 @@ namespace ConsultaDocumentos.Infra.Ioc
             });
 
             services.AddScoped<IClienteRepository, ClienteRepository>();
+            services.AddScoped<IAplicacaoRepository, AplicacaoRepository>();
 
 
             services.AddScoped<IClienteService, ClienteService>();
+            services.AddScoped<IAplicacaoService, AplicacaoService>();
 
 
             return services;
