@@ -1,4 +1,5 @@
-﻿using ConsultaDocumentos.Application.Interfaces;
+﻿using ConsultaDocumentos.Application.DTOs;
+using ConsultaDocumentos.Application.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ConsultaDocumentos.API.Controllers
@@ -44,19 +45,23 @@ namespace ConsultaDocumentos.API.Controllers
             }
         }
 
-        //[HttpPost]
-        //public virtual async Task<IActionResult> Create([FromBody] TCreate dto, CancellationToken ct = default)
-        //{
-        //    _service.AddAsync()
+        [HttpPost]
+        public virtual async Task<IActionResult> Create([FromBody] ClienteDTO dto, CancellationToken ct = default)
+        {
+            await _service.AddAsync(dto);
 
-        //    return Created();
-        //}
+            return Created();
+        }
 
-        //[HttpPut("{id}")]
-        //public virtual async Task<IActionResult> Update([FromRoute] Guid id, [FromBody] TUpdate dto, CancellationToken ct = default)
-        //{
-        //    var result
-        //}
+        [HttpPut("{id}")]
+        public virtual async Task<IActionResult> Update([FromRoute] Guid id, [FromBody] ClienteDTO dto, CancellationToken ct = default)
+        {
+            dto.Id = id;
+
+            await _service.UpdateAsync(dto);
+
+            return Ok();
+        }
 
         [HttpDelete("{id}")]
         public virtual async Task<IActionResult> Delete([FromRoute] Guid id, CancellationToken ct = default)

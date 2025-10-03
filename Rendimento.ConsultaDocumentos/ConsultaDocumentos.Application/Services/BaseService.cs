@@ -1,19 +1,27 @@
-﻿using ConsultaDocumentos.Application.Interfaces;
+﻿using AutoMapper;
+using ConsultaDocumentos.Application.DTOs;
+using ConsultaDocumentos.Application.Interfaces;
 using ConsultaDocumentos.Domain.Base;
 
 namespace ConsultaDocumentos.Application.Services
 {
-    public class BaseService<TEntity> : IBaseService<TEntity> where TEntity : BaseEntity
+    public class BaseService<TDTO, TEntity> : IBaseService<TDTO, TEntity> 
+        where TDTO : BaseDTO
+        where TEntity : BaseEntity
     {
-        private readonly IBaseRepository<TEntity> _repository;
+        protected readonly IBaseRepository<TEntity> _repository;
+        protected readonly IMapper _mapper;
 
-        public BaseService(IBaseRepository<TEntity> repository)
+        public BaseService(IBaseRepository<TEntity> repository, IMapper mapper)
         {
             _repository = repository;
+            _mapper = mapper;
         }
 
-        public Task AddAsync(TEntity entity)
+        public Task AddAsync(TDTO dto)
         {
+            var entity = _mapper.Map<TEntity>(dto);
+
             return _repository.AddAsync(entity);
         }
 
@@ -22,18 +30,26 @@ namespace ConsultaDocumentos.Application.Services
             return _repository.DeleteAsync(id);
         }
 
-        public Task<IList<TEntity>> GetAllAsync()
+        public async Task<IList<TDTO>> GetAllAsync()
         {
-            return _repository.GetAllAsync();
+            var entities = await _repository.GetAllAsync();
+            var maps = _mapper.Map<IList<TDTO>>(entities);
+
+            return maps;
         }
 
-        public Task<TEntity?> GetByIdAsync(Guid id)
+        public async Task<TDTO?> GetByIdAsync(Guid id)
         {
-            return _repository.GetByIdAsync(id);
+            var entity = await _repository.GetByIdAsync(id);
+            var mapping = _mapper.Map<TDTO>(entity);
+
+            return mapping;
         }
 
-        public Task UpdateAsync(TEntity entity)
+        public Task UpdateAsync(TDTO dto)
         {
+            var entity = _mapper.Map<TEntity>(dto);
+
             return _repository.UpdateAsync(entity);
         }
     }

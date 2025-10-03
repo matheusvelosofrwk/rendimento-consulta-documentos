@@ -1,4 +1,6 @@
-﻿using ConsultaDocumentos.Domain.Intefaces;
+﻿using ConsultaDocumentos.Application.Interfaces;
+using ConsultaDocumentos.Application.Services;
+using ConsultaDocumentos.Domain.Intefaces;
 using ConsultaDocumentos.Infra.Data.Context;
 using ConsultaDocumentos.Infra.Data.Repositories;
 using Microsoft.EntityFrameworkCore;
@@ -19,6 +21,16 @@ namespace ConsultaDocumentos.Infra.Ioc
 
             services.AddScoped<IClienteRepository, ClienteRepository>();
 
+
+            services.AddScoped<IClienteService, ClienteService>();
+
+
+            return services;
+        }
+
+        public static IServiceCollection AddAutoMapper(this IServiceCollection services)
+        {
+            services.AddAutoMapper(typeof(Application.Mappings.DomainToDTOMappingProfile));
 
             return services;
         }
