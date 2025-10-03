@@ -13,6 +13,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConsultaDocumentos.Applicat
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConsultaDocumentos.API", "ConsultaDocumentos.API\ConsultaDocumentos.API.csproj", "{2FD7202B-C1C7-438C-80D5-00B0D38FAD54}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConsultaDocumentos.Web", "ConsultaDocumentos.Web\ConsultaDocumentos.Web.csproj", "{904FCE52-C6E8-43D8-91AB-2B3CFAD79810}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -39,6 +41,10 @@ Global
 		{2FD7202B-C1C7-438C-80D5-00B0D38FAD54}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2FD7202B-C1C7-438C-80D5-00B0D38FAD54}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2FD7202B-C1C7-438C-80D5-00B0D38FAD54}.Release|Any CPU.Build.0 = Release|Any CPU
+		{904FCE52-C6E8-43D8-91AB-2B3CFAD79810}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{904FCE52-C6E8-43D8-91AB-2B3CFAD79810}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{904FCE52-C6E8-43D8-91AB-2B3CFAD79810}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{904FCE52-C6E8-43D8-91AB-2B3CFAD79810}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
