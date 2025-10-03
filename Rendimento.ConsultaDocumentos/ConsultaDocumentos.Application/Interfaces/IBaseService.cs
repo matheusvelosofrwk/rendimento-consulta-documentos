@@ -1,6 +1,8 @@
-﻿namespace ConsultaDocumentos.Domain.Base
+﻿using ConsultaDocumentos.Domain.Base;
+
+namespace ConsultaDocumentos.Application.Interfaces
 {
-    public interface IBaseRepository<TEntity> where TEntity : BaseEntity
+    public interface IBaseService<TEntity> where TEntity : BaseEntity
     {
         Task<TEntity?> GetByIdAsync(Guid id);
 

@@ -37,7 +37,7 @@ namespace ConsultaDocumentos.Infra.Data.Repositories
             return await dbSet.ToListAsync();
         }
 
-        public async Task<TEntity> GetByIdAsync(Guid id)
+        public async Task<TEntity?> GetByIdAsync(Guid id)
         {
             return await dbSet.FirstOrDefaultAsync(x => x.Id == id);
         }
