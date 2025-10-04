@@ -10,6 +10,7 @@ namespace ConsultaDocumentos.Application.Mappings
         {
             CreateMap<ClienteDTO, Cliente>().ReverseMap();
             CreateMap<AplicacaoDTO, Aplicacao>().ReverseMap();
+            CreateMap<ProvedorDTO, Provedor>().ReverseMap();
         }
     }
 }

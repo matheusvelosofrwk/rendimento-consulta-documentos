@@ -9,6 +9,8 @@ namespace ConsultaDocumentos.Infra.Data.Context
 
         public DbSet<Aplicacao> Aplicacao { get; set; }
 
+        public DbSet<Provedor> Provedor { get; set; }
+
         public ApplicationDbContext(DbContextOptions options) : base(options) { }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
