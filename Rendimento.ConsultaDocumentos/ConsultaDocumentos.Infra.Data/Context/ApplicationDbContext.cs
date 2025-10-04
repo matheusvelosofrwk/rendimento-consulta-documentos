@@ -1,9 +1,11 @@
 ﻿using ConsultaDocumentos.Domain.Entities;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 namespace ConsultaDocumentos.Infra.Data.Context
 {
-    public class ApplicationDbContext : DbContext
+    public class ApplicationDbContext : IdentityDbContext<IdentityUser>
     {
         public DbSet<Cliente> Cliente { get; set; }
 

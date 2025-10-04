@@ -1,4 +1,5 @@
 ﻿using ConsultaDocumentos.Web.Clients;
+using ConsultaDocumentos.Web.Handlers;
 using Refit;
 
 namespace ConsultaDocumentos.Web
@@ -10,7 +11,26 @@ namespace ConsultaDocumentos.Web
             // ler a BaseUrl do appsettings
             var baseUrl = configuration["ApiClients:JsonPlaceholder:BaseUrl"] ?? throw new InvalidOperationException("BaseUrl não configurada");
 
-            // registrar o cliente Refit tipado
+            // Registrar o AuthDelegatingHandler
+            services.AddTransient<AuthDelegatingHandler>();
+
+            // registrar o cliente de autenticação (sem AuthDelegatingHandler)
+            services
+                .AddRefitClient<IAuthApi>(new RefitSettings
+                {
+                    // Refit já usa System.Text.Json por padrão; customize aqui se quiser
+                    // ContentSerializer = new SystemTextJsonContentSerializer(customOptions)
+                })
+                .ConfigureHttpClient(c => c.BaseAddress = new Uri(baseUrl))
+                // (opcional) resiliência nativa do .NET 8
+                .AddStandardResilienceHandler(o =>
+                {
+                    o.Retry.MaxRetryAttempts = 3;
+                    o.AttemptTimeout.Timeout = TimeSpan.FromSeconds(10);
+                    // Circuit breaker e rate limiter já vêm com defaults sólidos
+                });
+
+            // registrar o cliente Refit tipado com AuthDelegatingHandler
             services
                 .AddRefitClient<IClienteApi>(new RefitSettings
                 {
@@ -18,6 +38,7 @@ namespace ConsultaDocumentos.Web
                     // ContentSerializer = new SystemTextJsonContentSerializer(customOptions)
                 })
                 .ConfigureHttpClient(c => c.BaseAddress = new Uri(baseUrl))
+                .AddHttpMessageHandler<AuthDelegatingHandler>()
                 // (opcional) resiliência nativa do .NET 8
                 .AddStandardResilienceHandler(o =>
                 {
@@ -33,6 +54,7 @@ namespace ConsultaDocumentos.Web
                     // ContentSerializer = new SystemTextJsonContentSerializer(customOptions)
                 })
                 .ConfigureHttpClient(c => c.BaseAddress = new Uri(baseUrl))
+                .AddHttpMessageHandler<AuthDelegatingHandler>()
                 // (opcional) resiliência nativa do .NET 8
                 .AddStandardResilienceHandler(o =>
                 {
@@ -48,6 +70,7 @@ namespace ConsultaDocumentos.Web
                     // ContentSerializer = new SystemTextJsonContentSerializer(customOptions)
                 })
                 .ConfigureHttpClient(c => c.BaseAddress = new Uri(baseUrl))
+                .AddHttpMessageHandler<AuthDelegatingHandler>()
                 // (opcional) resiliência nativa do .NET 8
                 .AddStandardResilienceHandler(o =>
                 {
