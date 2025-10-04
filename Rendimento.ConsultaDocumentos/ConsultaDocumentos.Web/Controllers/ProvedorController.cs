@@ -92,23 +92,6 @@ namespace ConsultaDocumentos.Web.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        // GET: ProvedorController/Delete/5
-        public async Task<ActionResult> Delete(Guid id)
-        {
-            var result = await _api.GetByIdAsync(id);
-
-            if (!result.Success)
-            {
-                foreach (var notification in result.Notifications)
-                {
-                    ModelState.AddModelError(string.Empty, notification);
-                }
-                return RedirectToAction(nameof(Index));
-            }
-
-            return View(result.Data);
-        }
-
         // POST: ProvedorController/Delete/5
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -116,13 +99,27 @@ namespace ConsultaDocumentos.Web.Controllers
         {
             var result = await _api.DeleteAsync(id);
 
+            // Se for requisição AJAX, retornar JSON
+            if (Request.Headers["X-Requested-With"] == "XMLHttpRequest" ||
+                Request.Headers.Accept.Contains("application/json"))
+            {
+                if (result.Success)
+                {
+                    return Json(new { success = true });
+                }
+                else
+                {
+                    return Json(new { success = false, errors = result.Notifications });
+                }
+            }
+
+            // Se não for AJAX, comportamento padrão
             if (!result.Success)
             {
                 foreach (var notification in result.Notifications)
                 {
                     ModelState.AddModelError(string.Empty, notification);
                 }
-                return RedirectToAction(nameof(Index));
             }
 
             return RedirectToAction(nameof(Index));

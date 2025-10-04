@@ -9,6 +9,8 @@
 <p>
     <a asp-action="Create">Create New</a>
 </p>
+
+@Html.AntiForgeryToken()
 <table class="table">
     <thead>
         <tr>
@@ -38,9 +40,16 @@
             </td>
             <td>
                 @Html.ActionLink("Edit", "Edit", new { id=item.Id  }) |
-                @Html.ActionLink("Delete", "Delete", new { id=item.Id  })
+                <a href="javascript:void(0);" onclick="openDeleteConfirmation('@item.Id', 'Aplicacao', '@item.Nome')" class="text-danger">Delete</a>
             </td>
         </tr>
 }
     </tbody>
 </table>
+
+@* Modal de confirmação de exclusão *@
+@await Html.PartialAsync("_DeleteConfirmationModal")
+
+@section Scripts {
+    <script src="~/js/delete-helper.js"></script>
+}

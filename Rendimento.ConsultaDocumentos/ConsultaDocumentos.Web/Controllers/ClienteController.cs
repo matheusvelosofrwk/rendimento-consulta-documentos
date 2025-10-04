@@ -100,27 +100,37 @@ namespace ConsultaDocumentos.Web.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        // GET: ClienteController/Delete/5
-        public ActionResult Delete(int id)
-        {
-
-
-            return View();
-        }
-
         // POST: ClienteController/Delete/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Delete(int id, IFormCollection collection)
+        public async Task<ActionResult> DeleteConfirmed(Guid id)
         {
-            try
+            var result = await _api.DeleteAsync(id);
+
+            // Se for requisição AJAX, retornar JSON
+            if (Request.Headers["X-Requested-With"] == "XMLHttpRequest" ||
+                Request.Headers.Accept.Contains("application/json"))
             {
-                return RedirectToAction(nameof(Index));
+                if (result.Success)
+                {
+                    return Json(new { success = true });
+                }
+                else
+                {
+                    return Json(new { success = false, errors = result.Notifications });
+                }
             }
-            catch
+
+            // Se não for AJAX, comportamento padrão
+            if (!result.Success)
             {
-                return View();
+                foreach (var notification in result.Notifications)
+                {
+                    ModelState.AddModelError(string.Empty, notification);
+                }
             }
+
+            return RedirectToAction(nameof(Index));
         }
     }
 }
