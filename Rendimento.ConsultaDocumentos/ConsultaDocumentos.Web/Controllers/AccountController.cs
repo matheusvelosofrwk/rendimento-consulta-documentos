@@ -4,7 +4,6 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Refit;
 using System.Security.Claims;
 
 namespace ConsultaDocumentos.Web.Controllers
@@ -36,47 +35,43 @@ namespace ConsultaDocumentos.Web.Controllers
                 return View(model);
             }
 
-            try
+            var result = await _authApi.LoginAsync(model);
+
+            if (!result.Success)
             {
-                var response = await _authApi.LoginAsync(model);
-
-                // Criar claims do usuário
-                var claims = new List<Claim>
+                foreach (var notification in result.Notifications)
                 {
-                    new Claim(ClaimTypes.Name, response.Email),
-                    new Claim(ClaimTypes.Email, response.Email),
-                    new Claim("access_token", response.Token)
-                };
-
-                var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
-                var authProperties = new AuthenticationProperties
-                {
-                    IsPersistent = true,
-                    ExpiresUtc = response.Expiration
-                };
-
-                await HttpContext.SignInAsync(
-                    CookieAuthenticationDefaults.AuthenticationScheme,
-                    new ClaimsPrincipal(claimsIdentity),
-                    authProperties);
-
-                if (!string.IsNullOrEmpty(returnUrl) && Url.IsLocalUrl(returnUrl))
-                {
-                    return Redirect(returnUrl);
+                    ModelState.AddModelError(string.Empty, notification);
                 }
+                return View(model);
+            }
 
-                return RedirectToAction("Index", "Home");
-            }
-            catch (ApiException ex)
+            // Criar claims do usuário
+            var claims = new List<Claim>
             {
-                ModelState.AddModelError(string.Empty, "Email ou senha inválidos");
-                return View(model);
-            }
-            catch (Exception ex)
+                new Claim(ClaimTypes.Name, result.Data.Email),
+                new Claim(ClaimTypes.Email, result.Data.Email),
+                new Claim("access_token", result.Data.Token)
+            };
+
+            var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+            var authProperties = new AuthenticationProperties
             {
-                ModelState.AddModelError(string.Empty, "Erro ao fazer login. Tente novamente.");
-                return View(model);
+                IsPersistent = true,
+                ExpiresUtc = result.Data.Expiration
+            };
+
+            await HttpContext.SignInAsync(
+                CookieAuthenticationDefaults.AuthenticationScheme,
+                new ClaimsPrincipal(claimsIdentity),
+                authProperties);
+
+            if (!string.IsNullOrEmpty(returnUrl) && Url.IsLocalUrl(returnUrl))
+            {
+                return Redirect(returnUrl);
             }
+
+            return RedirectToAction("Index", "Home");
         }
 
         [HttpGet]
@@ -94,42 +89,38 @@ namespace ConsultaDocumentos.Web.Controllers
                 return View(model);
             }
 
-            try
+            var result = await _authApi.RegisterAsync(model);
+
+            if (!result.Success)
             {
-                var response = await _authApi.RegisterAsync(model);
-
-                // Criar claims do usuário
-                var claims = new List<Claim>
+                foreach (var notification in result.Notifications)
                 {
-                    new Claim(ClaimTypes.Name, response.Email),
-                    new Claim(ClaimTypes.Email, response.Email),
-                    new Claim("access_token", response.Token)
-                };
-
-                var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
-                var authProperties = new AuthenticationProperties
-                {
-                    IsPersistent = true,
-                    ExpiresUtc = response.Expiration
-                };
-
-                await HttpContext.SignInAsync(
-                    CookieAuthenticationDefaults.AuthenticationScheme,
-                    new ClaimsPrincipal(claimsIdentity),
-                    authProperties);
-
-                return RedirectToAction("Index", "Home");
-            }
-            catch (ApiException ex)
-            {
-                ModelState.AddModelError(string.Empty, "Erro ao registrar usuário. Verifique os dados e tente novamente.");
+                    ModelState.AddModelError(string.Empty, notification);
+                }
                 return View(model);
             }
-            catch (Exception ex)
+
+            // Criar claims do usuário
+            var claims = new List<Claim>
             {
-                ModelState.AddModelError(string.Empty, "Erro ao registrar. Tente novamente.");
-                return View(model);
-            }
+                new Claim(ClaimTypes.Name, result.Data.Email),
+                new Claim(ClaimTypes.Email, result.Data.Email),
+                new Claim("access_token", result.Data.Token)
+            };
+
+            var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+            var authProperties = new AuthenticationProperties
+            {
+                IsPersistent = true,
+                ExpiresUtc = result.Data.Expiration
+            };
+
+            await HttpContext.SignInAsync(
+                CookieAuthenticationDefaults.AuthenticationScheme,
+                new ClaimsPrincipal(claimsIdentity),
+                authProperties);
+
+            return RedirectToAction("Index", "Home");
         }
 
         [HttpPost]

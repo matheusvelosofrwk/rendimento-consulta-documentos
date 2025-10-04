@@ -6,18 +6,18 @@ namespace ConsultaDocumentos.Web.Clients
     public interface IProvedorApi
     {
         [Get("/provedor")]
-        Task<IList<ProvedorViewModel>> GetAllAsync();
+        Task<Result<IList<ProvedorViewModel>>> GetAllAsync();
 
         [Get("/provedor/{id}")]
-        Task<ProvedorViewModel> GetByIdAsync(Guid id);
+        Task<Result<ProvedorViewModel>> GetByIdAsync(Guid id);
 
         [Post("/provedor")]
-        Task CreateAsync([Body] ProvedorViewModel model);
+        Task<Result<ProvedorViewModel>> CreateAsync([Body] ProvedorViewModel model);
 
         [Put("/provedor/{id}")]
-        Task UpdateAsync(Guid id, [Body] ProvedorViewModel model);
+        Task<Result<ProvedorViewModel>> UpdateAsync(Guid id, [Body] ProvedorViewModel model);
 
         [Delete("/provedor/{id}")]
-        Task DeleteAsync(Guid id);
+        Task<Result<bool>> DeleteAsync(Guid id);
     }
 }

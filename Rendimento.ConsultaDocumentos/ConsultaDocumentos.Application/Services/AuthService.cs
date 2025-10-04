@@ -1,5 +1,6 @@
 using ConsultaDocumentos.Application.DTOs;
 using ConsultaDocumentos.Application.Interfaces;
+using ConsultaDocumentos.Application.Results;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
@@ -22,49 +23,65 @@ namespace ConsultaDocumentos.Application.Services
             _configuration = configuration;
         }
 
-        public async Task<AuthResponseDTO> LoginAsync(LoginRequestDTO loginRequest)
+        public async Task<Result<AuthResponseDTO>> LoginAsync(LoginRequestDTO loginRequest)
         {
-            var user = await _userManager.FindByEmailAsync(loginRequest.Email);
-
-            if (user == null)
+            try
             {
-                throw new UnauthorizedAccessException("Email ou senha inválidos");
+                var user = await _userManager.FindByEmailAsync(loginRequest.Email);
+
+                if (user == null)
+                {
+                    return Result<AuthResponseDTO>.FailureResult("Email ou senha inválidos");
+                }
+
+                var passwordValid = await _userManager.CheckPasswordAsync(user, loginRequest.Password);
+
+                if (!passwordValid)
+                {
+                    return Result<AuthResponseDTO>.FailureResult("Email ou senha inválidos");
+                }
+
+                var token = GenerateJwtToken(user);
+                return Result<AuthResponseDTO>.SuccessResult(token);
             }
-
-            var passwordValid = await _userManager.CheckPasswordAsync(user, loginRequest.Password);
-
-            if (!passwordValid)
+            catch (Exception ex)
             {
-                throw new UnauthorizedAccessException("Email ou senha inválidos");
+                return Result<AuthResponseDTO>.FailureResult(ex.Message);
             }
-
-            return GenerateJwtToken(user);
         }
 
-        public async Task<AuthResponseDTO> RegisterAsync(RegisterRequestDTO registerRequest)
+        public async Task<Result<AuthResponseDTO>> RegisterAsync(RegisterRequestDTO registerRequest)
         {
-            var existingUser = await _userManager.FindByEmailAsync(registerRequest.Email);
-
-            if (existingUser != null)
+            try
             {
-                throw new InvalidOperationException("Email já está em uso");
+                var existingUser = await _userManager.FindByEmailAsync(registerRequest.Email);
+
+                if (existingUser != null)
+                {
+                    return Result<AuthResponseDTO>.FailureResult("Email já está em uso");
+                }
+
+                var user = new IdentityUser
+                {
+                    UserName = registerRequest.Email,
+                    Email = registerRequest.Email
+                };
+
+                var result = await _userManager.CreateAsync(user, registerRequest.Password);
+
+                if (!result.Succeeded)
+                {
+                    var errors = result.Errors.Select(e => e.Description).ToList();
+                    return Result<AuthResponseDTO>.FailureResult(errors);
+                }
+
+                var token = GenerateJwtToken(user);
+                return Result<AuthResponseDTO>.SuccessResult(token);
             }
-
-            var user = new IdentityUser
+            catch (Exception ex)
             {
-                UserName = registerRequest.Email,
-                Email = registerRequest.Email
-            };
-
-            var result = await _userManager.CreateAsync(user, registerRequest.Password);
-
-            if (!result.Succeeded)
-            {
-                var errors = string.Join(", ", result.Errors.Select(e => e.Description));
-                throw new InvalidOperationException($"Erro ao criar usuário: {errors}");
+                return Result<AuthResponseDTO>.FailureResult(ex.Message);
             }
-
-            return GenerateJwtToken(user);
         }
 
         private AuthResponseDTO GenerateJwtToken(IdentityUser user)

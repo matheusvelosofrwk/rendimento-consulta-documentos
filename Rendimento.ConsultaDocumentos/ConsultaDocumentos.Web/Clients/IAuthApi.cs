@@ -6,9 +6,9 @@ namespace ConsultaDocumentos.Web.Clients
     public interface IAuthApi
     {
         [Post("/auth/login")]
-        Task<AuthResponseViewModel> LoginAsync([Body] LoginViewModel model);
+        Task<Result<AuthResponseViewModel>> LoginAsync([Body] LoginViewModel model);
 
         [Post("/auth/register")]
-        Task<AuthResponseViewModel> RegisterAsync([Body] RegisterViewModel model);
+        Task<Result<AuthResponseViewModel>> RegisterAsync([Body] RegisterViewModel model);
     }
 }

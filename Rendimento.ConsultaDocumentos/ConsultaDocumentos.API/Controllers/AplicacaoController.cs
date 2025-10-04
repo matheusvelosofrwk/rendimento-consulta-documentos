@@ -18,64 +18,37 @@ namespace ConsultaDocumentos.API.Controllers
         [HttpGet]
         public virtual async Task<IActionResult> GetAll()
         {
-            try
-            {
-                var result = await _service.GetAllAsync();
-
-                return Ok(result);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
+            var result = await _service.GetAllAsync();
+            return Ok(result);
         }
 
         [HttpGet("{id}")]
         public virtual async Task<IActionResult> GetById([FromRoute] Guid id, CancellationToken ct = default)
         {
-            try
-            {
-                var result = await _service.GetByIdAsync(id);
-
-                return Ok(result);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
+            var result = await _service.GetByIdAsync(id);
+            return Ok(result);
         }
 
         [HttpPost]
         public virtual async Task<IActionResult> Create([FromBody] AplicacaoDTO dto, CancellationToken ct = default)
         {
-            await _service.AddAsync(dto);
-
-            return Created();
+            var result = await _service.AddAsync(dto);
+            return Ok(result);
         }
 
         [HttpPut("{id}")]
         public virtual async Task<IActionResult> Update([FromRoute] Guid id, [FromBody] AplicacaoDTO dto, CancellationToken ct = default)
         {
             dto.Id = id;
-
-            await _service.UpdateAsync(dto);
-
-            return Ok();
+            var result = await _service.UpdateAsync(dto);
+            return Ok(result);
         }
 
         [HttpDelete("{id}")]
         public virtual async Task<IActionResult> Delete([FromRoute] Guid id, CancellationToken ct = default)
         {
-            try
-            {
-                await _service.DeleteAsync(id);
-
-                return Ok();
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
+            var result = await _service.DeleteAsync(id);
+            return Ok(result);
         }
     }
 }

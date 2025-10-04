@@ -1,4 +1,5 @@
 ﻿using ConsultaDocumentos.Application.DTOs;
+using ConsultaDocumentos.Application.Results;
 using ConsultaDocumentos.Domain.Base;
 
 namespace ConsultaDocumentos.Application.Interfaces
@@ -7,15 +8,15 @@ namespace ConsultaDocumentos.Application.Interfaces
         where TDTO : BaseDTO
         where TEntity : BaseEntity
     {
-        Task AddAsync(TDTO dto);
+        Task<Result<TDTO>> AddAsync(TDTO dto);
 
-        Task DeleteAsync(Guid id);
+        Task<Result<bool>> DeleteAsync(Guid id);
 
-        Task<IList<TDTO>> GetAllAsync();
+        Task<Result<IList<TDTO>>> GetAllAsync();
 
-        Task<TDTO?> GetByIdAsync(Guid id);
+        Task<Result<TDTO>> GetByIdAsync(Guid id);
 
-        Task UpdateAsync(TDTO dto);
+        Task<Result<TDTO>> UpdateAsync(TDTO dto);
 
     }
 }

@@ -1,11 +1,12 @@
 ﻿using AutoMapper;
 using ConsultaDocumentos.Application.DTOs;
 using ConsultaDocumentos.Application.Interfaces;
+using ConsultaDocumentos.Application.Results;
 using ConsultaDocumentos.Domain.Base;
 
 namespace ConsultaDocumentos.Application.Services
 {
-    public class BaseService<TDTO, TEntity> : IBaseService<TDTO, TEntity> 
+    public class BaseService<TDTO, TEntity> : IBaseService<TDTO, TEntity>
         where TDTO : BaseDTO
         where TEntity : BaseEntity
     {
@@ -18,39 +19,84 @@ namespace ConsultaDocumentos.Application.Services
             _mapper = mapper;
         }
 
-        public Task AddAsync(TDTO dto)
+        public async Task<Result<TDTO>> AddAsync(TDTO dto)
         {
-            var entity = _mapper.Map<TEntity>(dto);
+            try
+            {
+                var entity = _mapper.Map<TEntity>(dto);
+                await _repository.AddAsync(entity);
 
-            return _repository.AddAsync(entity);
+                var result = _mapper.Map<TDTO>(entity);
+                return Result<TDTO>.SuccessResult(result);
+            }
+            catch (Exception ex)
+            {
+                return Result<TDTO>.FailureResult(ex.Message);
+            }
         }
 
-        public Task DeleteAsync(Guid id)
+        public async Task<Result<bool>> DeleteAsync(Guid id)
         {
-            return _repository.DeleteAsync(id);
+            try
+            {
+                await _repository.DeleteAsync(id);
+                return Result<bool>.SuccessResult(true);
+            }
+            catch (Exception ex)
+            {
+                return Result<bool>.FailureResult(ex.Message);
+            }
         }
 
-        public async Task<IList<TDTO>> GetAllAsync()
+        public async Task<Result<IList<TDTO>>> GetAllAsync()
         {
-            var entities = await _repository.GetAllAsync();
-            var maps = _mapper.Map<IList<TDTO>>(entities);
+            try
+            {
+                var entities = await _repository.GetAllAsync();
+                var maps = _mapper.Map<IList<TDTO>>(entities);
 
-            return maps;
+                return Result<IList<TDTO>>.SuccessResult(maps);
+            }
+            catch (Exception ex)
+            {
+                return Result<IList<TDTO>>.FailureResult(ex.Message);
+            }
         }
 
-        public async Task<TDTO?> GetByIdAsync(Guid id)
+        public async Task<Result<TDTO>> GetByIdAsync(Guid id)
         {
-            var entity = await _repository.GetByIdAsync(id);
-            var mapping = _mapper.Map<TDTO>(entity);
+            try
+            {
+                var entity = await _repository.GetByIdAsync(id);
 
-            return mapping;
+                if (entity == null)
+                {
+                    return Result<TDTO>.FailureResult("Registro não encontrado");
+                }
+
+                var mapping = _mapper.Map<TDTO>(entity);
+                return Result<TDTO>.SuccessResult(mapping);
+            }
+            catch (Exception ex)
+            {
+                return Result<TDTO>.FailureResult(ex.Message);
+            }
         }
 
-        public Task UpdateAsync(TDTO dto)
+        public async Task<Result<TDTO>> UpdateAsync(TDTO dto)
         {
-            var entity = _mapper.Map<TEntity>(dto);
+            try
+            {
+                var entity = _mapper.Map<TEntity>(dto);
+                await _repository.UpdateAsync(entity);
 
-            return _repository.UpdateAsync(entity);
+                var result = _mapper.Map<TDTO>(entity);
+                return Result<TDTO>.SuccessResult(result);
+            }
+            catch (Exception ex)
+            {
+                return Result<TDTO>.FailureResult(ex.Message);
+            }
         }
     }
 }
