@@ -1,0 +1,59 @@
+@model ConsultaDocumentos.Web.Models.UserViewModel
+
+@{
+    ViewData["Title"] = "Editar Usuário";
+}
+
+<h1>Editar Usuário</h1>
+
+<hr />
+<div class="row">
+    <div class="col-md-6">
+        <form asp-action="Edit">
+            @Html.HiddenFor(m => m.Id)
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+            <div class="form-group mb-3">
+                <label asp-for="Email" class="control-label"></label>
+                <input asp-for="Email" class="form-control" type="email" />
+                <span asp-validation-for="Email" class="text-danger"></span>
+            </div>
+
+            <div class="form-check mb-3">
+                <input asp-for="EmailConfirmed" class="form-check-input" />
+                <label asp-for="EmailConfirmed" class="form-check-label"></label>
+            </div>
+
+            <hr />
+            <h5>Alterar Senha (Opcional)</h5>
+            <p class="text-muted small">Deixe em branco para manter a senha atual</p>
+
+            <div class="form-group mb-3">
+                <label asp-for="Password" class="control-label">Nova Senha</label>
+                <input asp-for="Password" class="form-control" />
+                <span asp-validation-for="Password" class="text-danger"></span>
+            </div>
+
+            <div class="form-group mb-3">
+                <label asp-for="ConfirmPassword" class="control-label">Confirmar Nova Senha</label>
+                <input asp-for="ConfirmPassword" class="form-control" />
+                <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
+            </div>
+
+            <hr />
+
+            <div class="form-group">
+                <button type="submit" class="btn btn-primary">
+                    <i class="bi bi-save"></i> Salvar
+                </button>
+                <a asp-action="Index" class="btn btn-secondary">
+                    <i class="bi bi-arrow-left"></i> Cancelar
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

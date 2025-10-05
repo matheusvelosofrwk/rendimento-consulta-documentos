@@ -66,6 +66,17 @@
                                 <li><a class="dropdown-item" asp-controller="LogErro" asp-action="Index">Log de Erro</a></li>
                             </ul>
                         </li>
+
+                        <!-- Dropdown: Administração -->
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle text-dark" href="#" id="adminDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                Administração
+                            </a>
+                            <ul class="dropdown-menu" aria-labelledby="adminDropdown">
+                                <li><a class="dropdown-item" asp-controller="User" asp-action="Index">Usuários</a></li>
+                                <li><a class="dropdown-item" asp-controller="Role" asp-action="Index">Perfis (Roles)</a></li>
+                            </ul>
+                        </li>
                     </ul>
                     <ul class="navbar-nav">
                         @if (User.Identity?.IsAuthenticated == true)

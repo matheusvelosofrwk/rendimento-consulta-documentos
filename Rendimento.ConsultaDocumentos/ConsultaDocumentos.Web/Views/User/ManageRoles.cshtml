@@ -1,0 +1,55 @@
+@model ConsultaDocumentos.Web.Models.UserRoleViewModel
+
+@{
+    ViewData["Title"] = "Gerenciar Perfis";
+}
+
+<h1>Gerenciar Perfis do Usuário</h1>
+<h4>Usuário: <strong>@Model.UserEmail</strong></h4>
+
+<hr />
+<div class="row">
+    <div class="col-md-6">
+        <form asp-action="ManageRoles">
+            @Html.HiddenFor(m => m.UserId)
+            @Html.HiddenFor(m => m.UserEmail)
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+            @if (Model.Roles != null && Model.Roles.Any())
+            {
+                <div class="mb-3">
+                    <p class="text-muted">Selecione os perfis que deseja atribuir ao usuário:</p>
+                    @for (int i = 0; i < Model.Roles.Count; i++)
+                    {
+                        <div class="form-check mb-2">
+                            @Html.HiddenFor(m => m.Roles[i].RoleName)
+                            <input asp-for="Roles[i].IsSelected" class="form-check-input" />
+                            <label asp-for="Roles[i].IsSelected" class="form-check-label">
+                                @Model.Roles[i].RoleName
+                            </label>
+                        </div>
+                    }
+                </div>
+            }
+            else
+            {
+                <div class="alert alert-warning">
+                    Nenhum perfil encontrado. Por favor, crie perfis primeiro em <a asp-controller="Role" asp-action="Index">Gerenciar Perfis</a>.
+                </div>
+            }
+
+            <div class="form-group">
+                <button type="submit" class="btn btn-primary" @(Model.Roles == null || !Model.Roles.Any() ? "disabled" : "")>
+                    <i class="bi bi-save"></i> Salvar
+                </button>
+                <a asp-action="Index" class="btn btn-secondary">
+                    <i class="bi bi-arrow-left"></i> Voltar
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}
