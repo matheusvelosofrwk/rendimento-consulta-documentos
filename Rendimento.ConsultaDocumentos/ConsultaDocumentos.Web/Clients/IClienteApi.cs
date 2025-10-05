@@ -5,19 +5,19 @@ namespace ConsultaDocumentos.Web.Clients
 {
     public interface IClienteApi
     {
-        [Get("/cliente")]
+        [Get("/Cliente")]
         Task<Result<IList<ClienteViewModel>>> GetAllAsync();
 
-        [Get("/cliente/{id}")]
+        [Get("/Cliente/{id}")]
         Task<Result<ClienteViewModel>> GetByIdAsync(Guid id);
 
-        [Post("/cliente")]
+        [Post("/Cliente")]
         Task<Result<ClienteViewModel>> CreateAsync([Body] ClienteViewModel model);
 
-        [Put("/cliente/{id}")]
+        [Put("/Cliente/{id}")]
         Task<Result<ClienteViewModel>> UpdateAsync(Guid id, [Body] ClienteViewModel model);
 
-        [Delete("/cliente/{id}")]
+        [Delete("/Cliente/{id}")]
         Task<Result<bool>> DeleteAsync(Guid id);
     }
 }

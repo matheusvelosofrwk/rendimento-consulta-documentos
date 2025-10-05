@@ -1,0 +1,55 @@
+@model IEnumerable<ConsultaDocumentos.Web.Models.SituacaoCadastralViewModel>
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h1>Index</h1>
+
+<p>
+    <a asp-action="Create">Create New</a>
+</p>
+
+@Html.AntiForgeryToken()
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Descricao)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Ativo)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.DataCriacao)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.Descricao)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Ativo)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.DataCriacao)
+            </td>
+            <td>
+                @Html.ActionLink("Edit", "Edit", new { id=item.Id  }) |
+                <a href="javascript:void(0);" onclick="openDeleteConfirmation('@item.Id', 'SituacaoCadastral', '@item.Descricao')" class="text-danger">Delete</a>
+            </td>
+        </tr>
+}
+    </tbody>
+</table>
+
+@* Modal de confirmação de exclusão *@
+@await Html.PartialAsync("_DeleteConfirmationModal")
+
+@section Scripts {
+    <script src="~/js/delete-helper.js"></script>
+}

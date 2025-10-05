@@ -65,11 +65,29 @@ namespace ConsultaDocumentos.Infra.Ioc
             services.AddScoped<IClienteRepository, ClienteRepository>();
             services.AddScoped<IAplicacaoRepository, AplicacaoRepository>();
             services.AddScoped<IProvedorRepository, ProvedorRepository>();
+            services.AddScoped<INacionalidadeRepository, NacionalidadeRepository>();
+            services.AddScoped<ISituacaoCadastralRepository, SituacaoCadastralRepository>();
+            services.AddScoped<IDocumentoRepository, DocumentoRepository>();
+            services.AddScoped<IEnderecoRepository, EnderecoRepository>();
+            services.AddScoped<ITelefoneRepository, TelefoneRepository>();
+            services.AddScoped<IEmailRepository, EmailRepository>();
+            services.AddScoped<IQuadroSocietarioRepository, QuadroSocietarioRepository>();
+            services.AddScoped<IAplicacaoProvedorRepository, AplicacaoProvedorRepository>();
+            services.AddScoped<ILogAuditoriaRepository, LogAuditoriaRepository>();
+            services.AddScoped<ILogErroRepository, LogErroRepository>();
 
             services.AddScoped<IClienteService, ClienteService>();
             services.AddScoped<IAplicacaoService, AplicacaoService>();
             services.AddScoped<IProvedorService, ProvedorService>();
             services.AddScoped<IAuthService, AuthService>();
+            services.AddScoped<INacionalidadeService, NacionalidadeService>();
+            services.AddScoped<ISituacaoCadastralService, SituacaoCadastralService>();
+            services.AddScoped<IDocumentoService, DocumentoService>();
+            services.AddScoped<IEnderecoService, EnderecoService>();
+            services.AddScoped<ITelefoneService, TelefoneService>();
+            services.AddScoped<IEmailService, EmailService>();
+            services.AddScoped<IQuadroSocietarioService, QuadroSocietarioService>();
+            services.AddScoped<IAplicacaoProvedorService, AplicacaoProvedorService>();
 
             return services;
         }

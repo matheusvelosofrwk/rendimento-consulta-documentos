@@ -1,0 +1,66 @@
+@model ConsultaDocumentos.Web.Models.AplicacaoProvedorViewModel
+
+@{
+    ViewData["Title"] = "Criar Aplicação-Provedor";
+}
+
+<h1>Criar Aplicação-Provedor</h1>
+
+<h4>Associar Provedor a uma Aplicação</h4>
+<hr />
+<div class="row">
+    <div class="col-md-6">
+        <form asp-action="Create">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+            <div class="form-group">
+                <label asp-for="AplicacaoId" class="control-label">Aplicação</label>
+                <select asp-for="AplicacaoId" class="form-control">
+                    <option value="">Selecione uma aplicação</option>
+                    @foreach (var app in ViewBag.Aplicacoes)
+                    {
+                        <option value="@app.Id">@app.Nome</option>
+                    }
+                </select>
+                <span asp-validation-for="AplicacaoId" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="ProvedorId" class="control-label">Provedor</label>
+                <select asp-for="ProvedorId" class="form-control">
+                    <option value="">Selecione um provedor</option>
+                    @foreach (var prov in ViewBag.Provedores)
+                    {
+                        <option value="@prov.Id">@prov.Nome</option>
+                    }
+                </select>
+                <span asp-validation-for="ProvedorId" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="Ordem" class="control-label">Ordem (Prioridade)</label>
+                <input asp-for="Ordem" class="form-control" type="number" min="1" />
+                <span asp-validation-for="Ordem" class="text-danger"></span>
+                <small class="form-text text-muted">1 = Mais prioritário</small>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="Status" class="control-label">Status</label>
+                <select asp-for="Status" class="form-control">
+                    <option value="@((int)ConsultaDocumentos.Web.Enums.StatusEnum.Ativo)">Ativo</option>
+                    <option value="@((int)ConsultaDocumentos.Web.Enums.StatusEnum.Inativo)">Inativo</option>
+                </select>
+                <span asp-validation-for="Status" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <input type="submit" value="Criar" class="btn btn-primary" />
+                <a asp-action="Index" class="btn btn-secondary">Cancelar</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

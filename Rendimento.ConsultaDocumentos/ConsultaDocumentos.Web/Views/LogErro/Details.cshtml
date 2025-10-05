@@ -1,0 +1,73 @@
+@model ConsultaDocumentos.Web.Models.LogErroViewModel
+
+@{
+    ViewData["Title"] = "Detalhes do Log de Erro";
+}
+
+<h1>Detalhes do Log de Erro</h1>
+
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        @TempData["Error"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
+<div class="card">
+    <div class="card-header bg-danger text-white">
+        <h5>Informações do Erro</h5>
+    </div>
+    <div class="card-body">
+        <dl class="row">
+            <dt class="col-sm-3">ID</dt>
+            <dd class="col-sm-9">@Model.Id</dd>
+
+            <dt class="col-sm-3">Data/Hora</dt>
+            <dd class="col-sm-9">@Model.DataHora.ToString("dd/MM/yyyy HH:mm:ss")</dd>
+
+            <dt class="col-sm-3">Aplicação</dt>
+            <dd class="col-sm-9">@(Model.Aplicacao ?? "-")</dd>
+
+            <dt class="col-sm-3">Método</dt>
+            <dd class="col-sm-9">@(Model.Metodo ?? "-")</dd>
+
+            <dt class="col-sm-3">Usuário</dt>
+            <dd class="col-sm-9">@(Model.Usuario ?? "-")</dd>
+
+            @if (Model.IdSistema.HasValue)
+            {
+                <dt class="col-sm-3">ID Sistema</dt>
+                <dd class="col-sm-9">@Model.IdSistema</dd>
+            }
+        </dl>
+    </div>
+</div>
+
+@if (!string.IsNullOrWhiteSpace(Model.Erro))
+{
+    <div class="card mt-3">
+        <div class="card-header">
+            <h5>Mensagem de Erro</h5>
+        </div>
+        <div class="card-body">
+            <pre class="bg-light p-3 text-danger">@Model.Erro</pre>
+        </div>
+    </div>
+}
+
+@if (!string.IsNullOrWhiteSpace(Model.StackTrace))
+{
+    <div class="card mt-3">
+        <div class="card-header">
+            <h5>Stack Trace</h5>
+        </div>
+        <div class="card-body">
+            <pre class="bg-light p-3" style="max-height: 500px; overflow-y: auto; font-size: 0.85rem;">@Model.StackTrace</pre>
+        </div>
+    </div>
+}
+
+<div class="mt-3">
+    <a asp-action="Index" class="btn btn-secondary">Voltar para Lista</a>
+</div>

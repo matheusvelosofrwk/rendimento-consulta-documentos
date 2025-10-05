@@ -79,6 +79,101 @@ namespace ConsultaDocumentos.Web
                     // Circuit breaker e rate limiter já vêm com defaults sólidos
                 });
 
+            services
+                .AddRefitClient<INacionalidadeApi>(new RefitSettings
+                {
+                    // Refit já usa System.Text.Json por padrão; customize aqui se quiser
+                    // ContentSerializer = new SystemTextJsonContentSerializer(customOptions)
+                })
+                .ConfigureHttpClient(c => c.BaseAddress = new Uri(baseUrl))
+                .AddHttpMessageHandler<AuthDelegatingHandler>()
+                // (opcional) resiliência nativa do .NET 8
+                .AddStandardResilienceHandler(o =>
+                {
+                    o.Retry.MaxRetryAttempts = 3;
+                    o.AttemptTimeout.Timeout = TimeSpan.FromSeconds(10);
+                    // Circuit breaker e rate limiter já vêm com defaults sólidos
+                });
+
+            services
+                .AddRefitClient<ISituacaoCadastralApi>(new RefitSettings
+                {
+                    // Refit já usa System.Text.Json por padrão; customize aqui se quiser
+                    // ContentSerializer = new SystemTextJsonContentSerializer(customOptions)
+                })
+                .ConfigureHttpClient(c => c.BaseAddress = new Uri(baseUrl))
+                .AddHttpMessageHandler<AuthDelegatingHandler>()
+                // (opcional) resiliência nativa do .NET 8
+                .AddStandardResilienceHandler(o =>
+                {
+                    o.Retry.MaxRetryAttempts = 3;
+                    o.AttemptTimeout.Timeout = TimeSpan.FromSeconds(10);
+                    // Circuit breaker e rate limiter já vêm com defaults sólidos
+                });
+
+            services
+                .AddRefitClient<IDocumentoApi>(new RefitSettings
+                {
+                    // Refit já usa System.Text.Json por padrão; customize aqui se quiser
+                    // ContentSerializer = new SystemTextJsonContentSerializer(customOptions)
+                })
+                .ConfigureHttpClient(c => c.BaseAddress = new Uri(baseUrl))
+                .AddHttpMessageHandler<AuthDelegatingHandler>()
+                // (opcional) resiliência nativa do .NET 8
+                .AddStandardResilienceHandler(o =>
+                {
+                    o.Retry.MaxRetryAttempts = 3;
+                    o.AttemptTimeout.Timeout = TimeSpan.FromSeconds(10);
+                    // Circuit breaker e rate limiter já vêm com defaults sólidos
+                });
+
+            services
+                .AddRefitClient<IAplicacaoProvedorApi>(new RefitSettings
+                {
+                    // Refit já usa System.Text.Json por padrão; customize aqui se quiser
+                    // ContentSerializer = new SystemTextJsonContentSerializer(customOptions)
+                })
+                .ConfigureHttpClient(c => c.BaseAddress = new Uri(baseUrl))
+                .AddHttpMessageHandler<AuthDelegatingHandler>()
+                // (opcional) resiliência nativa do .NET 8
+                .AddStandardResilienceHandler(o =>
+                {
+                    o.Retry.MaxRetryAttempts = 3;
+                    o.AttemptTimeout.Timeout = TimeSpan.FromSeconds(10);
+                    // Circuit breaker e rate limiter já vêm com defaults sólidos
+                });
+
+            services
+                .AddRefitClient<ILogAuditoriaApi>(new RefitSettings
+                {
+                    // Refit já usa System.Text.Json por padrão; customize aqui se quiser
+                    // ContentSerializer = new SystemTextJsonContentSerializer(customOptions)
+                })
+                .ConfigureHttpClient(c => c.BaseAddress = new Uri(baseUrl))
+                .AddHttpMessageHandler<AuthDelegatingHandler>()
+                // (opcional) resiliência nativa do .NET 8
+                .AddStandardResilienceHandler(o =>
+                {
+                    o.Retry.MaxRetryAttempts = 3;
+                    o.AttemptTimeout.Timeout = TimeSpan.FromSeconds(10);
+                    // Circuit breaker e rate limiter já vêm com defaults sólidos
+                });
+
+            services
+                .AddRefitClient<ILogErroApi>(new RefitSettings
+                {
+                    // Refit já usa System.Text.Json por padrão; customize aqui se quiser
+                    // ContentSerializer = new SystemTextJsonContentSerializer(customOptions)
+                })
+                .ConfigureHttpClient(c => c.BaseAddress = new Uri(baseUrl))
+                .AddHttpMessageHandler<AuthDelegatingHandler>()
+                // (opcional) resiliência nativa do .NET 8
+                .AddStandardResilienceHandler(o =>
+                {
+                    o.Retry.MaxRetryAttempts = 3;
+                    o.AttemptTimeout.Timeout = TimeSpan.FromSeconds(10);
+                    // Circuit breaker e rate limiter já vêm com defaults sólidos
+                });
 
             return services;
         }

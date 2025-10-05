@@ -22,8 +22,49 @@
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
                         </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+
+                        <!-- Dropdown: Cadastros -->
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle text-dark" href="#" id="cadastrosDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                Cadastros
+                            </a>
+                            <ul class="dropdown-menu" aria-labelledby="cadastrosDropdown">
+                                <li><a class="dropdown-item" asp-controller="Cliente" asp-action="Index">Clientes</a></li>
+                                <li><a class="dropdown-item" asp-controller="Provedor" asp-action="Index">Provedores</a></li>
+                                <li><a class="dropdown-item" asp-controller="Aplicacao" asp-action="Index">Aplicações</a></li>
+                            </ul>
+                        </li>
+
+                        <!-- Dropdown: Tabelas de Referência -->
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle text-dark" href="#" id="referenciasDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                Referências
+                            </a>
+                            <ul class="dropdown-menu" aria-labelledby="referenciasDropdown">
+                                <li><a class="dropdown-item" asp-controller="Nacionalidade" asp-action="Index">Nacionalidades</a></li>
+                                <li><a class="dropdown-item" asp-controller="SituacaoCadastral" asp-action="Index">Situações Cadastrais</a></li>
+                            </ul>
+                        </li>
+
+                        <!-- Dropdown: Configurações -->
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle text-dark" href="#" id="configuracoesDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                Configurações
+                            </a>
+                            <ul class="dropdown-menu" aria-labelledby="configuracoesDropdown">
+                                <li><a class="dropdown-item" asp-controller="AplicacaoProvedor" asp-action="Index">Aplicação-Provedor</a></li>
+                            </ul>
+                        </li>
+
+                        <!-- Dropdown: Logs e Auditoria -->
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle text-dark" href="#" id="logsDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                Logs & Auditoria
+                            </a>
+                            <ul class="dropdown-menu" aria-labelledby="logsDropdown">
+                                <li><a class="dropdown-item" asp-controller="LogAuditoria" asp-action="Index">Log de Auditoria</a></li>
+                                <li><a class="dropdown-item" asp-controller="LogErro" asp-action="Index">Log de Erro</a></li>
+                            </ul>
                         </li>
                     </ul>
                     <ul class="navbar-nav">

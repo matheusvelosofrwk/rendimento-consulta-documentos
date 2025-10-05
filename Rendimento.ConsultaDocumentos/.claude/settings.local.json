@@ -8,7 +8,12 @@
       "Bash(findstr:*)",
       "Bash(dotnet build)",
       "Bash(dotnet add package:*)",
-      "Bash(dotnet remove package:*)"
+      "Bash(dotnet remove package:*)",
+      "Bash(dotnet ef migrations list:*)",
+      "Bash(dotnet build:*)",
+      "Bash(while read file)",
+      "Bash(do echo \"=== $file ===\")",
+      "Bash(done)"
     ],
     "deny": [],
     "ask": []

@@ -1,0 +1,67 @@
+@model IEnumerable<ConsultaDocumentos.Web.Models.AplicacaoProvedorViewModel>
+
+@{
+    ViewData["Title"] = "Aplicações e Provedores";
+}
+
+<h1>Aplicações e Provedores</h1>
+
+<p>
+    <a asp-action="Create" class="btn btn-primary">Criar Novo</a>
+</p>
+
+@Html.AntiForgeryToken()
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>
+                Aplicação
+            </th>
+            <th>
+                Provedor
+            </th>
+            <th>
+                Ordem
+            </th>
+            <th>
+                Status
+            </th>
+            <th>
+                Data Criação
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.NomeAplicacao)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.NomeProvedor)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Ordem)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Status)
+            </td>
+            <td>
+                @item.DataCriacao.ToString("dd/MM/yyyy HH:mm")
+            </td>
+            <td>
+                @Html.ActionLink("Editar", "Edit", new { id=item.Id  }, new { @class = "btn btn-sm btn-warning" })
+                <a href="javascript:void(0);" onclick="openDeleteConfirmation('@item.Id', 'AplicacaoProvedor', '@item.NomeAplicacao - @item.NomeProvedor')" class="btn btn-sm btn-danger">Excluir</a>
+            </td>
+        </tr>
+}
+    </tbody>
+</table>
+
+@* Modal de confirmação de exclusão *@
+@await Html.PartialAsync("_DeleteConfirmationModal")
+
+@section Scripts {
+    <script src="~/js/delete-helper.js"></script>
+}
