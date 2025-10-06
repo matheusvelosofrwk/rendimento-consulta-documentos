@@ -1,55 +1,146 @@
 @model IEnumerable<ConsultaDocumentos.Web.Models.NacionalidadeViewModel>
 
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Nacionalidades";
 }
 
-<h1>Index</h1>
+<!-- Page Header -->
+<div class="page-header fade-in">
+    <div class="d-flex justify-content-between align-items-center">
+        <div>
+            <h1><i class="fas fa-flag"></i> Nacionalidades</h1>
+            <p>Gerencie as nacionalidades do sistema</p>
+        </div>
+        <div>
+            <a asp-action="Create" class="btn btn-primary-modern btn-modern btn-icon">
+                <i class="fas fa-plus"></i>
+                <span>Nova Nacionalidade</span>
+            </a>
+        </div>
+    </div>
+</div>
 
-<p>
-    <a asp-action="Create">Create New</a>
-</p>
-
-@Html.AntiForgeryToken()
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.Descricao)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Codigo)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Ativo)
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.Descricao)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Codigo)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Ativo)
-            </td>
-            <td>
-                @Html.ActionLink("Edit", "Edit", new { id=item.Id  }) |
-                <a href="javascript:void(0);" onclick="openDeleteConfirmation('@item.Id', 'Nacionalidade', '@item.Descricao')" class="text-danger">Delete</a>
-            </td>
-        </tr>
-}
-    </tbody>
-</table>
-
-@* Modal de confirmação de exclusão *@
-@await Html.PartialAsync("_DeleteConfirmationModal")
+<!-- Card com Tabela -->
+<div class="card-modern fade-in">
+    <div class="card-header">
+        <h5 class="mb-0">
+            <i class="fas fa-list"></i> Lista de Nacionalidades
+        </h5>
+    </div>
+    <div class="card-body">
+        @if (Model != null && Model.Any())
+        {
+            @Html.AntiForgeryToken()
+            <div class="table-responsive">
+                <table id="nacionalidadesTable" class="table table-hover table-modern">
+                    <thead>
+                        <tr>
+                            <th>
+                                <i class="fas fa-info-circle me-1"></i>
+                                @Html.DisplayNameFor(model => model.Descricao)
+                            </th>
+                            <th>
+                                <i class="fas fa-hashtag me-1"></i>
+                                @Html.DisplayNameFor(model => model.Codigo)
+                            </th>
+                            <th>
+                                <i class="fas fa-check-circle me-1"></i>
+                                @Html.DisplayNameFor(model => model.Ativo)
+                            </th>
+                            <th class="text-center" style="width: 120px;">
+                                <i class="fas fa-cog me-1"></i>Ações
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model)
+                        {
+                            <tr>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <div class="user-avatar me-2" style="width: 32px; height: 32px; font-size: 0.875rem;">
+                                            @(item.Descricao?.Substring(0, 1).ToUpper() ?? "N")
+                                        </div>
+                                        <strong>@Html.DisplayFor(modelItem => item.Descricao)</strong>
+                                    </div>
+                                </td>
+                                <td>
+                                    <span class="badge badge-modern bg-primary">
+                                        @Html.DisplayFor(modelItem => item.Codigo)
+                                    </span>
+                                </td>
+                                <td>
+                                    @if (item.Ativo)
+                                    {
+                                        <span class="badge badge-modern bg-success">
+                                            <i class="fas fa-check-circle me-1"></i>Ativo
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge badge-modern bg-secondary">
+                                            <i class="fas fa-times-circle me-1"></i>Inativo
+                                        </span>
+                                    }
+                                </td>
+                                <td>
+                                    <div class="action-buttons justify-content-center">
+                                        <a asp-action="Edit" asp-route-id="@item.Id"
+                                           class="btn-action edit"
+                                           data-bs-toggle="tooltip"
+                                           title="Editar">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+                                        <button onclick="confirmDelete('@item.Id', 'Nacionalidade', '@item.Descricao')"
+                                                class="btn-action delete"
+                                                data-bs-toggle="tooltip"
+                                                title="Excluir">
+                                            <i class="fas fa-trash-alt"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+        else
+        {
+            <!-- Empty State -->
+            <div class="empty-state">
+                <div class="empty-state-icon">
+                    <i class="fas fa-flag"></i>
+                </div>
+                <h3>Nenhuma nacionalidade cadastrada</h3>
+                <p>Comece adicionando a primeira nacionalidade ao sistema</p>
+                <a asp-action="Create" class="btn btn-primary-modern btn-modern btn-icon mt-3">
+                    <i class="fas fa-plus"></i>
+                    <span>Cadastrar Primeira Nacionalidade</span>
+                </a>
+            </div>
+        }
+    </div>
+</div>
 
 @section Scripts {
-    <script src="~/js/delete-helper.js"></script>
+    <script>
+        $(document).ready(function() {
+            // Inicializar DataTables
+            if ($('#nacionalidadesTable').length) {
+                initDataTable('#nacionalidadesTable', {
+                    order: [[0, 'asc']],
+                    columnDefs: [
+                        { orderable: false, targets: -1 } // Desabilitar ordenação na coluna de ações
+                    ]
+                });
+            }
+
+            // Inicializar tooltips
+            var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+            tooltipTriggerList.map(function (tooltipTriggerEl) {
+                return new bootstrap.Tooltip(tooltipTriggerEl);
+            });
+        });
+    </script>
 }

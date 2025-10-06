@@ -4,50 +4,134 @@
     ViewData["Title"] = "Editar Usuário";
 }
 
-<h1>Editar Usuário</h1>
+<!-- Page Header -->
+<div class="page-header fade-in">
+    <div class="d-flex justify-content-between align-items-center">
+        <div>
+            <h1><i class="fas fa-user-edit"></i> Editar Usuário</h1>
+            <p>Atualize as informações do usuário</p>
+        </div>
+        <div>
+            <a asp-action="Index" class="btn btn-secondary btn-icon">
+                <i class="fas fa-arrow-left"></i>
+                <span>Voltar</span>
+            </a>
+        </div>
+    </div>
+</div>
 
-<hr />
-<div class="row">
-    <div class="col-md-6">
-        <form asp-action="Edit">
-            @Html.HiddenFor(m => m.Id)
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-
-            <div class="form-group mb-3">
-                <label asp-for="Email" class="control-label"></label>
-                <input asp-for="Email" class="form-control" type="email" />
-                <span asp-validation-for="Email" class="text-danger"></span>
+<!-- Form Card -->
+<div class="row justify-content-center fade-in">
+    <div class="col-lg-8">
+        <div class="card-modern">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-info-circle"></i> Dados do Usuário
+                </h5>
             </div>
+            <div class="card-body" style="padding: 2rem;">
+                <form asp-action="Edit" method="post" class="form-modern">
+                    @Html.HiddenFor(m => m.Id)
+                    <div asp-validation-summary="ModelOnly" class="alert alert-modern alert-danger mb-4"></div>
 
-            <div class="form-check mb-3">
-                <input asp-for="EmailConfirmed" class="form-check-input" />
-                <label asp-for="EmailConfirmed" class="form-check-label"></label>
+                    <!-- Email -->
+                    <div class="form-group mb-4">
+                        <label asp-for="Email" class="form-label">
+                            <i class="fas fa-envelope text-primary me-2"></i>Email
+                        </label>
+                        <div class="input-group input-group-modern">
+                            <span class="input-group-text">
+                                <i class="fas fa-at"></i>
+                            </span>
+                            <input asp-for="Email" class="form-control" type="email" />
+                        </div>
+                        <span asp-validation-for="Email" class="text-danger small"></span>
+                    </div>
+
+                    <!-- Email Confirmado (Switch) -->
+                    <div class="form-group mb-4">
+                        <label class="form-label d-block">
+                            <i class="fas fa-check-circle text-primary me-2"></i>Status do Email
+                        </label>
+                        <div class="form-check form-switch" style="padding-left: 2.5rem;">
+                            <input asp-for="EmailConfirmed" class="form-check-input" style="width: 3rem; height: 1.5rem; cursor: pointer;" />
+                            <label asp-for="EmailConfirmed" class="form-check-label" style="margin-left: 0.5rem; cursor: pointer;">
+                                Email Confirmado
+                            </label>
+                        </div>
+                        <small class="form-text text-muted">
+                            <i class="fas fa-info-circle"></i> Ative para confirmar que o email foi verificado
+                        </small>
+                    </div>
+
+                    <div class="divider my-4"></div>
+
+                    <!-- Seção de Alteração de Senha -->
+                    <div class="mb-4">
+                        <h6 class="text-muted mb-3">
+                            <i class="fas fa-lock me-2"></i>Alterar Senha (Opcional)
+                        </h6>
+                        <div class="alert alert-modern alert-warning mb-3">
+                            <i class="fas fa-exclamation-triangle me-2"></i>
+                            Deixe em branco para manter a senha atual
+                        </div>
+
+                        <!-- Nova Senha -->
+                        <div class="form-group mb-4">
+                            <label asp-for="Password" class="form-label">
+                                <i class="fas fa-key text-primary me-2"></i>Nova Senha
+                            </label>
+                            <div class="input-group input-group-modern">
+                                <span class="input-group-text">
+                                    <i class="fas fa-lock"></i>
+                                </span>
+                                <input asp-for="Password" class="form-control" type="password" placeholder="Digite a nova senha" />
+                            </div>
+                            <span asp-validation-for="Password" class="text-danger small"></span>
+                            <small class="form-text text-muted">
+                                <i class="fas fa-info-circle"></i> Mínimo de 6 caracteres, com letras maiúsculas, minúsculas e números
+                            </small>
+                        </div>
+                    </div>
+
+                    <div class="divider my-4"></div>
+
+                    <!-- Botões de Ação -->
+                    <div class="d-flex gap-3 justify-content-end">
+                        <a asp-action="Index" class="btn btn-secondary btn-modern btn-icon">
+                            <i class="fas fa-times"></i>
+                            <span>Cancelar</span>
+                        </a>
+                        <button type="submit" class="btn btn-primary-modern btn-modern btn-icon">
+                            <i class="fas fa-save"></i>
+                            <span>Salvar Alterações</span>
+                        </button>
+                    </div>
+                </form>
             </div>
+        </div>
 
-            <hr />
-            <h5>Alterar Senha (Opcional)</h5>
-            <p class="text-muted small">Deixe em branco para manter a senha atual</p>
-
-            <div class="form-group mb-3">
-                <label asp-for="Password" class="control-label">Nova Senha</label>
-                <input asp-for="Password" class="form-control" />
-                <span asp-validation-for="Password" class="text-danger"></span>
-            </div>
-
-            <hr />
-
-            <div class="form-group">
-                <button type="submit" class="btn btn-primary">
-                    <i class="bi bi-save"></i> Salvar
-                </button>
-                <a asp-action="Index" class="btn btn-secondary">
-                    <i class="bi bi-arrow-left"></i> Cancelar
-                </a>
-            </div>
-        </form>
+        <!-- Informações Adicionais -->
+        <div class="alert alert-modern alert-info mt-4">
+            <i class="fas fa-lightbulb me-2"></i>
+            <strong>Dica:</strong> Certifique-se de que o email está correto antes de salvar. Para alterar a senha, preencha o campo "Nova Senha".
+        </div>
     </div>
 </div>
 
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script>
+        $(document).ready(function() {
+            // Focar no primeiro campo
+            $('input[name="Email"]').focus();
+
+            // Animação ao submeter
+            $('form').on('submit', function() {
+                if ($(this).valid()) {
+                    showLoading();
+                }
+            });
+        });
+    </script>
 }

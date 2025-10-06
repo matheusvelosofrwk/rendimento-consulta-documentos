@@ -1,55 +1,109 @@
 @model IEnumerable<ConsultaDocumentos.Web.Models.RoleViewModel>
 
 @{
-    ViewData["Title"] = "Perfis";
+    ViewData["Title"] = "Perfis de Acesso";
 }
 
-<h1>Perfis de Acesso</h1>
+<!-- Page Header -->
+<div class="page-header fade-in">
+    <div class="d-flex justify-content-between align-items-center">
+        <div>
+            <h1><i class="fas fa-shield-alt"></i> Perfis de Acesso</h1>
+            <p>Gerencie os perfis de acesso do sistema</p>
+        </div>
+        <div>
+            <a asp-action="Create" class="btn btn-primary-modern btn-modern btn-icon">
+                <i class="fas fa-plus"></i>
+                <span>Novo Perfil</span>
+            </a>
+        </div>
+    </div>
+</div>
 
+<!-- Alert de Sucesso -->
 @if (TempData["SuccessMessage"] != null)
 {
-    <div class="alert alert-success alert-dismissible fade show" role="alert">
+    <div class="alert alert-modern alert-success alert-dismissible fade show fade-in" role="alert">
+        <i class="fas fa-check-circle me-2"></i>
         @TempData["SuccessMessage"]
         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
     </div>
 }
 
-<p>
-    <a asp-action="Create" class="btn btn-primary">
-        <i class="bi bi-plus-circle"></i> Novo Perfil
-    </a>
-</p>
-
-<table class="table table-striped table-hover">
-    <thead>
-        <tr>
-            <th>Nome do Perfil</th>
-            <th style="width: 200px;">Ações</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var item in Model)
+<!-- Card com Tabela -->
+<div class="card-modern fade-in">
+    <div class="card-header">
+        <h5 class="mb-0">
+            <i class="fas fa-list"></i> Lista de Perfis
+        </h5>
+    </div>
+    <div class="card-body">
+        @if (Model != null && Model.Any())
         {
-            <tr>
-                <td>@item.Name</td>
-                <td>
-                    <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-warning">
-                        <i class="bi bi-pencil"></i> Editar
-                    </a>
-                    <button type="button" class="btn btn-sm btn-danger" onclick="confirmDelete('@item.Id', '@item.Name')">
-                        <i class="bi bi-trash"></i> Excluir
-                    </button>
-                </td>
-            </tr>
+            @Html.AntiForgeryToken()
+            <div class="table-responsive">
+                <table id="rolesTable" class="table table-hover table-modern">
+                    <thead>
+                        <tr>
+                            <th>
+                                <i class="fas fa-tag me-1"></i>Nome do Perfil
+                            </th>
+                            <th class="text-center" style="width: 150px;">
+                                <i class="fas fa-cog me-1"></i>Ações
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model)
+                        {
+                            <tr>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <div class="user-avatar me-2" style="width: 32px; height: 32px; font-size: 0.875rem; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                                            <i class="fas fa-shield-alt"></i>
+                                        </div>
+                                        <strong>@item.Name</strong>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="action-buttons justify-content-center">
+                                        <a asp-action="Edit" asp-route-id="@item.Id"
+                                           class="btn-action edit"
+                                           data-bs-toggle="tooltip"
+                                           title="Editar">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+                                        <button onclick="confirmDelete('@item.Id', '@item.Name')"
+                                                class="btn-action delete"
+                                                data-bs-toggle="tooltip"
+                                                title="Excluir">
+                                            <i class="fas fa-trash-alt"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
         }
-        @if (!Model.Any())
+        else
         {
-            <tr>
-                <td colspan="2" class="text-center text-muted">Nenhum perfil encontrado.</td>
-            </tr>
+            <!-- Empty State -->
+            <div class="empty-state">
+                <div class="empty-state-icon">
+                    <i class="fas fa-shield-alt"></i>
+                </div>
+                <h3>Nenhum perfil cadastrado</h3>
+                <p>Comece adicionando seu primeiro perfil de acesso ao sistema</p>
+                <a asp-action="Create" class="btn btn-primary-modern btn-modern btn-icon mt-3">
+                    <i class="fas fa-plus"></i>
+                    <span>Cadastrar Primeiro Perfil</span>
+                </a>
+            </div>
         }
-    </tbody>
-</table>
+    </div>
+</div>
 
 <!-- Modal de Confirmação de Exclusão -->
 <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
@@ -75,6 +129,24 @@
 
 @section Scripts {
     <script>
+        $(document).ready(function() {
+            // Inicializar DataTables
+            if ($('#rolesTable').length) {
+                initDataTable('#rolesTable', {
+                    order: [[0, 'asc']],
+                    columnDefs: [
+                        { orderable: false, targets: -1 } // Desabilitar ordenação na coluna de ações
+                    ]
+                });
+            }
+
+            // Inicializar tooltips
+            var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+            tooltipTriggerList.map(function (tooltipTriggerEl) {
+                return new bootstrap.Tooltip(tooltipTriggerEl);
+            });
+        });
+
         function confirmDelete(id, name) {
             document.getElementById('roleNameToDelete').textContent = name;
             var form = document.getElementById('deleteForm');

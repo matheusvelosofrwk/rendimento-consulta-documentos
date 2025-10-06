@@ -1,88 +1,228 @@
 @model ConsultaDocumentos.Web.Models.QuadroSocietarioViewModel
 
 @{
-    ViewData["Title"] = "Cadastrar Sócio";
+    ViewData["Title"] = "Novo Sócio";
 }
 
-<h2>Cadastrar Sócio</h2>
-
-<form asp-action="Create" method="post">
-    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-
-    <div class="form-group">
-        <label asp-for="CpfCnpj"></label>
-        <input asp-for="CpfCnpj" class="form-control" />
-        <span asp-validation-for="CpfCnpj" class="text-danger"></span>
+<!-- Page Header -->
+<div class="page-header fade-in">
+    <div class="d-flex justify-content-between align-items-center">
+        <div>
+            <h1><i class="fas fa-plus-circle"></i> Novo Sócio</h1>
+            <p>Cadastre um novo sócio no quadro societário</p>
+        </div>
+        <div>
+            <a asp-action="Index" class="btn btn-secondary btn-icon">
+                <i class="fas fa-arrow-left"></i>
+                <span>Voltar</span>
+            </a>
+        </div>
     </div>
+</div>
 
-    <div class="form-group">
-        <label asp-for="Nome"></label>
-        <input asp-for="Nome" class="form-control" />
-        <span asp-validation-for="Nome" class="text-danger"></span>
+<!-- Form Card -->
+<div class="row justify-content-center fade-in">
+    <div class="col-lg-8">
+        <div class="card-modern">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-info-circle"></i> Dados do Sócio
+                </h5>
+            </div>
+            <div class="card-body" style="padding: 2rem;">
+                <form asp-action="Create" method="post" class="form-modern">
+                    <div asp-validation-summary="ModelOnly" class="alert alert-modern alert-danger mb-4"></div>
+
+                    <!-- CPF/CNPJ -->
+                    <div class="form-group mb-4">
+                        <label asp-for="CpfCnpj" class="form-label">
+                            <i class="fas fa-id-card text-primary me-2"></i>CPF/CNPJ
+                        </label>
+                        <div class="input-group input-group-modern">
+                            <span class="input-group-text">
+                                <i class="fas fa-id-card"></i>
+                            </span>
+                            <input asp-for="CpfCnpj" class="form-control" placeholder="Digite o CPF ou CNPJ" />
+                        </div>
+                        <span asp-validation-for="CpfCnpj" class="text-danger small"></span>
+                    </div>
+
+                    <!-- Nome -->
+                    <div class="form-group mb-4">
+                        <label asp-for="Nome" class="form-label">
+                            <i class="fas fa-user text-primary me-2"></i>Nome
+                        </label>
+                        <div class="input-group input-group-modern">
+                            <span class="input-group-text">
+                                <i class="fas fa-user"></i>
+                            </span>
+                            <input asp-for="Nome" class="form-control" placeholder="Digite o nome completo" />
+                        </div>
+                        <span asp-validation-for="Nome" class="text-danger small"></span>
+                    </div>
+
+                    <!-- Qualificação -->
+                    <div class="form-group mb-4">
+                        <label asp-for="Qualificacao" class="form-label">
+                            <i class="fas fa-certificate text-primary me-2"></i>Qualificação
+                        </label>
+                        <div class="input-group input-group-modern">
+                            <span class="input-group-text">
+                                <i class="fas fa-certificate"></i>
+                            </span>
+                            <input asp-for="Qualificacao" class="form-control" placeholder="Digite a qualificação" />
+                        </div>
+                        <span asp-validation-for="Qualificacao" class="text-danger small"></span>
+                    </div>
+
+                    <!-- Tipo -->
+                    <div class="form-group mb-4">
+                        <label asp-for="Tipo" class="form-label">
+                            <i class="fas fa-tag text-primary me-2"></i>Tipo
+                        </label>
+                        <div class="input-group input-group-modern">
+                            <span class="input-group-text">
+                                <i class="fas fa-tag"></i>
+                            </span>
+                            <select asp-for="Tipo" class="form-control">
+                                <option value="">Selecione...</option>
+                                <option value="ADMINISTRADOR">Administrador</option>
+                                <option value="SOCIO">Sócio</option>
+                                <option value="PRESIDENTE">Presidente</option>
+                                <option value="DIRETOR">Diretor</option>
+                            </select>
+                        </div>
+                        <span asp-validation-for="Tipo" class="text-danger small"></span>
+                    </div>
+
+                    <!-- Percentual Capital -->
+                    <div class="form-group mb-4">
+                        <label asp-for="PercentualCapital" class="form-label">
+                            <i class="fas fa-percent text-primary me-2"></i>Percentual de Capital
+                        </label>
+                        <div class="input-group input-group-modern">
+                            <span class="input-group-text">
+                                <i class="fas fa-percent"></i>
+                            </span>
+                            <input asp-for="PercentualCapital" type="number" step="0.01" class="form-control" placeholder="0.00" />
+                            <span class="input-group-text">%</span>
+                        </div>
+                        <span asp-validation-for="PercentualCapital" class="text-danger small"></span>
+                    </div>
+
+                    <!-- Nacionalidade -->
+                    <div class="form-group mb-4">
+                        <label asp-for="IdNacionalidade" class="form-label">
+                            <i class="fas fa-flag text-primary me-2"></i>Nacionalidade
+                        </label>
+                        <div class="input-group input-group-modern">
+                            <span class="input-group-text">
+                                <i class="fas fa-flag"></i>
+                            </span>
+                            <select asp-for="IdNacionalidade" class="form-control" asp-items="ViewBag.Nacionalidades">
+                                <option value="">Selecione...</option>
+                            </select>
+                        </div>
+                        <span asp-validation-for="IdNacionalidade" class="text-danger small"></span>
+                    </div>
+
+                    <!-- Código País Origem -->
+                    <div class="form-group mb-4">
+                        <label asp-for="CodPaisOrigem" class="form-label">
+                            <i class="fas fa-globe text-primary me-2"></i>Código do País de Origem
+                        </label>
+                        <div class="input-group input-group-modern">
+                            <span class="input-group-text">
+                                <i class="fas fa-globe"></i>
+                            </span>
+                            <input asp-for="CodPaisOrigem" class="form-control" placeholder="Ex: BR, US, PT" />
+                        </div>
+                        <span asp-validation-for="CodPaisOrigem" class="text-danger small"></span>
+                    </div>
+
+                    <!-- Nome País Origem -->
+                    <div class="form-group mb-4">
+                        <label asp-for="NomePaisOrigem" class="form-label">
+                            <i class="fas fa-globe-americas text-primary me-2"></i>Nome do País de Origem
+                        </label>
+                        <div class="input-group input-group-modern">
+                            <span class="input-group-text">
+                                <i class="fas fa-globe-americas"></i>
+                            </span>
+                            <input asp-for="NomePaisOrigem" class="form-control" placeholder="Ex: Brasil, Estados Unidos" />
+                        </div>
+                        <span asp-validation-for="NomePaisOrigem" class="text-danger small"></span>
+                    </div>
+
+                    <!-- Data Entrada -->
+                    <div class="form-group mb-4">
+                        <label asp-for="DataEntrada" class="form-label">
+                            <i class="fas fa-calendar-plus text-primary me-2"></i>Data de Entrada
+                        </label>
+                        <div class="input-group input-group-modern">
+                            <span class="input-group-text">
+                                <i class="fas fa-calendar-plus"></i>
+                            </span>
+                            <input asp-for="DataEntrada" type="date" class="form-control" />
+                        </div>
+                        <span asp-validation-for="DataEntrada" class="text-danger small"></span>
+                    </div>
+
+                    <!-- Data Saída -->
+                    <div class="form-group mb-4">
+                        <label asp-for="DataSaida" class="form-label">
+                            <i class="fas fa-calendar-minus text-primary me-2"></i>Data de Saída
+                        </label>
+                        <div class="input-group input-group-modern">
+                            <span class="input-group-text">
+                                <i class="fas fa-calendar-minus"></i>
+                            </span>
+                            <input asp-for="DataSaida" type="date" class="form-control" />
+                        </div>
+                        <span asp-validation-for="DataSaida" class="text-danger small"></span>
+                        <small class="form-text text-muted">
+                            <i class="fas fa-info-circle"></i> Deixe em branco se o sócio ainda estiver ativo
+                        </small>
+                    </div>
+
+                    <div class="divider my-4"></div>
+
+                    <!-- Botões de Ação -->
+                    <div class="d-flex gap-3 justify-content-end">
+                        <a asp-action="Index" class="btn btn-secondary btn-modern btn-icon">
+                            <i class="fas fa-times"></i>
+                            <span>Cancelar</span>
+                        </a>
+                        <button type="submit" class="btn btn-primary-modern btn-modern btn-icon">
+                            <i class="fas fa-save"></i>
+                            <span>Cadastrar Sócio</span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Informações Adicionais -->
+        <div class="alert alert-modern alert-info mt-4">
+            <i class="fas fa-lightbulb me-2"></i>
+            <strong>Dica:</strong> Certifique-se de que todos os dados estão corretos antes de salvar. O percentual de capital deve ser um valor entre 0 e 100.
+        </div>
     </div>
-
-    <div class="form-group">
-        <label asp-for="Qualificacao"></label>
-        <input asp-for="Qualificacao" class="form-control" />
-        <span asp-validation-for="Qualificacao" class="text-danger"></span>
-    </div>
-
-    <!-- NOVOS CAMPOS -->
-
-    <div class="form-group">
-        <label asp-for="Tipo"></label>
-        <select asp-for="Tipo" class="form-control">
-            <option value="">Selecione...</option>
-            <option value="ADMINISTRADOR">Administrador</option>
-            <option value="SOCIO">Sócio</option>
-            <option value="PRESIDENTE">Presidente</option>
-            <option value="DIRETOR">Diretor</option>
-        </select>
-        <span asp-validation-for="Tipo" class="text-danger"></span>
-    </div>
-
-    <div class="form-group">
-        <label asp-for="IdNacionalidade"></label>
-        <select asp-for="IdNacionalidade" class="form-control" asp-items="ViewBag.Nacionalidades">
-            <option value="">Selecione...</option>
-        </select>
-        <span asp-validation-for="IdNacionalidade" class="text-danger"></span>
-    </div>
-
-    <div class="form-group">
-        <label asp-for="CodPaisOrigem"></label>
-        <input asp-for="CodPaisOrigem" class="form-control" />
-        <span asp-validation-for="CodPaisOrigem" class="text-danger"></span>
-    </div>
-
-    <div class="form-group">
-        <label asp-for="NomePaisOrigem"></label>
-        <input asp-for="NomePaisOrigem" class="form-control" />
-        <span asp-validation-for="NomePaisOrigem" class="text-danger"></span>
-    </div>
-
-    <div class="form-group">
-        <label asp-for="PercentualCapital"></label>
-        <input asp-for="PercentualCapital" type="number" step="0.01" class="form-control" />
-        <span asp-validation-for="PercentualCapital" class="text-danger"></span>
-    </div>
-
-    <div class="form-group">
-        <label asp-for="DataEntrada"></label>
-        <input asp-for="DataEntrada" type="date" class="form-control" />
-        <span asp-validation-for="DataEntrada" class="text-danger"></span>
-    </div>
-
-    <div class="form-group">
-        <label asp-for="DataSaida"></label>
-        <input asp-for="DataSaida" type="date" class="form-control" />
-        <span asp-validation-for="DataSaida" class="text-danger"></span>
-    </div>
-
-    <button type="submit" class="btn btn-primary">Cadastrar</button>
-    <a asp-action="Index" class="btn btn-secondary">Cancelar</a>
-</form>
+</div>
 
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script>
+        $(document).ready(function() {
+            // Focar no primeiro campo
+            $('input[name="CpfCnpj"]').focus();
+
+            // Animação ao submeter
+            $('form').on('submit', function() {
+                if ($(this).valid()) {
+                    showLoading();
+                }
+            });
+        });
+    </script>
 }

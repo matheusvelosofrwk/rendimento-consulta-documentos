@@ -4,70 +4,168 @@
     ViewData["Title"] = "Detalhes do Log de Erro";
 }
 
-<h1>Detalhes do Log de Erro</h1>
+<!-- Page Header -->
+<div class="page-header fade-in">
+    <div class="d-flex justify-content-between align-items-center">
+        <div>
+            <h1><i class="fas fa-bug"></i> Detalhes do Erro</h1>
+            <p>Informações completas do log de erro</p>
+        </div>
+        <div>
+            <a asp-action="Index" class="btn btn-secondary btn-modern btn-icon">
+                <i class="fas fa-arrow-left"></i>
+                <span>Voltar</span>
+            </a>
+        </div>
+    </div>
+</div>
 
 @if (TempData["Error"] != null)
 {
-    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+    <div class="alert alert-danger alert-modern alert-dismissible fade show" role="alert">
+        <i class="fas fa-exclamation-circle me-2"></i>
         @TempData["Error"]
         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
     </div>
 }
 
-<div class="card">
+<!-- Informações do Erro -->
+<div class="card-modern fade-in">
     <div class="card-header bg-danger text-white">
-        <h5>Informações do Erro</h5>
+        <h5 class="mb-0">
+            <i class="fas fa-exclamation-triangle"></i> Informações do Erro
+        </h5>
     </div>
     <div class="card-body">
-        <dl class="row">
-            <dt class="col-sm-3">ID</dt>
-            <dd class="col-sm-9">@Model.Id</dd>
+        <div class="row">
+            <div class="col-md-6">
+                <dl class="row mb-0">
+                    <dt class="col-sm-4 text-muted">
+                        <i class="fas fa-fingerprint me-1"></i> ID
+                    </dt>
+                    <dd class="col-sm-8">
+                        <span class="badge badge-modern bg-dark">@Model.Id</span>
+                    </dd>
 
-            <dt class="col-sm-3">Data/Hora</dt>
-            <dd class="col-sm-9">@Model.DataHora.ToString("dd/MM/yyyy HH:mm:ss")</dd>
+                    <dt class="col-sm-4 text-muted">
+                        <i class="fas fa-clock me-1"></i> Data/Hora
+                    </dt>
+                    <dd class="col-sm-8">
+                        <strong>@Model.DataHora.ToString("dd/MM/yyyy HH:mm:ss")</strong>
+                    </dd>
 
-            <dt class="col-sm-3">Aplicação</dt>
-            <dd class="col-sm-9">@(Model.Aplicacao ?? "-")</dd>
+                    <dt class="col-sm-4 text-muted">
+                        <i class="fas fa-desktop me-1"></i> Aplicação
+                    </dt>
+                    <dd class="col-sm-8">
+                        @if (!string.IsNullOrWhiteSpace(Model.Aplicacao))
+                        {
+                            <span class="badge badge-modern bg-danger">@Model.Aplicacao</span>
+                        }
+                        else
+                        {
+                            <span class="text-muted">-</span>
+                        }
+                    </dd>
+                </dl>
+            </div>
+            <div class="col-md-6">
+                <dl class="row mb-0">
+                    <dt class="col-sm-4 text-muted">
+                        <i class="fas fa-code me-1"></i> Método
+                    </dt>
+                    <dd class="col-sm-8">
+                        @if (!string.IsNullOrWhiteSpace(Model.Metodo))
+                        {
+                            <code class="text-primary" style="font-size: 0.9rem;">@Model.Metodo</code>
+                        }
+                        else
+                        {
+                            <span class="text-muted">-</span>
+                        }
+                    </dd>
 
-            <dt class="col-sm-3">Método</dt>
-            <dd class="col-sm-9">@(Model.Metodo ?? "-")</dd>
+                    <dt class="col-sm-4 text-muted">
+                        <i class="fas fa-user me-1"></i> Usuário
+                    </dt>
+                    <dd class="col-sm-8">
+                        @if (!string.IsNullOrWhiteSpace(Model.Usuario))
+                        {
+                            <div class="d-flex align-items-center">
+                                <div class="user-avatar me-2" style="width: 28px; height: 28px; font-size: 0.75rem; background-color: #dc3545;">
+                                    @(Model.Usuario?.Substring(0, 1).ToUpper() ?? "U")
+                                </div>
+                                <span>@Model.Usuario</span>
+                            </div>
+                        }
+                        else
+                        {
+                            <span class="text-muted">-</span>
+                        }
+                    </dd>
 
-            <dt class="col-sm-3">Usuário</dt>
-            <dd class="col-sm-9">@(Model.Usuario ?? "-")</dd>
-
-            @if (Model.IdSistema.HasValue)
-            {
-                <dt class="col-sm-3">ID Sistema</dt>
-                <dd class="col-sm-9">@Model.IdSistema</dd>
-            }
-        </dl>
+                    @if (Model.IdSistema.HasValue)
+                    {
+                        <dt class="col-sm-4 text-muted">
+                            <i class="fas fa-hashtag me-1"></i> ID Sistema
+                        </dt>
+                        <dd class="col-sm-8">
+                            <span class="badge badge-modern bg-secondary">@Model.IdSistema</span>
+                        </dd>
+                    }
+                </dl>
+            </div>
+        </div>
     </div>
 </div>
 
+<!-- Mensagem de Erro -->
 @if (!string.IsNullOrWhiteSpace(Model.Erro))
 {
-    <div class="card mt-3">
+    <div class="card-modern fade-in mt-3">
         <div class="card-header">
-            <h5>Mensagem de Erro</h5>
+            <h5 class="mb-0">
+                <i class="fas fa-exclamation-circle"></i> Mensagem de Erro
+            </h5>
         </div>
         <div class="card-body">
-            <pre class="bg-light p-3 text-danger">@Model.Erro</pre>
+            <div class="alert alert-danger alert-modern mb-0">
+                <div style="font-family: 'Courier New', monospace; font-size: 0.9rem; white-space: pre-wrap; word-break: break-word;">@Model.Erro</div>
+            </div>
         </div>
     </div>
 }
 
+<!-- Stack Trace -->
 @if (!string.IsNullOrWhiteSpace(Model.StackTrace))
 {
-    <div class="card mt-3">
+    <div class="card-modern fade-in mt-3">
         <div class="card-header">
-            <h5>Stack Trace</h5>
+            <h5 class="mb-0">
+                <i class="fas fa-layer-group"></i> Stack Trace
+            </h5>
         </div>
         <div class="card-body">
-            <pre class="bg-light p-3" style="max-height: 500px; overflow-y: auto; font-size: 0.85rem;">@Model.StackTrace</pre>
+            <pre class="bg-dark text-light p-3 rounded border" style="max-height: 600px; overflow-y: auto; font-size: 0.85rem; margin-bottom: 0; line-height: 1.5;"><code class="language-csharp">@Model.StackTrace</code></pre>
         </div>
     </div>
 }
 
-<div class="mt-3">
-    <a asp-action="Index" class="btn btn-secondary">Voltar para Lista</a>
-</div>
+@section Scripts {
+    <script>
+        $(document).ready(function() {
+            // Adicionar números de linha ao stack trace se houver
+            $('pre code.language-csharp').each(function() {
+                var lines = $(this).text().split('\n');
+                var numberedLines = lines.map(function(line, index) {
+                    if (line.trim().length > 0) {
+                        var lineNum = (index + 1).toString().padStart(3, ' ');
+                        return '<span style="color: #6c757d; user-select: none;">' + lineNum + '│ </span>' + line;
+                    }
+                    return line;
+                }).join('\n');
+                $(this).html(numberedLines);
+            });
+        });
+    </script>
+}

@@ -1,55 +1,139 @@
 @model IEnumerable<ConsultaDocumentos.Web.Models.AplicacaoViewModel>
 
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Aplicações";
 }
 
-<h1>Index</h1>
+<!-- Page Header -->
+<div class="page-header fade-in">
+    <div class="d-flex justify-content-between align-items-center">
+        <div>
+            <h1><i class="fas fa-desktop"></i> Aplicações</h1>
+            <p>Gerencie as aplicações do sistema</p>
+        </div>
+        <div>
+            <a asp-action="Create" class="btn btn-primary-modern btn-modern btn-icon">
+                <i class="fas fa-plus"></i>
+                <span>Nova Aplicação</span>
+            </a>
+        </div>
+    </div>
+</div>
 
-<p>
-    <a asp-action="Create">Create New</a>
-</p>
-
-@Html.AntiForgeryToken()
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.Nome)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Descricao)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Status)
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.Nome)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Descricao)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Status)
-            </td>
-            <td>
-                @Html.ActionLink("Edit", "Edit", new { id=item.Id  }) |
-                <a href="javascript:void(0);" onclick="openDeleteConfirmation('@item.Id', 'Aplicacao', '@item.Nome')" class="text-danger">Delete</a>
-            </td>
-        </tr>
-}
-    </tbody>
-</table>
+<!-- Card com Tabela -->
+<div class="card-modern fade-in">
+    <div class="card-header">
+        <h5 class="mb-0">
+            <i class="fas fa-list"></i> Lista de Aplicações
+        </h5>
+    </div>
+    <div class="card-body">
+        @if (Model != null && Model.Any())
+        {
+            @Html.AntiForgeryToken()
+            <div class="table-responsive">
+                <table id="aplicacoesTable" class="table table-hover table-modern">
+                    <thead>
+                        <tr>
+                            <th>
+                                <i class="fas fa-tag me-1"></i>
+                                @Html.DisplayNameFor(model => model.Nome)
+                            </th>
+                            <th>
+                                <i class="fas fa-info-circle me-1"></i>
+                                @Html.DisplayNameFor(model => model.Descricao)
+                            </th>
+                            <th>
+                                <i class="fas fa-toggle-on me-1"></i>
+                                @Html.DisplayNameFor(model => model.Status)
+                            </th>
+                            <th class="text-center" style="width: 120px;">
+                                <i class="fas fa-cog me-1"></i>Ações
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model)
+                        {
+                            <tr>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <div class="user-avatar me-2" style="width: 32px; height: 32px; font-size: 0.875rem;">
+                                            @(item.Nome?.Substring(0, 1).ToUpper() ?? "A")
+                                        </div>
+                                        <strong>@Html.DisplayFor(modelItem => item.Nome)</strong>
+                                    </div>
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.Descricao)
+                                </td>
+                                <td>
+                                    <span class="badge badge-modern bg-primary">
+                                        @Html.DisplayFor(modelItem => item.Status)
+                                    </span>
+                                </td>
+                                <td>
+                                    <div class="action-buttons justify-content-center">
+                                        <a asp-action="Edit" asp-route-id="@item.Id"
+                                           class="btn-action edit"
+                                           data-bs-toggle="tooltip"
+                                           title="Editar">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+                                        <button onclick="openDeleteConfirmation('@item.Id', 'Aplicacao', '@item.Nome')"
+                                                class="btn-action delete"
+                                                data-bs-toggle="tooltip"
+                                                title="Excluir">
+                                            <i class="fas fa-trash-alt"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+        else
+        {
+            <!-- Empty State -->
+            <div class="empty-state">
+                <div class="empty-state-icon">
+                    <i class="fas fa-desktop"></i>
+                </div>
+                <h3>Nenhuma aplicação cadastrada</h3>
+                <p>Comece adicionando sua primeira aplicação ao sistema</p>
+                <a asp-action="Create" class="btn btn-primary-modern btn-modern btn-icon mt-3">
+                    <i class="fas fa-plus"></i>
+                    <span>Cadastrar Primeira Aplicação</span>
+                </a>
+            </div>
+        }
+    </div>
+</div>
 
 @* Modal de confirmação de exclusão *@
 @await Html.PartialAsync("_DeleteConfirmationModal")
 
 @section Scripts {
     <script src="~/js/delete-helper.js"></script>
+    <script>
+        $(document).ready(function() {
+            // Inicializar DataTables
+            if ($('#aplicacoesTable').length) {
+                initDataTable('#aplicacoesTable', {
+                    order: [[0, 'asc']],
+                    columnDefs: [
+                        { orderable: false, targets: -1 } // Desabilitar ordenação na coluna de ações
+                    ]
+                });
+            }
+
+            // Inicializar tooltips
+            var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+            tooltipTriggerList.map(function (tooltipTriggerEl) {
+                return new bootstrap.Tooltip(tooltipTriggerEl);
+            });
+        });
+    </script>
 }

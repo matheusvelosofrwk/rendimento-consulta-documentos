@@ -1,46 +1,129 @@
 @model ConsultaDocumentos.Web.Models.AplicacaoViewModel
 
 @{
-    ViewData["Title"] = "Cadastrar Aplicação";
+    ViewData["Title"] = "Nova Aplicação";
 }
 
-<h2>Cadastrar Aplicação</h2>
-
-<form asp-action="Create" method="post">
-    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-
-    <div class="form-group">
-        <label asp-for="Nome"></label>
-        <input asp-for="Nome" class="form-control" />
-        <span asp-validation-for="Nome" class="text-danger"></span>
+<!-- Page Header -->
+<div class="page-header fade-in">
+    <div class="d-flex justify-content-between align-items-center">
+        <div>
+            <h1><i class="fas fa-plus-circle"></i> Nova Aplicação</h1>
+            <p>Cadastre uma nova aplicação no sistema</p>
+        </div>
+        <div>
+            <a asp-action="Index" class="btn btn-secondary btn-icon">
+                <i class="fas fa-arrow-left"></i>
+                <span>Voltar</span>
+            </a>
+        </div>
     </div>
+</div>
 
-    <div class="form-group">
-        <label asp-for="Descricao"></label>
-        <textarea asp-for="Descricao" class="form-control" rows="3"></textarea>
-        <span asp-validation-for="Descricao" class="text-danger"></span>
+<!-- Form Card -->
+<div class="row justify-content-center fade-in">
+    <div class="col-lg-8">
+        <div class="card-modern">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-info-circle"></i> Dados da Aplicação
+                </h5>
+            </div>
+            <div class="card-body" style="padding: 2rem;">
+                <form asp-action="Create" method="post" class="form-modern">
+                    <div asp-validation-summary="ModelOnly" class="alert alert-modern alert-danger mb-4"></div>
+
+                    <!-- Nome -->
+                    <div class="form-group mb-4">
+                        <label asp-for="Nome" class="form-label">
+                            <i class="fas fa-tag text-primary me-2"></i>Nome da Aplicação
+                        </label>
+                        <div class="input-group input-group-modern">
+                            <span class="input-group-text">
+                                <i class="fas fa-desktop"></i>
+                            </span>
+                            <input asp-for="Nome" class="form-control" placeholder="Digite o nome da aplicação" />
+                        </div>
+                        <span asp-validation-for="Nome" class="text-danger small"></span>
+                    </div>
+
+                    <!-- Descrição -->
+                    <div class="form-group mb-4">
+                        <label asp-for="Descricao" class="form-label">
+                            <i class="fas fa-info-circle text-primary me-2"></i>Descrição
+                        </label>
+                        <div class="input-group input-group-modern">
+                            <span class="input-group-text">
+                                <i class="fas fa-align-left"></i>
+                            </span>
+                            <textarea asp-for="Descricao" class="form-control" rows="3" placeholder="Digite uma descrição para a aplicação"></textarea>
+                        </div>
+                        <span asp-validation-for="Descricao" class="text-danger small"></span>
+                    </div>
+
+                    <!-- Status -->
+                    <div class="form-group mb-4">
+                        <label asp-for="Status" class="form-label">
+                            <i class="fas fa-toggle-on text-primary me-2"></i>Status
+                        </label>
+                        <div class="input-group input-group-modern">
+                            <span class="input-group-text">
+                                <i class="fas fa-check-circle"></i>
+                            </span>
+                            <input asp-for="Status" class="form-control" placeholder="Digite o status" />
+                        </div>
+                        <span asp-validation-for="Status" class="text-danger small"></span>
+                    </div>
+
+                    <!-- Serpro -->
+                    <div class="form-group mb-4">
+                        <div class="form-check form-switch">
+                            <input asp-for="Serpro" class="form-check-input" type="checkbox" role="switch" />
+                            <label asp-for="Serpro" class="form-check-label">
+                                <i class="fas fa-shield-alt me-1"></i> Tem acesso ao provedor SERPRO
+                            </label>
+                        </div>
+                        <span asp-validation-for="Serpro" class="text-danger small"></span>
+                    </div>
+
+                    <div class="divider my-4"></div>
+
+                    <!-- Botões de Ação -->
+                    <div class="d-flex gap-3 justify-content-end">
+                        <a asp-action="Index" class="btn btn-secondary btn-modern btn-icon">
+                            <i class="fas fa-times"></i>
+                            <span>Cancelar</span>
+                        </a>
+                        <button type="submit" class="btn btn-primary-modern btn-modern btn-icon">
+                            <i class="fas fa-save"></i>
+                            <span>Salvar Aplicação</span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Informações Adicionais -->
+        <div class="alert alert-modern alert-info mt-4">
+            <i class="fas fa-lightbulb me-2"></i>
+            <strong>Dica:</strong> O status e as configurações de acesso ao SERPRO podem ser ajustados posteriormente.
+        </div>
     </div>
-
-    <div class="form-group">
-        <label asp-for="Status"></label>
-        <input asp-for="Status" class="form-control" />
-        <span asp-validation-for="Status" class="text-danger"></span>
-    </div>
-
-    <!-- NOVO CAMPO -->
-    <div class="form-check">
-        <input asp-for="Serpro" class="form-check-input" type="checkbox" />
-        <label asp-for="Serpro" class="form-check-label">
-            Tem acesso ao provedor SERPRO
-        </label>
-        <span asp-validation-for="Serpro" class="text-danger"></span>
-    </div>
-
-    <br />
-    <button type="submit" class="btn btn-primary">Cadastrar</button>
-    <a asp-action="Index" class="btn btn-secondary">Cancelar</a>
-</form>
+</div>
 
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script>
+        $(document).ready(function() {
+            // Focar no primeiro campo
+            $('input[name="Nome"]').focus();
+
+            // Animação ao submeter
+            $('form').on('submit', function() {
+                if ($(this).valid()) {
+                    showLoading();
+                }
+            });
+        });
+    </script>
 }
