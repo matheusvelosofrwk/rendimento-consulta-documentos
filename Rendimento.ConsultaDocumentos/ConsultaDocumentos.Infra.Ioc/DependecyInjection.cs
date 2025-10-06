@@ -115,6 +115,7 @@ namespace ConsultaDocumentos.Infra.Ioc
             services.AddScoped<IProvedorService, ProvedorService>();
             services.AddScoped<IAuthService, AuthService>();
             services.AddScoped<IRoleService, RoleService>();
+            services.AddScoped<IUserService, UserService>();
             services.AddScoped<INacionalidadeService, NacionalidadeService>();
             services.AddScoped<ISituacaoCadastralService, SituacaoCadastralService>();
             services.AddScoped<IDocumentoService, DocumentoService>();
