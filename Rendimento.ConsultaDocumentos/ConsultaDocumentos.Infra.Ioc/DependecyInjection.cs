@@ -4,6 +4,7 @@ using ConsultaDocumentos.Application.Services.External;
 using ConsultaDocumentos.Domain.Intefaces;
 using ConsultaDocumentos.Infra.Data.Context;
 using ConsultaDocumentos.Infra.Data.Repositories;
+using ConsultaDocumentos.Infra.Data.Services.Cache;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -23,6 +24,27 @@ namespace ConsultaDocumentos.Infra.Ioc
                 options.UseSqlServer(configuration.GetConnectionString("DefaultConnection"),
                     b => b.MigrationsAssembly(typeof(ApplicationDbContext).Assembly.FullName));
             });
+
+            // Configurar Cache (Redis ou Sem Cache)
+            var redisConfig = configuration.GetSection("Redis");
+            var redisEnabled = redisConfig.GetValue<bool>("Enabled");
+            var redisConnectionString = redisConfig.GetValue<string>("ConnectionString");
+
+            if (redisEnabled && !string.IsNullOrEmpty(redisConnectionString))
+            {
+                // Redis habilitado - usar cache
+                services.AddStackExchangeRedisCache(options =>
+                {
+                    options.Configuration = redisConnectionString;
+                    options.InstanceName = "RendimentoConsultaDocumentos:";
+                });
+                services.AddScoped<ICacheService, RedisCacheService>();
+            }
+            else
+            {
+                // Redis desabilitado - sem cache, consulta sempre nos providers
+                services.AddScoped<ICacheService, NoOpCacheService>();
+            }
 
             // Configurar Identity
             services.AddIdentity<IdentityUser, IdentityRole>(options =>

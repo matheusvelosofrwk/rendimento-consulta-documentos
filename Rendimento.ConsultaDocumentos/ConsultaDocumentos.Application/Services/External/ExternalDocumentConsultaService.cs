@@ -24,6 +24,7 @@ namespace ConsultaDocumentos.Application.Services.External
         private readonly IProvedorRepository _provedorRepository;
         private readonly ILogAuditoriaRepository _logAuditoriaRepository;
         private readonly ILogErroRepository _logErroRepository;
+        private readonly ICacheService _cacheService;
         private readonly IMapper _mapper;
         private readonly ILogger<ExternalDocumentConsultaService> _logger;
 
@@ -35,6 +36,7 @@ namespace ConsultaDocumentos.Application.Services.External
             IProvedorRepository provedorRepository,
             ILogAuditoriaRepository logAuditoriaRepository,
             ILogErroRepository logErroRepository,
+            ICacheService cacheService,
             IMapper mapper,
             ILogger<ExternalDocumentConsultaService> logger)
         {
@@ -45,6 +47,7 @@ namespace ConsultaDocumentos.Application.Services.External
             _provedorRepository = provedorRepository;
             _logAuditoriaRepository = logAuditoriaRepository;
             _logErroRepository = logErroRepository;
+            _cacheService = cacheService;
             _mapper = mapper;
             _logger = logger;
         }
@@ -64,40 +67,38 @@ namespace ConsultaDocumentos.Application.Services.External
                     "Iniciando consulta de documento {Tipo} {Numero} para aplicação {AplicacaoId}",
                     request.TipoDocumento, request.NumeroDocumento, request.AplicacaoId);
 
-                // Verifica se existe em cache e se ainda é válido
-                if (!request.ForcarNovaConsulta)
+                // Verifica se existe em cache
+                var documentoLimpo = DocumentoValidationHelper.RemoverFormatacao(request.NumeroDocumento);
+                var cacheKey = $"documento:{documentoLimpo}";
+
+                var documentoCacheDTO = await _cacheService.GetAsync<DocumentoDTO>(cacheKey, cancellationToken);
+                if (documentoCacheDTO != null)
                 {
-                    var documentoCache = await VerificarCacheAsync(request.NumeroDocumento, cancellationToken);
-                    if (documentoCache != null)
+                    _logger.LogInformation("Documento encontrado em cache válido");
+                    stopwatch.Stop();
+
+                    await RegistrarAuditoriaAsync(
+                        request.AplicacaoId,
+                        request.NumeroDocumento,
+                        request.TipoDocumento,
+                        true,
+                        "CACHE",
+                        "CACHE",
+                        stopwatch.ElapsedMilliseconds,
+                        true,
+                        "Documento retornado do cache");
+
+                    return new ConsultaDocumentoResponse
                     {
-                        _logger.LogInformation("Documento encontrado em cache válido");
-                        stopwatch.Stop();
-
-                        var documentoDTO = _mapper.Map<DocumentoDTO>(documentoCache);
-
-                        await RegistrarAuditoriaAsync(
-                            request.AplicacaoId,
-                            request.NumeroDocumento,
-                            request.TipoDocumento,
-                            true,
-                            "CACHE",
-                            "CACHE",
-                            stopwatch.ElapsedMilliseconds,
-                            true,
-                            "Documento retornado do cache");
-
-                        return new ConsultaDocumentoResponse
-                        {
-                            Sucesso = true,
-                            Mensagem = "Documento retornado do cache",
-                            ProvedorUtilizado = "CACHE",
-                            ProvedoresTentados = new List<string> { "CACHE" },
-                            OrigemCache = true,
-                            TempoProcessamentoMs = stopwatch.ElapsedMilliseconds,
-                            DataConsulta = DateTime.UtcNow,
-                            Documento = documentoDTO
-                        };
-                    }
+                        Sucesso = true,
+                        Mensagem = "Documento retornado do cache",
+                        ProvedorUtilizado = "CACHE",
+                        ProvedoresTentados = new List<string> { "CACHE" },
+                        OrigemCache = true,
+                        TempoProcessamentoMs = stopwatch.ElapsedMilliseconds,
+                        DataConsulta = DateTime.UtcNow,
+                        Documento = documentoCacheDTO
+                    };
                 }
 
                 // Busca provedores configurados para a aplicação
@@ -180,6 +181,11 @@ namespace ConsultaDocumentos.Application.Services.External
 
                 // Salva o documento consultado
                 var documentoSalvo = await SalvarDocumentoAsync(documentoConsultado, cancellationToken);
+                var documentoDTOResult = _mapper.Map<DocumentoDTO>(documentoSalvo);
+
+                // Atualiza o cache com o documento consultado
+                await _cacheService.SetAsync(cacheKey, documentoDTOResult, TimeSpan.FromDays(90), cancellationToken);
+                _logger.LogInformation("Documento armazenado no cache com chave: {CacheKey}", cacheKey);
 
                 await RegistrarAuditoriaAsync(
                     request.AplicacaoId,
@@ -191,8 +197,6 @@ namespace ConsultaDocumentos.Application.Services.External
                     stopwatch.ElapsedMilliseconds,
                     false,
                     "Documento consultado e salvo com sucesso");
-
-                var documentoDTOResult = _mapper.Map<DocumentoDTO>(documentoSalvo);
 
                 return new ConsultaDocumentoResponse
                 {
@@ -306,32 +310,6 @@ namespace ConsultaDocumentos.Application.Services.External
                     Erro = ex.Message
                 };
             }
-        }
-
-        private async Task<Documento?> VerificarCacheAsync(string numeroDocumento, CancellationToken cancellationToken)
-        {
-            // Implementação simplificada - busca o documento mais recente e verifica validade
-            var resultado = await _documentoService.GetAllAsync();
-
-            if (!resultado.Success || resultado.Data == null)
-            {
-                return null;
-            }
-
-            var documentoLimpo = DocumentoValidationHelper.RemoverFormatacao(numeroDocumento);
-
-            var documento = resultado.Data
-                .Select(dto => _mapper.Map<Documento>(dto))
-                .Where(d => d.Numero == documentoLimpo)
-                .OrderByDescending(d => d.DataConsulta)
-                .FirstOrDefault();
-
-            if (documento != null && documento.IsValido())
-            {
-                return documento;
-            }
-
-            return null;
         }
 
         private async Task<List<Provedor>> ObterProvedoresOrdenadosAsync(Guid aplicacaoId, CancellationToken cancellationToken)

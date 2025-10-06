@@ -8,6 +8,5 @@ namespace ConsultaDocumentos.Application.DTOs.External
         public TipoDocumento TipoDocumento { get; set; }
         public int PerfilCNPJ { get; set; } = 1; // 1, 2 ou 3 (apenas para CNPJ)
         public Guid AplicacaoId { get; set; }
-        public bool ForcarNovaConsulta { get; set; } = false;
     }
 }

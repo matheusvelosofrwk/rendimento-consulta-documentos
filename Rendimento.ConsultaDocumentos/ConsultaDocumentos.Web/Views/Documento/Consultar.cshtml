@@ -1,0 +1,180 @@
+@model ConsultaDocumentos.Web.Models.ConsultaDocumentoViewModel
+
+@{
+    ViewData["Title"] = "Consultar Documento";
+    var resultado = ViewBag.Resultado as ConsultaDocumentos.Web.Models.ConsultaDocumentoResultViewModel;
+}
+
+<h1>Consultar Documento (CPF/CNPJ)</h1>
+<hr />
+
+<div class="row">
+    <div class="col-md-6">
+        <form asp-action="Consultar" method="post">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+            <div class="form-group">
+                <label asp-for="AplicacaoId" class="control-label"></label>
+                <select asp-for="AplicacaoId" class="form-control" asp-items="@ViewBag.Aplicacoes">
+                    <option value="">Selecione uma aplicação</option>
+                </select>
+                <span asp-validation-for="AplicacaoId" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="TipoDocumento" class="control-label"></label>
+                <div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" asp-for="TipoDocumento" value="CPF" id="tipoCPF" checked />
+                        <label class="form-check-label" for="tipoCPF">CPF</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" asp-for="TipoDocumento" value="CNPJ" id="tipoCNPJ" />
+                        <label class="form-check-label" for="tipoCNPJ">CNPJ</label>
+                    </div>
+                </div>
+                <span asp-validation-for="TipoDocumento" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="NumeroDocumento" class="control-label"></label>
+                <input asp-for="NumeroDocumento" class="form-control" placeholder="Digite o CPF ou CNPJ" />
+                <span asp-validation-for="NumeroDocumento" class="text-danger"></span>
+            </div>
+
+            <div class="form-group" id="divPerfilCNPJ" style="display: none;">
+                <label asp-for="PerfilCNPJ" class="control-label"></label>
+                <select asp-for="PerfilCNPJ" class="form-control">
+                    <option value="1">Perfil 1 - Básico</option>
+                    <option value="2">Perfil 2 - Completo</option>
+                    <option value="3" selected>Perfil 3 - Com Sócios</option>
+                </select>
+                <span asp-validation-for="PerfilCNPJ" class="text-danger"></span>
+            </div>
+
+            <div class="form-group mt-3">
+                <button type="submit" class="btn btn-primary">
+                    <i class="bi bi-search"></i> Consultar
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+@if (resultado != null)
+{
+    <hr />
+    <div class="mt-4">
+        <h3>Resultado da Consulta</h3>
+
+        @if (resultado.Sucesso)
+        {
+            <div class="alert alert-success">
+                <h4><i class="bi bi-check-circle"></i> @resultado.Mensagem</h4>
+                <p><strong>Provedor:</strong> @resultado.ProvedorUtilizado</p>
+                <p><strong>Origem:</strong> @(resultado.OrigemCache ? "Cache" : "Consulta ao Provider")</p>
+                <p><strong>Tempo de processamento:</strong> @resultado.TempoProcessamentoMs ms</p>
+                @if (resultado.ProvedoresTentados != null && resultado.ProvedoresTentados.Any())
+                {
+                    <p><strong>Provedores tentados:</strong> @string.Join(", ", resultado.ProvedoresTentados)</p>
+                }
+            </div>
+
+            @if (resultado.Documento != null)
+            {
+                <div class="card mt-3">
+                    <div class="card-header">
+                        <h5>Dados do Documento</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <p><strong>Número:</strong> @resultado.Documento.Numero</p>
+                                <p><strong>Nome:</strong> @resultado.Documento.Nome</p>
+                                <p><strong>Tipo Pessoa:</strong> @(resultado.Documento.TipoPessoa == 'F' ? "Física" : "Jurídica")</p>
+                            </div>
+                            <div class="col-md-6">
+                                <p><strong>Data Consulta:</strong> @resultado.Documento.DataConsulta.ToString("dd/MM/yyyy HH:mm")</p>
+                                <p><strong>Válido até:</strong> @resultado.Documento.DataConsultaValidade.ToString("dd/MM/yyyy HH:mm")</p>
+                            </div>
+                        </div>
+
+                        @if (resultado.Documento.TipoPessoa == 'F')
+                        {
+                            <hr />
+                            <h6>Dados Pessoa Física</h6>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    @if (resultado.Documento.DataNascimento.HasValue)
+                                    {
+                                        <p><strong>Data Nascimento:</strong> @resultado.Documento.DataNascimento.Value.ToString("dd/MM/yyyy")</p>
+                                    }
+                                    <p><strong>Nome da Mãe:</strong> @resultado.Documento.NomeMae</p>
+                                </div>
+                                <div class="col-md-6">
+                                    <p><strong>Sexo:</strong> @resultado.Documento.Sexo</p>
+                                </div>
+                            </div>
+                        }
+                        else if (resultado.Documento.TipoPessoa == 'J')
+                        {
+                            <hr />
+                            <h6>Dados Pessoa Jurídica</h6>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <p><strong>Nome Fantasia:</strong> @resultado.Documento.NomeFantasia</p>
+                                    @if (resultado.Documento.DataAbertura.HasValue)
+                                    {
+                                        <p><strong>Data Abertura:</strong> @resultado.Documento.DataAbertura.Value.ToString("dd/MM/yyyy")</p>
+                                    }
+                                </div>
+                                <div class="col-md-6">
+                                    @if (!string.IsNullOrEmpty(resultado.Documento.Inscricao))
+                                    {
+                                        <p><strong>Inscrição:</strong> @resultado.Documento.Inscricao</p>
+                                    }
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </div>
+            }
+        }
+        else
+        {
+            <div class="alert alert-danger">
+                <h4><i class="bi bi-x-circle"></i> Erro na Consulta</h4>
+                <p>@resultado.Mensagem</p>
+                @if (!string.IsNullOrEmpty(resultado.Erro))
+                {
+                    <p><strong>Detalhes:</strong> @resultado.Erro</p>
+                }
+                @if (resultado.ProvedoresTentados != null && resultado.ProvedoresTentados.Any())
+                {
+                    <p><strong>Provedores tentados:</strong> @string.Join(", ", resultado.ProvedoresTentados)</p>
+                }
+            </div>
+        }
+    </div>
+}
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script>
+        $(document).ready(function() {
+            // Mostrar/esconder perfil CNPJ baseado no tipo selecionado
+            $('input[name="TipoDocumento"]').change(function() {
+                if ($(this).val() === 'CNPJ') {
+                    $('#divPerfilCNPJ').show();
+                } else {
+                    $('#divPerfilCNPJ').hide();
+                }
+            });
+
+            // Verificar estado inicial
+            if ($('input[name="TipoDocumento"]:checked').val() === 'CNPJ') {
+                $('#divPerfilCNPJ').show();
+            }
+        });
+    </script>
+}
