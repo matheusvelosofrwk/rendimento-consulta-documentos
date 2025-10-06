@@ -159,7 +159,7 @@ app.UseSwagger();
 app.UseSwaggerUI(c =>
 {
     c.SwaggerEndpoint("/swagger/v1/swagger.json", "ConsultaDocumentos API v1");
-    c.RoutePrefix = string.Empty; // Acessível na raiz: /
+    c.RoutePrefix = "swagger"; // Acessível em: /swagger
 });
 
 // Comentado pois causa problemas no Docker onde não temos HTTPS configurado
