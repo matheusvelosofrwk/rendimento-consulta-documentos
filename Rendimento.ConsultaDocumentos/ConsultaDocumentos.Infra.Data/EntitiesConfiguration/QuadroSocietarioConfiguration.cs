@@ -50,14 +50,32 @@ namespace ConsultaDocumentos.Infra.Data.EntitiesConfiguration
             builder.Property(x => x.DataCriacao)
                 .IsRequired();
 
-            // Relacionamento
+            // Novos campos
+            builder.Property(x => x.Tipo)
+                .HasMaxLength(100);
+
+            builder.Property(x => x.CodPaisOrigem)
+                .HasMaxLength(10);
+
+            builder.Property(x => x.NomePaisOrigem)
+                .HasMaxLength(100);
+
+            // Relacionamentos
             builder.HasOne(q => q.Documento)
                 .WithMany(d => d.QuadrosSocietarios)
                 .HasForeignKey(q => q.IdDocumento)
                 .OnDelete(DeleteBehavior.Cascade);
 
+            builder.HasOne(x => x.Nacionalidade)
+                .WithMany()
+                .HasForeignKey(x => x.IdNacionalidade)
+                .OnDelete(DeleteBehavior.SetNull);
+
             // Índices
             builder.HasIndex(x => x.IdDocumento);
+
+            builder.HasIndex(x => x.IdNacionalidade)
+                .HasDatabaseName("IX_QuadroSocietario_IdNacionalidade");
         }
     }
 }

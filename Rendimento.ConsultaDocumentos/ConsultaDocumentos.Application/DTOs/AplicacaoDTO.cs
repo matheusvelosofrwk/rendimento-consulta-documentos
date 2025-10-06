@@ -7,5 +7,7 @@ namespace ConsultaDocumentos.Application.DTOs
         public string Descricao { get; set; }
 
         public string Status { get; set; }
+
+        public bool Serpro { get; set; }
     }
 }

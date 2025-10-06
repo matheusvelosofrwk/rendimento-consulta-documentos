@@ -20,6 +20,7 @@ namespace ConsultaDocumentos.Application.DTOs
         public string? NomeFantasia { get; set; }
         public int? MatrizFilialQtde { get; set; }
         public bool? Matriz { get; set; }
+        public string? Porte { get; set; }
 
         // Campos PF (Pessoa Física)
         public DateTime? DataNascimento { get; set; }
@@ -28,6 +29,7 @@ namespace ConsultaDocumentos.Application.DTOs
         public string? TituloEleitor { get; set; }
         public bool? ResidenteExterior { get; set; }
         public int? AnoObito { get; set; }
+        public string? NomeSocial { get; set; }
 
         // Campos de Situação
         public DateTime? DataSituacao { get; set; }

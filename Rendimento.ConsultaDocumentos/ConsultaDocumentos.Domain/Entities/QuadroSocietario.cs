@@ -27,8 +27,15 @@ namespace ConsultaDocumentos.Domain.Entities
         public decimal? PercentualCapital { get; set; }
         public DateTime DataCriacao { get; set; }
 
-        // Navigation Property
+        // Novos campos
+        public string? Tipo { get; set; } // Tipo de sócio
+        public Guid? IdNacionalidade { get; set; } // FK Nacionalidade
+        public string? CodPaisOrigem { get; set; } // Código país origem
+        public string? NomePaisOrigem { get; set; } // Nome país origem
+
+        // Navigation Properties
         public virtual Documento? Documento { get; set; }
+        public virtual Nacionalidade? Nacionalidade { get; set; }
 
         // Factory Method
         public static QuadroSocietario Criar(

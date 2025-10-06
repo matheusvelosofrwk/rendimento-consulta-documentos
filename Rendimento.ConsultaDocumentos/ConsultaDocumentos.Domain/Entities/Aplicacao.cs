@@ -9,5 +9,8 @@ namespace ConsultaDocumentos.Domain.Entities
         public string Descricao { get; set; }
 
         public string Status { get; set; }
+
+        // Flag se sistema tem acesso ao SERPRO
+        public bool Serpro { get; set; }
     }
 }

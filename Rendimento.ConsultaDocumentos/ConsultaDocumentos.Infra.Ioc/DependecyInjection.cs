@@ -46,6 +46,12 @@ namespace ConsultaDocumentos.Infra.Ioc
                 services.AddScoped<ICacheService, NoOpCacheService>();
             }
 
+            // Memory Cache (para cache de provedores - 5 minutos)
+            services.AddMemoryCache();
+
+            // HttpContextAccessor (para obter IP/Host em logs de billing)
+            services.AddHttpContextAccessor();
+
             // Configurar Identity
             services.AddIdentity<IdentityUser, IdentityRole>(options =>
             {
@@ -103,6 +109,7 @@ namespace ConsultaDocumentos.Infra.Ioc
             services.AddScoped<IAplicacaoService, AplicacaoService>();
             services.AddScoped<IProvedorService, ProvedorService>();
             services.AddScoped<IAuthService, AuthService>();
+            services.AddScoped<IRoleService, RoleService>();
             services.AddScoped<INacionalidadeService, NacionalidadeService>();
             services.AddScoped<ISituacaoCadastralService, SituacaoCadastralService>();
             services.AddScoped<IDocumentoService, DocumentoService>();

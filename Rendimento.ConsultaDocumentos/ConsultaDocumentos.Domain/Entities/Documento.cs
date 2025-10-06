@@ -23,6 +23,7 @@ namespace ConsultaDocumentos.Domain.Entities
         public string? NomeFantasia { get; set; }
         public int? MatrizFilialQtde { get; set; }
         public bool? Matriz { get; set; }
+        public string? Porte { get; set; } // ME/EPP/Médio/Grande
 
         // Campos PF (Pessoa Física)
         public DateTime? DataNascimento { get; set; }
@@ -31,6 +32,7 @@ namespace ConsultaDocumentos.Domain.Entities
         public string? TituloEleitor { get; set; }
         public bool? ResidenteExterior { get; set; }
         public int? AnoObito { get; set; }
+        public string? NomeSocial { get; set; }
 
         // Campos de Situação
         public DateTime? DataSituacao { get; set; }

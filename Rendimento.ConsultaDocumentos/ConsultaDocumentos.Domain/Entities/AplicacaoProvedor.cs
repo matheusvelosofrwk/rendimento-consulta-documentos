@@ -14,9 +14,16 @@ namespace ConsultaDocumentos.Domain.Entities
         public string? CriadoPor { get; private set; }
         public string? AtualizadoPor { get; private set; }
 
+        // Campos de LOG DE USO (billing)
+        public Guid? IdDocumento { get; private set; }
+        public DateTime? DataConsulta { get; private set; }
+        public string? EnderecoIP { get; private set; }
+        public string? RemoteHost { get; private set; }
+
         // Navigation Properties
         public virtual Aplicacao Aplicacao { get; set; }
         public virtual Provedor Provedor { get; set; }
+        public virtual Documento? Documento { get; set; }
 
         // Construtor privado para EF Core
         private AplicacaoProvedor() { }
@@ -74,6 +81,29 @@ namespace ConsultaDocumentos.Domain.Entities
         public bool IsAtivo()
         {
             return Status == StatusEnum.Ativo;
+        }
+
+        // Factory Method para LOG DE USO
+        public static AplicacaoProvedor CriarLogDeUso(
+            Guid aplicacaoId,
+            Guid provedorId,
+            Guid idDocumento,
+            string? enderecoIP = null,
+            string? remoteHost = null)
+        {
+            return new AplicacaoProvedor
+            {
+                Id = Guid.NewGuid(),
+                AplicacaoId = aplicacaoId,
+                ProvedorId = provedorId,
+                Ordem = 0, // Log não precisa de ordem
+                Status = StatusEnum.Ativo,
+                DataCriacao = DateTime.UtcNow,
+                IdDocumento = idDocumento,
+                DataConsulta = DateTime.UtcNow,
+                EnderecoIP = enderecoIP,
+                RemoteHost = remoteHost
+            };
         }
     }
 }

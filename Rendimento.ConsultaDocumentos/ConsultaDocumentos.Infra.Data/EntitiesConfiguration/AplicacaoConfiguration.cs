@@ -15,6 +15,10 @@ namespace ConsultaDocumentos.Infra.Data.EntitiesConfiguration
             builder.Property(x => x.Descricao).HasMaxLength(500);
 
             builder.Property(x => x.Status).HasMaxLength(50).IsRequired();
+
+            builder.Property(x => x.Serpro)
+                .IsRequired()
+                .HasDefaultValue(false);
         }
     }
 }

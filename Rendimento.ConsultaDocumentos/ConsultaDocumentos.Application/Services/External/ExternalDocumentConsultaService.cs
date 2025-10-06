@@ -9,6 +9,8 @@ using ConsultaDocumentos.Application.Interfaces;
 using ConsultaDocumentos.Domain.Entities;
 using ConsultaDocumentos.Domain.Enums;
 using ConsultaDocumentos.Domain.Intefaces;
+using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 using System.Diagnostics;
 using System.Text.Json;
@@ -25,6 +27,8 @@ namespace ConsultaDocumentos.Application.Services.External
         private readonly ILogAuditoriaRepository _logAuditoriaRepository;
         private readonly ILogErroRepository _logErroRepository;
         private readonly ICacheService _cacheService;
+        private readonly IMemoryCache _memoryCache;
+        private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IMapper _mapper;
         private readonly ILogger<ExternalDocumentConsultaService> _logger;
 
@@ -37,6 +41,8 @@ namespace ConsultaDocumentos.Application.Services.External
             ILogAuditoriaRepository logAuditoriaRepository,
             ILogErroRepository logErroRepository,
             ICacheService cacheService,
+            IMemoryCache memoryCache,
+            IHttpContextAccessor httpContextAccessor,
             IMapper mapper,
             ILogger<ExternalDocumentConsultaService> logger)
         {
@@ -48,6 +54,8 @@ namespace ConsultaDocumentos.Application.Services.External
             _logAuditoriaRepository = logAuditoriaRepository;
             _logErroRepository = logErroRepository;
             _cacheService = cacheService;
+            _memoryCache = memoryCache;
+            _httpContextAccessor = httpContextAccessor;
             _mapper = mapper;
             _logger = logger;
         }
@@ -183,9 +191,39 @@ namespace ConsultaDocumentos.Application.Services.External
                 var documentoSalvo = await SalvarDocumentoAsync(documentoConsultado, cancellationToken);
                 var documentoDTOResult = _mapper.Map<DocumentoDTO>(documentoSalvo);
 
-                // Atualiza o cache com o documento consultado
-                await _cacheService.SetAsync(cacheKey, documentoDTOResult, TimeSpan.FromDays(90), cancellationToken);
-                _logger.LogInformation("Documento armazenado no cache com chave: {CacheKey}", cacheKey);
+                // Buscar o provedor usado para obter dias de validade
+                var provedorUsado = await _provedorRepository.GetByNomeAsync(provedorUtilizado);
+                if (provedorUsado == null)
+                {
+                    throw new InvalidOperationException($"Provedor {provedorUtilizado} não encontrado");
+                }
+
+                // Calcular validade dinâmica baseada no tipo de documento
+                var diasValidade = request.TipoDocumento == TipoDocumento.CPF
+                    ? provedorUsado.QtdDiasValidadePF
+                    : provedorUsado.QtdDiasValidadePJ;
+
+                // Atualizar DataConsultaValidade do documento
+                documentoConsultado.DataConsultaValidade = DateTime.UtcNow.AddDays(diasValidade);
+                await _documentoService.UpdateAsync(_mapper.Map<DocumentoDTO>(documentoConsultado));
+
+                // Atualiza o cache com validade dinâmica
+                await _cacheService.SetAsync(
+                    cacheKey,
+                    documentoDTOResult,
+                    TimeSpan.FromDays(diasValidade),
+                    cancellationToken);
+
+                _logger.LogInformation(
+                    "Documento armazenado no cache com validade de {Dias} dias (provedor: {Provedor})",
+                    diasValidade, provedorUtilizado);
+
+                // Registrar log de uso para billing
+                await RegistrarLogDeUsoAsync(
+                    request.AplicacaoId,
+                    provedorUsado.Id,
+                    documentoSalvo.Id,
+                    cancellationToken);
 
                 await RegistrarAuditoriaAsync(
                     request.AplicacaoId,
@@ -314,6 +352,17 @@ namespace ConsultaDocumentos.Application.Services.External
 
         private async Task<List<Provedor>> ObterProvedoresOrdenadosAsync(Guid aplicacaoId, CancellationToken cancellationToken)
         {
+            var cacheKey = $"provedores:aplicacao:{aplicacaoId}";
+
+            // Tentar buscar do cache em memória
+            if (_memoryCache.TryGetValue<List<Provedor>>(cacheKey, out var provedoresCached))
+            {
+                _logger.LogInformation("Provedores retornados do cache em memória para aplicação {AplicacaoId}", aplicacaoId);
+                return provedoresCached!;
+            }
+
+            _logger.LogInformation("Cache miss: buscando provedores do BD para aplicação {AplicacaoId}", aplicacaoId);
+
             var aplicacaoProvedores = await _aplicacaoProvedorRepository.GetAllAsync();
 
             var provedoresAplicacao = aplicacaoProvedores
@@ -328,6 +377,25 @@ namespace ConsultaDocumentos.Application.Services.External
                 var provedor = await _provedorRepository.GetByIdAsync(ap.ProvedorId);
                 if (provedor != null && provedor.Status.ToUpperInvariant() == "ATIVO")
                 {
+                    // CONTROLE DE QUOTA SERPRO
+                    if (provedor.Nome.ToUpperInvariant() == "SERPRO" && provedor.QtdAcessoMaximo.HasValue)
+                    {
+                        // Contar consultas SERPRO hoje
+                        var totalConsultasHoje = await ContarConsultasProvedorHoje(provedor.Id);
+
+                        if (totalConsultasHoje >= provedor.QtdAcessoMaximo.Value)
+                        {
+                            _logger.LogWarning(
+                                "Quota SERPRO atingida: {Total}/{Max}. Pulando provedor.",
+                                totalConsultasHoje, provedor.QtdAcessoMaximo.Value);
+                            continue; // Pula SERPRO
+                        }
+
+                        _logger.LogInformation(
+                            "Quota SERPRO: {Total}/{Max}",
+                            totalConsultasHoje, provedor.QtdAcessoMaximo.Value);
+                    }
+
                     provedores.Add(provedor);
                 }
             }
@@ -336,13 +404,50 @@ namespace ConsultaDocumentos.Application.Services.External
             if (!provedores.Any())
             {
                 var todosProvedores = await _provedorRepository.GetAllAsync();
-                provedores = todosProvedores
-                    .Where(p => p.Status.ToUpperInvariant() == "ATIVO")
-                    .OrderBy(p => p.Prioridade)
-                    .ToList();
+
+                foreach (var provedor in todosProvedores.Where(p => p.Status.ToUpperInvariant() == "ATIVO").OrderBy(p => p.Prioridade))
+                {
+                    // Aplicar controle de quota também no fallback
+                    if (provedor.Nome.ToUpperInvariant() == "SERPRO" && provedor.QtdAcessoMaximo.HasValue)
+                    {
+                        var totalConsultasHoje = await ContarConsultasProvedorHoje(provedor.Id);
+                        if (totalConsultasHoje >= provedor.QtdAcessoMaximo.Value)
+                        {
+                            continue;
+                        }
+                    }
+
+                    provedores.Add(provedor);
+                }
             }
 
+            // Armazenar no cache por 5 minutos (conforme sistema legado)
+            var cacheOptions = new MemoryCacheEntryOptions
+            {
+                AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(5),
+                Priority = CacheItemPriority.Normal
+            };
+
+            _memoryCache.Set(cacheKey, provedores, cacheOptions);
+            _logger.LogInformation("Provedores armazenados no cache em memória (5 minutos) para aplicação {AplicacaoId}", aplicacaoId);
+
             return provedores;
+        }
+
+        private async Task<int> ContarConsultasProvedorHoje(Guid provedorId)
+        {
+            var hoje = DateTime.UtcNow.Date;
+            var amanha = hoje.AddDays(1);
+
+            // Conta em LogAuditoria
+            var logsHoje = await _logAuditoriaRepository.GetAllAsync();
+            var totalLogs = logsHoje
+                .Where(l => l.ProvedorPrincipal == "SERPRO"
+                            && l.DataHoraConsulta >= hoje
+                            && l.DataHoraConsulta < amanha)
+                .Count();
+
+            return totalLogs;
         }
 
         private async Task<Documento?> ConsultarNoProvedorAsync(
@@ -580,6 +685,45 @@ namespace ConsultaDocumentos.Application.Services.External
             var documentoDTO = _mapper.Map<DocumentoDTO>(documento);
             var result = await _documentoService.AddAsync(documentoDTO);
             return _mapper.Map<Documento>(result);
+        }
+
+        private async Task RegistrarLogDeUsoAsync(
+            Guid aplicacaoId,
+            Guid provedorId,
+            Guid idDocumento,
+            CancellationToken cancellationToken)
+        {
+            try
+            {
+                // Obter IP e Host da requisição (via HttpContext se disponível)
+                string? enderecoIP = null;
+                string? remoteHost = null;
+
+                var httpContext = _httpContextAccessor?.HttpContext;
+                if (httpContext != null)
+                {
+                    enderecoIP = httpContext.Connection.RemoteIpAddress?.ToString();
+                    remoteHost = httpContext.Request.Host.Value;
+                }
+
+                var logDeUso = AplicacaoProvedor.CriarLogDeUso(
+                    aplicacaoId,
+                    provedorId,
+                    idDocumento,
+                    enderecoIP,
+                    remoteHost);
+
+                await _aplicacaoProvedorRepository.AddAsync(logDeUso);
+
+                _logger.LogInformation(
+                    "Log de uso registrado: Aplicação {AplicacaoId}, Provedor {ProvedorId}, Documento {DocumentoId}",
+                    aplicacaoId, provedorId, idDocumento);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Erro ao registrar log de uso");
+                // Não propagar exceção - log de uso é informativo
+            }
         }
 
         private async Task RegistrarAuditoriaAsync(

@@ -1,0 +1,66 @@
+@model IEnumerable<ConsultaDocumentos.Web.Models.QuadroSocietarioViewModel>
+
+@{
+    ViewData["Title"] = "Quadro Societário";
+}
+
+<h2>Quadro Societário</h2>
+
+<p>
+    <a asp-action="Create" class="btn btn-primary">Novo Sócio</a>
+</p>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>CPF/CNPJ</th>
+            <th>Nome</th>
+            <th>Qualificação</th>
+            <th>Tipo</th>
+            <th>Percentual Capital</th>
+            <th>Ações</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@item.CpfCnpj</td>
+                <td>@item.Nome</td>
+                <td>@item.Qualificacao</td>
+                <td>@item.Tipo</td>
+                <td>@(item.PercentualCapital?.ToString("N2") ?? "-")%</td>
+                <td>
+                    <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-warning">Editar</a>
+                    <button type="button" class="btn btn-sm btn-danger" onclick="confirmDelete('@item.Id')">Excluir</button>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@section Scripts {
+    <script>
+        function confirmDelete(id) {
+            if (confirm('Deseja realmente excluir este sócio?')) {
+                var form = document.createElement('form');
+                form.method = 'POST';
+                form.action = '/QuadroSocietario/DeleteConfirmed';
+
+                var input = document.createElement('input');
+                input.type = 'hidden';
+                input.name = 'id';
+                input.value = id;
+                form.appendChild(input);
+
+                var token = document.querySelector('input[name="__RequestVerificationToken"]');
+                if (token) {
+                    form.appendChild(token.cloneNode());
+                }
+
+                document.body.appendChild(form);
+                form.submit();
+            }
+        }
+    </script>
+}

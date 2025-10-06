@@ -32,6 +32,22 @@ namespace ConsultaDocumentos.API.Controllers
         [HttpPost]
         public virtual async Task<IActionResult> Create([FromBody] ProvedorDTO dto, CancellationToken ct = default)
         {
+            // Validações
+            if (dto.QtdDiasValidadePF <= 0 || dto.QtdDiasValidadePJ <= 0 || dto.QtdDiasValidadeEND <= 0)
+            {
+                return BadRequest(new { erro = "Dias de validade devem ser maiores que zero" });
+            }
+
+            if (dto.TipoWebService < 1 || dto.TipoWebService > 3)
+            {
+                return BadRequest(new { erro = "TipoWebService deve ser 1 (CPF), 2 (CNPJ) ou 3 (Ambos)" });
+            }
+
+            if (dto.QtdAcessoMaximo.HasValue && dto.QtdAcessoMaximo.Value < 0)
+            {
+                return BadRequest(new { erro = "QtdAcessoMaximo não pode ser negativo" });
+            }
+
             var result = await _service.AddAsync(dto);
             return Ok(result);
         }

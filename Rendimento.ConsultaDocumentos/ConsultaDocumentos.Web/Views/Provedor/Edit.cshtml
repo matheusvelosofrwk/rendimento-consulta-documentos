@@ -1,63 +1,164 @@
 @model ConsultaDocumentos.Web.Models.ProvedorViewModel
 
 @{
-    ViewData["Title"] = "Edit";
+    ViewData["Title"] = "Editar Provedor";
 }
 
-<h1>Edit</h1>
+<h2>Editar Provedor</h2>
 
-<h4>ProvedorViewModel</h4>
-<hr />
-<div class="row">
-    <div class="col-md-4">
-        <form asp-action="Edit">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <input type="hidden" asp-for="Id" />
-            <div class="form-group">
-                <label asp-for="Nome" class="control-label"></label>
-                <input asp-for="Nome" class="form-control" />
-                <span asp-validation-for="Nome" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Descricao" class="control-label"></label>
-                <input asp-for="Descricao" class="form-control" />
-                <span asp-validation-for="Descricao" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="EndpointUrl" class="control-label"></label>
-                <input asp-for="EndpointUrl" class="form-control" />
-                <span asp-validation-for="EndpointUrl" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Credencial" class="control-label"></label>
-                <input asp-for="Credencial" class="form-control" />
-                <span asp-validation-for="Credencial" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Prioridade" class="control-label"></label>
-                <input asp-for="Prioridade" class="form-control" />
-                <span asp-validation-for="Prioridade" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Status" class="control-label"></label>
-                <input asp-for="Status" class="form-control" />
-                <span asp-validation-for="Status" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Timeout" class="control-label"></label>
-                <input asp-for="Timeout" class="form-control" />
-                <span asp-validation-for="Timeout" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <input type="submit" value="Save" class="btn btn-primary" />
-            </div>
-        </form>
+<form asp-action="Edit" method="post">
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+    <input type="hidden" asp-for="Id" />
+
+    <div class="form-group">
+        <label asp-for="Nome"></label>
+        <input asp-for="Nome" class="form-control" />
+        <span asp-validation-for="Nome" class="text-danger"></span>
     </div>
-</div>
 
-<div>
-    <a asp-action="Index">Back to List</a>
-</div>
+    <div class="form-group">
+        <label asp-for="Descricao"></label>
+        <input asp-for="Descricao" class="form-control" />
+        <span asp-validation-for="Descricao" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="EndpointUrl"></label>
+        <input asp-for="EndpointUrl" class="form-control" />
+        <span asp-validation-for="EndpointUrl" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="Credencial"></label>
+        <input asp-for="Credencial" class="form-control" />
+        <span asp-validation-for="Credencial" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="Prioridade"></label>
+        <input asp-for="Prioridade" type="number" class="form-control" />
+        <span asp-validation-for="Prioridade" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="Timeout"></label>
+        <input asp-for="Timeout" type="number" class="form-control" />
+        <span asp-validation-for="Timeout" class="text-danger"></span>
+    </div>
+
+    <!-- NOVOS CAMPOS -->
+
+    <hr />
+    <h4>Configurações de Autenticação</h4>
+
+    <div class="form-group">
+        <label asp-for="EndCertificado"></label>
+        <input asp-for="EndCertificado" class="form-control" placeholder="C:\Certificates\certificado.pfx" />
+        <span asp-validation-for="EndCertificado" class="text-danger"></span>
+        <small class="form-text text-muted">Caminho do certificado digital (.pfx) - SERPRO</small>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="Usuario"></label>
+        <input asp-for="Usuario" class="form-control" />
+        <span asp-validation-for="Usuario" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="Senha"></label>
+        <input asp-for="Senha" type="password" class="form-control" />
+        <span asp-validation-for="Senha" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="Dominio"></label>
+        <input asp-for="Dominio" class="form-control" />
+        <span asp-validation-for="Dominio" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="Porta"></label>
+        <input asp-for="Porta" type="number" class="form-control" />
+        <span asp-validation-for="Porta" class="text-danger"></span>
+        <small class="form-text text-muted">Porta TCP (BoaVista Socket)</small>
+    </div>
+
+    <hr />
+    <h4>Controle de Quota</h4>
+
+    <div class="form-group">
+        <label asp-for="QtdAcessoMinimo"></label>
+        <input asp-for="QtdAcessoMinimo" type="number" class="form-control" />
+        <span asp-validation-for="QtdAcessoMinimo" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="QtdAcessoMaximo"></label>
+        <input asp-for="QtdAcessoMaximo" type="number" class="form-control" />
+        <span asp-validation-for="QtdAcessoMaximo" class="text-danger"></span>
+        <small class="form-text text-muted">Limite diário de consultas (SERPRO)</small>
+    </div>
+
+    <hr />
+    <h4>Validade de Cache</h4>
+
+    <div class="form-group">
+        <label asp-for="QtdDiasValidadePF"></label>
+        <input asp-for="QtdDiasValidadePF" type="number" class="form-control" min="1" max="365" />
+        <span asp-validation-for="QtdDiasValidadePF" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="QtdDiasValidadePJ"></label>
+        <input asp-for="QtdDiasValidadePJ" type="number" class="form-control" min="1" max="365" />
+        <span asp-validation-for="QtdDiasValidadePJ" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="QtdDiasValidadeEND"></label>
+        <input asp-for="QtdDiasValidadeEND" type="number" class="form-control" min="1" max="365" />
+        <span asp-validation-for="QtdDiasValidadeEND" class="text-danger"></span>
+    </div>
+
+    <hr />
+    <h4>Alertas e Faturamento</h4>
+
+    <div class="form-group">
+        <label asp-for="QtdMinEmailLog"></label>
+        <input asp-for="QtdMinEmailLog" type="number" class="form-control" />
+        <span asp-validation-for="QtdMinEmailLog" class="text-danger"></span>
+        <small class="form-text text-muted">Mínimo de erros para enviar alerta por email</small>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="DiaCorte"></label>
+        <input asp-for="DiaCorte" type="number" class="form-control" min="1" max="31" />
+        <span asp-validation-for="DiaCorte" class="text-danger"></span>
+        <small class="form-text text-muted">Dia de corte para faturamento</small>
+    </div>
+
+    <hr />
+    <h4>Tipo de Documento</h4>
+
+    <div class="form-group">
+        <label asp-for="TipoWebService"></label>
+        <select asp-for="TipoWebService" class="form-control">
+            <option value="1">CPF</option>
+            <option value="2">CNPJ</option>
+            <option value="3">Ambos (CPF e CNPJ)</option>
+        </select>
+        <span asp-validation-for="TipoWebService" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="Status"></label>
+        <input asp-for="Status" class="form-control" />
+        <span asp-validation-for="Status" class="text-danger"></span>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Salvar</button>
+    <a asp-action="Index" class="btn btn-secondary">Cancelar</a>
+</form>
 
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}

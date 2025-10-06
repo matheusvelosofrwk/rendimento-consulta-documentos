@@ -13,6 +13,12 @@ namespace ConsultaDocumentos.Application.DTOs
         public string? CriadoPor { get; set; }
         public string? AtualizadoPor { get; set; }
 
+        // Campos de LOG DE USO (billing)
+        public Guid? IdDocumento { get; set; }
+        public DateTime? DataConsulta { get; set; }
+        public string? EnderecoIP { get; set; }
+        public string? RemoteHost { get; set; }
+
         // Propriedades adicionais para exibição
         public string? NomeAplicacao { get; set; }
         public string? NomeProvedor { get; set; }

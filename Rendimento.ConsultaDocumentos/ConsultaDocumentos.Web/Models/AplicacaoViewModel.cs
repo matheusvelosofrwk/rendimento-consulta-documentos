@@ -1,3 +1,5 @@
+using System.ComponentModel.DataAnnotations;
+
 namespace ConsultaDocumentos.Web.Models
 {
     public class AplicacaoViewModel : BaseViewModel
@@ -7,5 +9,8 @@ namespace ConsultaDocumentos.Web.Models
         public string Descricao { get; set; }
 
         public string Status { get; set; }
+
+        [Display(Name = "Acesso SERPRO")]
+        public bool Serpro { get; set; }
     }
 }

@@ -1,33 +1,31 @@
+using ConsultaDocumentos.Web.Clients;
 using ConsultaDocumentos.Web.Models;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
 namespace ConsultaDocumentos.Web.Controllers
 {
     [Authorize]
     public class RoleController : Controller
     {
-        private readonly RoleManager<IdentityRole> _roleManager;
+        private readonly IRoleApi _roleApi;
 
-        public RoleController(RoleManager<IdentityRole> roleManager)
+        public RoleController(IRoleApi roleApi)
         {
-            _roleManager = roleManager;
+            _roleApi = roleApi;
         }
 
         // GET: Role
         public async Task<IActionResult> Index()
         {
-            var roles = await _roleManager.Roles.ToListAsync();
-            var roleViewModels = roles.Select(r => new RoleViewModel
+            var result = await _roleApi.GetAllAsync();
+            if (!result.Success)
             {
-                Id = r.Id,
-                Name = r.Name ?? string.Empty,
-                NormalizedName = r.NormalizedName
-            }).ToList();
+                TempData["ErrorMessage"] = string.Join(", ", result.Notifications);
+                return View(new List<RoleViewModel>());
+            }
 
-            return View(roleViewModels);
+            return View(result.Data);
         }
 
         // GET: Role/Create
@@ -39,29 +37,21 @@ namespace ConsultaDocumentos.Web.Controllers
         // POST: Role/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(RoleViewModel model)
+        public async Task<IActionResult> Create(CreateRoleViewModel model)
         {
             if (ModelState.IsValid)
             {
-                var roleExists = await _roleManager.RoleExistsAsync(model.Name);
-                if (roleExists)
-                {
-                    ModelState.AddModelError(string.Empty, "Já existe um perfil com este nome.");
-                    return View(model);
-                }
+                var result = await _roleApi.CreateAsync(model);
 
-                var role = new IdentityRole(model.Name);
-                var result = await _roleManager.CreateAsync(role);
-
-                if (result.Succeeded)
+                if (result.Success)
                 {
                     TempData["SuccessMessage"] = $"Perfil '{model.Name}' criado com sucesso!";
                     return RedirectToAction(nameof(Index));
                 }
 
-                foreach (var error in result.Errors)
+                foreach (var error in result.Notifications)
                 {
-                    ModelState.AddModelError(string.Empty, error.Description);
+                    ModelState.AddModelError(string.Empty, error);
                 }
             }
 
@@ -76,17 +66,16 @@ namespace ConsultaDocumentos.Web.Controllers
                 return NotFound();
             }
 
-            var role = await _roleManager.FindByIdAsync(id);
-            if (role == null)
+            var result = await _roleApi.GetByIdAsync(id);
+            if (!result.Success || result.Data == null)
             {
                 return NotFound();
             }
 
-            var model = new RoleViewModel
+            var model = new UpdateRoleViewModel
             {
-                Id = role.Id,
-                Name = role.Name ?? string.Empty,
-                NormalizedName = role.NormalizedName
+                Id = result.Data.Id,
+                Name = result.Data.Name
             };
 
             return View(model);
@@ -95,7 +84,7 @@ namespace ConsultaDocumentos.Web.Controllers
         // POST: Role/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(string id, RoleViewModel model)
+        public async Task<IActionResult> Edit(string id, UpdateRoleViewModel model)
         {
             if (id != model.Id)
             {
@@ -104,32 +93,17 @@ namespace ConsultaDocumentos.Web.Controllers
 
             if (ModelState.IsValid)
             {
-                var role = await _roleManager.FindByIdAsync(id);
-                if (role == null)
-                {
-                    return NotFound();
-                }
+                var result = await _roleApi.UpdateAsync(id, model);
 
-                // Verificar se o novo nome já existe (exceto para o próprio perfil)
-                var existingRole = await _roleManager.FindByNameAsync(model.Name);
-                if (existingRole != null && existingRole.Id != id)
-                {
-                    ModelState.AddModelError(string.Empty, "Já existe um perfil com este nome.");
-                    return View(model);
-                }
-
-                role.Name = model.Name;
-                var result = await _roleManager.UpdateAsync(role);
-
-                if (result.Succeeded)
+                if (result.Success)
                 {
                     TempData["SuccessMessage"] = $"Perfil '{model.Name}' atualizado com sucesso!";
                     return RedirectToAction(nameof(Index));
                 }
 
-                foreach (var error in result.Errors)
+                foreach (var error in result.Notifications)
                 {
-                    ModelState.AddModelError(string.Empty, error.Description);
+                    ModelState.AddModelError(string.Empty, error);
                 }
             }
 
@@ -141,43 +115,32 @@ namespace ConsultaDocumentos.Web.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(string id)
         {
-            var role = await _roleManager.FindByIdAsync(id);
-            if (role == null)
-            {
-                if (Request.Headers["X-Requested-With"] == "XMLHttpRequest" ||
-                    Request.Headers.Accept.Contains("application/json"))
-                {
-                    return Json(new { success = false, errors = new[] { "Perfil não encontrado." } });
-                }
-                return NotFound();
-            }
-
-            var result = await _roleManager.DeleteAsync(role);
+            var result = await _roleApi.DeleteAsync(id);
 
             // Se for requisição AJAX, retornar JSON
             if (Request.Headers["X-Requested-With"] == "XMLHttpRequest" ||
                 Request.Headers.Accept.Contains("application/json"))
             {
-                if (result.Succeeded)
+                if (result.Success)
                 {
                     return Json(new { success = true });
                 }
                 else
                 {
-                    return Json(new { success = false, errors = result.Errors.Select(e => e.Description).ToArray() });
+                    return Json(new { success = false, errors = result.Notifications.ToArray() });
                 }
             }
 
             // Se não for AJAX, comportamento padrão
-            if (result.Succeeded)
+            if (result.Success)
             {
-                TempData["SuccessMessage"] = $"Perfil '{role.Name}' excluído com sucesso!";
+                TempData["SuccessMessage"] = "Perfil excluído com sucesso!";
             }
             else
             {
-                foreach (var error in result.Errors)
+                foreach (var error in result.Notifications)
                 {
-                    ModelState.AddModelError(string.Empty, error.Description);
+                    ModelState.AddModelError(string.Empty, error);
                 }
             }
 

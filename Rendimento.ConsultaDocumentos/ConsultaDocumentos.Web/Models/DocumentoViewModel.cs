@@ -1,3 +1,5 @@
+using System.ComponentModel.DataAnnotations;
+
 namespace ConsultaDocumentos.Web.Models
 {
     public class DocumentoViewModel : BaseViewModel
@@ -17,6 +19,13 @@ namespace ConsultaDocumentos.Web.Models
         public DateTime? DataNascimento { get; set; }
         public string? NomeMae { get; set; }
         public string? Sexo { get; set; }
+
+        // NOVOS CAMPOS
+        [Display(Name = "Nome Social")]
+        public string? NomeSocial { get; set; }
+
+        [Display(Name = "Porte")]
+        public string? Porte { get; set; }
 
         // Referências
         public Guid? IdNacionalidade { get; set; }

@@ -24,5 +24,14 @@ namespace ConsultaDocumentos.Application.DTOs
         public DateTime? DataSaida { get; set; }
         public decimal? PercentualCapital { get; set; }
         public DateTime DataCriacao { get; set; }
+
+        // Novos campos
+        public string? Tipo { get; set; }
+        public Guid? IdNacionalidade { get; set; }
+        public string? CodPaisOrigem { get; set; }
+        public string? NomePaisOrigem { get; set; }
+
+        // Para exibição
+        public NacionalidadeDTO? Nacionalidade { get; set; }
     }
 }

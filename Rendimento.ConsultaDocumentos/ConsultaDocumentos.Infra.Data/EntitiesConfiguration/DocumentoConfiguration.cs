@@ -58,6 +58,12 @@ namespace ConsultaDocumentos.Infra.Data.EntitiesConfiguration
             builder.Property(x => x.TituloEleitor)
                 .HasMaxLength(20);
 
+            builder.Property(x => x.NomeSocial)
+                .HasMaxLength(100);
+
+            builder.Property(x => x.Porte)
+                .HasMaxLength(50);
+
             // Campos de Situação
             builder.Property(x => x.CodControle)
                 .HasMaxLength(50);
