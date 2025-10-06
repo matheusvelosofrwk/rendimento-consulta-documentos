@@ -1,44 +1,33 @@
+using ConsultaDocumentos.Web.Clients;
 using ConsultaDocumentos.Web.Models;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
 namespace ConsultaDocumentos.Web.Controllers
 {
     [Authorize]
     public class UserController : Controller
     {
-        private readonly UserManager<IdentityUser> _userManager;
-        private readonly RoleManager<IdentityRole> _roleManager;
+        private readonly IUserApi _userApi;
+        private readonly IRoleApi _roleApi;
 
-        public UserController(UserManager<IdentityUser> userManager, RoleManager<IdentityRole> roleManager)
+        public UserController(IUserApi userApi, IRoleApi roleApi)
         {
-            _userManager = userManager;
-            _roleManager = roleManager;
+            _userApi = userApi;
+            _roleApi = roleApi;
         }
 
         // GET: User
         public async Task<IActionResult> Index()
         {
-            var users = await _userManager.Users.ToListAsync();
-            var userViewModels = new List<UserViewModel>();
-
-            foreach (var user in users)
+            var result = await _userApi.GetAllAsync();
+            if (!result.Success)
             {
-                var roles = await _userManager.GetRolesAsync(user);
-                userViewModels.Add(new UserViewModel
-                {
-                    Id = user.Id,
-                    Email = user.Email ?? string.Empty,
-                    UserName = user.UserName,
-                    EmailConfirmed = user.EmailConfirmed,
-                    LockoutEnabled = user.LockoutEnabled,
-                    Roles = roles.ToList()
-                });
+                TempData["ErrorMessage"] = string.Join(", ", result.Notifications);
+                return View(new List<UserViewModel>());
             }
 
-            return View(userViewModels);
+            return View(result.Data);
         }
 
         // GET: User/Create
@@ -50,35 +39,21 @@ namespace ConsultaDocumentos.Web.Controllers
         // POST: User/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(UserViewModel model)
+        public async Task<IActionResult> Create(CreateUserViewModel model)
         {
             if (ModelState.IsValid)
             {
-                var userExists = await _userManager.FindByEmailAsync(model.Email);
-                if (userExists != null)
-                {
-                    ModelState.AddModelError(string.Empty, "Já existe um usuário com este email.");
-                    return View(model);
-                }
+                var result = await _userApi.CreateAsync(model);
 
-                var user = new IdentityUser
-                {
-                    UserName = model.Email,
-                    Email = model.Email,
-                    EmailConfirmed = true
-                };
-
-                var result = await _userManager.CreateAsync(user, model.Password!);
-
-                if (result.Succeeded)
+                if (result.Success)
                 {
                     TempData["SuccessMessage"] = $"Usuário '{model.Email}' criado com sucesso!";
                     return RedirectToAction(nameof(Index));
                 }
 
-                foreach (var error in result.Errors)
+                foreach (var error in result.Notifications)
                 {
-                    ModelState.AddModelError(string.Empty, error.Description);
+                    ModelState.AddModelError(string.Empty, error);
                 }
             }
 
@@ -93,21 +68,17 @@ namespace ConsultaDocumentos.Web.Controllers
                 return NotFound();
             }
 
-            var user = await _userManager.FindByIdAsync(id);
-            if (user == null)
+            var result = await _userApi.GetByIdAsync(id);
+            if (!result.Success || result.Data == null)
             {
                 return NotFound();
             }
 
-            var roles = await _userManager.GetRolesAsync(user);
-            var model = new UserViewModel
+            var model = new UpdateUserViewModel
             {
-                Id = user.Id,
-                Email = user.Email ?? string.Empty,
-                UserName = user.UserName,
-                EmailConfirmed = user.EmailConfirmed,
-                LockoutEnabled = user.LockoutEnabled,
-                Roles = roles.ToList()
+                Id = result.Data.Id,
+                Email = result.Data.Email,
+                EmailConfirmed = result.Data.EmailConfirmed
             };
 
             return View(model);
@@ -116,15 +87,9 @@ namespace ConsultaDocumentos.Web.Controllers
         // POST: User/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(string id, UserViewModel model)
+        public async Task<IActionResult> Edit(string id, UpdateUserViewModel model)
         {
             if (id != model.Id)
-            {
-                return NotFound();
-            }
-
-            var user = await _userManager.FindByIdAsync(id);
-            if (user == null)
             {
                 return NotFound();
             }
@@ -133,50 +98,21 @@ namespace ConsultaDocumentos.Web.Controllers
             if (string.IsNullOrWhiteSpace(model.Password))
             {
                 ModelState.Remove("Password");
-                ModelState.Remove("ConfirmPassword");
             }
 
             if (ModelState.IsValid)
             {
-                // Verificar se o novo email já existe (exceto para o próprio usuário)
-                var existingUser = await _userManager.FindByEmailAsync(model.Email);
-                if (existingUser != null && existingUser.Id != id)
+                var result = await _userApi.UpdateAsync(id, model);
+
+                if (result.Success)
                 {
-                    ModelState.AddModelError(string.Empty, "Já existe um usuário com este email.");
-                    return View(model);
-                }
-
-                user.Email = model.Email;
-                user.UserName = model.Email;
-                user.EmailConfirmed = model.EmailConfirmed;
-
-                var result = await _userManager.UpdateAsync(user);
-
-                if (result.Succeeded)
-                {
-                    // Atualizar senha se foi fornecida
-                    if (!string.IsNullOrWhiteSpace(model.Password))
-                    {
-                        var token = await _userManager.GeneratePasswordResetTokenAsync(user);
-                        var resetResult = await _userManager.ResetPasswordAsync(user, token, model.Password);
-
-                        if (!resetResult.Succeeded)
-                        {
-                            foreach (var error in resetResult.Errors)
-                            {
-                                ModelState.AddModelError(string.Empty, error.Description);
-                            }
-                            return View(model);
-                        }
-                    }
-
                     TempData["SuccessMessage"] = $"Usuário '{model.Email}' atualizado com sucesso!";
                     return RedirectToAction(nameof(Index));
                 }
 
-                foreach (var error in result.Errors)
+                foreach (var error in result.Notifications)
                 {
-                    ModelState.AddModelError(string.Empty, error.Description);
+                    ModelState.AddModelError(string.Empty, error);
                 }
             }
 
@@ -191,23 +127,27 @@ namespace ConsultaDocumentos.Web.Controllers
                 return NotFound();
             }
 
-            var user = await _userManager.FindByIdAsync(id);
-            if (user == null)
+            var userResult = await _userApi.GetByIdAsync(id);
+            if (!userResult.Success || userResult.Data == null)
             {
                 return NotFound();
             }
 
-            var allRoles = await _roleManager.Roles.ToListAsync();
-            var userRoles = await _userManager.GetRolesAsync(user);
+            var rolesResult = await _roleApi.GetAllAsync();
+            if (!rolesResult.Success)
+            {
+                TempData["ErrorMessage"] = "Erro ao carregar perfis";
+                return RedirectToAction(nameof(Index));
+            }
 
             var model = new UserRoleViewModel
             {
-                UserId = user.Id,
-                UserEmail = user.Email ?? string.Empty,
-                Roles = allRoles.Select(r => new RoleSelectionViewModel
+                UserId = userResult.Data.Id,
+                UserEmail = userResult.Data.Email,
+                Roles = rolesResult.Data.Select(r => new RoleSelectionViewModel
                 {
-                    RoleName = r.Name ?? string.Empty,
-                    IsSelected = userRoles.Contains(r.Name!)
+                    RoleName = r.Name,
+                    IsSelected = userResult.Data.Roles?.Contains(r.Name) ?? false
                 }).ToList()
             };
 
@@ -219,39 +159,28 @@ namespace ConsultaDocumentos.Web.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> ManageRoles(UserRoleViewModel model)
         {
-            var user = await _userManager.FindByIdAsync(model.UserId);
-            if (user == null)
-            {
-                return NotFound();
-            }
-
-            var userRoles = await _userManager.GetRolesAsync(user);
-
-            // Remover todas as roles atuais
-            var removeResult = await _userManager.RemoveFromRolesAsync(user, userRoles);
-            if (!removeResult.Succeeded)
-            {
-                ModelState.AddModelError(string.Empty, "Erro ao remover perfis anteriores.");
-                return View(model);
-            }
-
-            // Adicionar roles selecionadas
             var selectedRoles = model.Roles.Where(r => r.IsSelected).Select(r => r.RoleName).ToList();
-            if (selectedRoles.Any())
+
+            var manageRolesDto = new ManageUserRolesViewModel
             {
-                var addResult = await _userManager.AddToRolesAsync(user, selectedRoles);
-                if (!addResult.Succeeded)
-                {
-                    foreach (var error in addResult.Errors)
-                    {
-                        ModelState.AddModelError(string.Empty, error.Description);
-                    }
-                    return View(model);
-                }
+                UserId = model.UserId,
+                RoleNames = selectedRoles
+            };
+
+            var result = await _userApi.ManageRolesAsync(model.UserId, manageRolesDto);
+
+            if (result.Success)
+            {
+                TempData["SuccessMessage"] = $"Perfis do usuário '{model.UserEmail}' atualizados com sucesso!";
+                return RedirectToAction(nameof(Index));
             }
 
-            TempData["SuccessMessage"] = $"Perfis do usuário '{user.Email}' atualizados com sucesso!";
-            return RedirectToAction(nameof(Index));
+            foreach (var error in result.Notifications)
+            {
+                ModelState.AddModelError(string.Empty, error);
+            }
+
+            return View(model);
         }
 
         // POST: User/Delete/5
@@ -259,43 +188,32 @@ namespace ConsultaDocumentos.Web.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(string id)
         {
-            var user = await _userManager.FindByIdAsync(id);
-            if (user == null)
-            {
-                if (Request.Headers["X-Requested-With"] == "XMLHttpRequest" ||
-                    Request.Headers.Accept.Contains("application/json"))
-                {
-                    return Json(new { success = false, errors = new[] { "Usuário não encontrado." } });
-                }
-                return NotFound();
-            }
-
-            var result = await _userManager.DeleteAsync(user);
+            var result = await _userApi.DeleteAsync(id);
 
             // Se for requisição AJAX, retornar JSON
             if (Request.Headers["X-Requested-With"] == "XMLHttpRequest" ||
                 Request.Headers.Accept.Contains("application/json"))
             {
-                if (result.Succeeded)
+                if (result.Success)
                 {
                     return Json(new { success = true });
                 }
                 else
                 {
-                    return Json(new { success = false, errors = result.Errors.Select(e => e.Description).ToArray() });
+                    return Json(new { success = false, errors = result.Notifications.ToArray() });
                 }
             }
 
             // Se não for AJAX, comportamento padrão
-            if (result.Succeeded)
+            if (result.Success)
             {
-                TempData["SuccessMessage"] = $"Usuário '{user.Email}' excluído com sucesso!";
+                TempData["SuccessMessage"] = "Usuário excluído com sucesso!";
             }
             else
             {
-                foreach (var error in result.Errors)
+                foreach (var error in result.Notifications)
                 {
-                    ModelState.AddModelError(string.Empty, error.Description);
+                    ModelState.AddModelError(string.Empty, error);
                 }
             }
 
