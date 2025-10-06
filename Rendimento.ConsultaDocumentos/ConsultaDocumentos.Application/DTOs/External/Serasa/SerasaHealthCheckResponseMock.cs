@@ -2,7 +2,7 @@ using System.Text.Json.Serialization;
 
 namespace ConsultaDocumentos.Application.DTOs.External.Serasa
 {
-    public class SerasaHealthCheckResponse
+    public class SerasaHealthCheckResponseMock
     {
         [JsonPropertyName("status")]
         public string Status { get; set; }
@@ -11,10 +11,10 @@ namespace ConsultaDocumentos.Application.DTOs.External.Serasa
         public string Timestamp { get; set; }
 
         [JsonPropertyName("services")]
-        public SerasaServicesStatusDTO? Services { get; set; }
+        public SerasaServicesStatusDTOMock? Services { get; set; }
     }
 
-    public class SerasaServicesStatusDTO
+    public class SerasaServicesStatusDTOMock
     {
         [JsonPropertyName("cpf")]
         public string? Cpf { get; set; }

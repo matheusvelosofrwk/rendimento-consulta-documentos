@@ -2,7 +2,7 @@ using System.Text.Json.Serialization;
 
 namespace ConsultaDocumentos.Application.DTOs.External.Serasa
 {
-    public class SerasaScoreResponse
+    public class SerasaScoreResponseMock
     {
         [JsonPropertyName("status")]
         public string Status { get; set; }
@@ -23,10 +23,10 @@ namespace ConsultaDocumentos.Application.DTOs.External.Serasa
         public string TipoDocumento { get; set; }
 
         [JsonPropertyName("score")]
-        public SerasaScoreDataDTO? Score { get; set; }
+        public SerasaScoreDataDTOMock? Score { get; set; }
     }
 
-    public class SerasaScoreDataDTO
+    public class SerasaScoreDataDTOMock
     {
         [JsonPropertyName("valor")]
         public int? Valor { get; set; }

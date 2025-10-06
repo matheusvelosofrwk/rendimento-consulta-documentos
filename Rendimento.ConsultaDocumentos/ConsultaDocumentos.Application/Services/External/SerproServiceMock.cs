@@ -10,18 +10,18 @@ using System.Text.Json;
 
 namespace ConsultaDocumentos.Application.Services.External
 {
-    public class SerproService : ISerproService
+    public class SerproServiceMock : ISerproServiceMock
     {
         private readonly HttpClient _httpClient;
         private readonly IConfiguration _configuration;
-        private readonly ILogger<SerproService> _logger;
+        private readonly ILogger<SerproServiceMock> _logger;
         private readonly string _baseUrl;
         private readonly string _cpfOperador;
 
-        public SerproService(
+        public SerproServiceMock(
             HttpClient httpClient,
             IConfiguration configuration,
-            ILogger<SerproService> logger)
+            ILogger<SerproServiceMock> logger)
         {
             _httpClient = httpClient;
             _configuration = configuration;
@@ -43,7 +43,7 @@ namespace ConsultaDocumentos.Application.Services.External
             _httpClient.DefaultRequestHeaders.Add("Accept", "application/json");
         }
 
-        public async Task<SerprocCPFResponse> ConsultarCPFAsync(
+        public async Task<SerprocCPFResponseMock> ConsultarCPFAsync(
             string cpf,
             CancellationToken cancellationToken = default)
         {
@@ -56,7 +56,7 @@ namespace ConsultaDocumentos.Application.Services.External
                     throw new ExternalProviderException("SERPRO", "CPF inválido");
                 }
 
-                var request = new SerprocCPFRequest
+                var request = new SerprocCPFRequestMock
                 {
                     ListaDeCpf = cpfLimpo,
                     CpfUsuario = _cpfOperador
@@ -64,7 +64,7 @@ namespace ConsultaDocumentos.Application.Services.External
 
                 _logger.LogInformation("Consultando CPF {CPF} no SERPRO", MascararCPF(cpfLimpo));
 
-                var response = await PostAsync<SerprocCPFRequest, SerprocCPFResponse>(
+                var response = await PostAsync<SerprocCPFRequestMock, SerprocCPFResponseMock>(
                     "/cpf/ConsultarCPFP1",
                     request,
                     cancellationToken);
@@ -90,7 +90,7 @@ namespace ConsultaDocumentos.Application.Services.External
             }
         }
 
-        public async Task<SerprocCNPJPerfil1Response> ConsultarCNPJPerfil1Async(
+        public async Task<SerprocCNPJPerfil1ResponseMock> ConsultarCNPJPerfil1Async(
             string cnpj,
             CancellationToken cancellationToken = default)
         {
@@ -102,7 +102,7 @@ namespace ConsultaDocumentos.Application.Services.External
                     throw new ExternalProviderException("SERPRO", "CNPJ inválido");
                 }
 
-                var request = new SerprocCNPJRequest
+                var request = new SerprocCNPJRequestMock
                 {
                     ListaDeCnpj = cnpjLimpo,
                     CpfUsuario = _cpfOperador
@@ -110,7 +110,7 @@ namespace ConsultaDocumentos.Application.Services.External
 
                 _logger.LogInformation("Consultando CNPJ {CNPJ} Perfil 1 no SERPRO", MascararCNPJ(cnpjLimpo));
 
-                var response = await PostAsync<SerprocCNPJRequest, SerprocCNPJPerfil1Response>(
+                var response = await PostAsync<SerprocCNPJRequestMock, SerprocCNPJPerfil1ResponseMock>(
                     "/cnpj/ConsultarCNPJP1",
                     request,
                     cancellationToken);
@@ -136,7 +136,7 @@ namespace ConsultaDocumentos.Application.Services.External
             }
         }
 
-        public async Task<SerprocCNPJPerfil2Response> ConsultarCNPJPerfil2Async(
+        public async Task<SerprocCNPJPerfil2ResponseMock> ConsultarCNPJPerfil2Async(
             string cnpj,
             CancellationToken cancellationToken = default)
         {
@@ -148,7 +148,7 @@ namespace ConsultaDocumentos.Application.Services.External
                     throw new ExternalProviderException("SERPRO", "CNPJ inválido");
                 }
 
-                var request = new SerprocCNPJRequest
+                var request = new SerprocCNPJRequestMock
                 {
                     ListaDeCnpj = cnpjLimpo,
                     CpfUsuario = _cpfOperador
@@ -156,7 +156,7 @@ namespace ConsultaDocumentos.Application.Services.External
 
                 _logger.LogInformation("Consultando CNPJ {CNPJ} Perfil 2 no SERPRO", MascararCNPJ(cnpjLimpo));
 
-                var response = await PostAsync<SerprocCNPJRequest, SerprocCNPJPerfil2Response>(
+                var response = await PostAsync<SerprocCNPJRequestMock, SerprocCNPJPerfil2ResponseMock>(
                     "/cnpj/ConsultarCNPJP2",
                     request,
                     cancellationToken);
@@ -182,7 +182,7 @@ namespace ConsultaDocumentos.Application.Services.External
             }
         }
 
-        public async Task<SerprocCNPJPerfil3Response> ConsultarCNPJPerfil3Async(
+        public async Task<SerprocCNPJPerfil3ResponseMock> ConsultarCNPJPerfil3Async(
             string cnpj,
             CancellationToken cancellationToken = default)
         {
@@ -194,7 +194,7 @@ namespace ConsultaDocumentos.Application.Services.External
                     throw new ExternalProviderException("SERPRO", "CNPJ inválido");
                 }
 
-                var request = new SerprocCNPJRequest
+                var request = new SerprocCNPJRequestMock
                 {
                     ListaDeCnpj = cnpjLimpo,
                     CpfUsuario = _cpfOperador
@@ -202,7 +202,7 @@ namespace ConsultaDocumentos.Application.Services.External
 
                 _logger.LogInformation("Consultando CNPJ {CNPJ} Perfil 3 no SERPRO", MascararCNPJ(cnpjLimpo));
 
-                var response = await PostAsync<SerprocCNPJRequest, SerprocCNPJPerfil3Response>(
+                var response = await PostAsync<SerprocCNPJRequestMock, SerprocCNPJPerfil3ResponseMock>(
                     "/cnpj/ConsultarCNPJP3",
                     request,
                     cancellationToken);
@@ -228,7 +228,7 @@ namespace ConsultaDocumentos.Application.Services.External
             }
         }
 
-        public async Task<SerproHealthCheckResponse> HealthCheckAsync(
+        public async Task<SerproHealthCheckResponseMock> HealthCheckAsync(
             CancellationToken cancellationToken = default)
         {
             try
@@ -239,7 +239,7 @@ namespace ConsultaDocumentos.Application.Services.External
                 response.EnsureSuccessStatusCode();
 
                 var content = await response.Content.ReadAsStringAsync(cancellationToken);
-                var healthCheck = JsonSerializer.Deserialize<SerproHealthCheckResponse>(
+                var healthCheck = JsonSerializer.Deserialize<SerproHealthCheckResponseMock>(
                     content,
                     new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
 

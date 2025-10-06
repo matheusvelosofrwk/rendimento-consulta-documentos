@@ -2,7 +2,7 @@ using System.Text.Json.Serialization;
 
 namespace ConsultaDocumentos.Application.DTOs.External.Serpro
 {
-    public class SerproHealthCheckResponse
+    public class SerproHealthCheckResponseMock
     {
         [JsonPropertyName("status")]
         public string Status { get; set; }

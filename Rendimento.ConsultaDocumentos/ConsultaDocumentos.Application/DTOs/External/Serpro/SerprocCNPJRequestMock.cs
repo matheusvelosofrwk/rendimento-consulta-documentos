@@ -2,10 +2,10 @@ using System.Text.Json.Serialization;
 
 namespace ConsultaDocumentos.Application.DTOs.External.Serpro
 {
-    public class SerprocCPFRequest
+    public class SerprocCNPJRequestMock
     {
-        [JsonPropertyName("listadecpf")]
-        public string ListaDeCpf { get; set; }
+        [JsonPropertyName("listadecnpj")]
+        public string ListaDeCnpj { get; set; }
 
         [JsonPropertyName("cpfUsuario")]
         public string CpfUsuario { get; set; }

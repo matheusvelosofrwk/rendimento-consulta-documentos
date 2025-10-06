@@ -2,7 +2,7 @@ using System.Text.Json.Serialization;
 
 namespace ConsultaDocumentos.Application.DTOs.External.Serasa
 {
-    public class SerasaEnderecoDTO
+    public class SerasaEnderecoDTOMock
     {
         [JsonPropertyName("logradouro")]
         public string? Logradouro { get; set; }
@@ -26,7 +26,7 @@ namespace ConsultaDocumentos.Application.DTOs.External.Serasa
         public string? Uf { get; set; }
     }
 
-    public class SerasaContatoDTO
+    public class SerasaContatoDTOMock
     {
         [JsonPropertyName("ddd")]
         public string? Ddd { get; set; }

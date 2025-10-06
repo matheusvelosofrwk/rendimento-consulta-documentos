@@ -121,7 +121,7 @@ namespace ConsultaDocumentos.Infra.Ioc
 
             // Configurar HttpClients para APIs Externas
             // HttpClient para SERPRO
-            services.AddHttpClient<ISerproService, SerproService>((serviceProvider, client) =>
+            services.AddHttpClient<ISerproServiceMock, SerproServiceMock>((serviceProvider, client) =>
             {
                 var config = serviceProvider.GetRequiredService<IConfiguration>();
                 var timeout = config.GetValue<int?>("ExternalProviders:Serpro:Timeout") ?? 30000;
@@ -129,7 +129,7 @@ namespace ConsultaDocumentos.Infra.Ioc
             });
 
             // HttpClient para SERASA
-            services.AddHttpClient<ISerasaService, SerasaService>((serviceProvider, client) =>
+            services.AddHttpClient<ISerasaServiceMock, SerasaServiceMock>((serviceProvider, client) =>
             {
                 var config = serviceProvider.GetRequiredService<IConfiguration>();
                 var timeout = config.GetValue<int?>("ExternalProviders:Serasa:Timeout") ?? 30000;

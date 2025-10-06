@@ -19,8 +19,8 @@ namespace ConsultaDocumentos.Application.Services.External
 {
     public class ExternalDocumentConsultaService : IExternalDocumentConsultaService
     {
-        private readonly ISerproService _serproService;
-        private readonly ISerasaService _serasaService;
+        private readonly ISerproServiceMock _serproService;
+        private readonly ISerasaServiceMock _serasaService;
         private readonly IDocumentoService _documentoService;
         private readonly IAplicacaoProvedorRepository _aplicacaoProvedorRepository;
         private readonly IProvedorRepository _provedorRepository;
@@ -33,8 +33,8 @@ namespace ConsultaDocumentos.Application.Services.External
         private readonly ILogger<ExternalDocumentConsultaService> _logger;
 
         public ExternalDocumentConsultaService(
-            ISerproService serproService,
-            ISerasaService serasaService,
+            ISerproServiceMock serproService,
+            ISerasaServiceMock serasaService,
             IDocumentoService documentoService,
             IAplicacaoProvedorRepository aplicacaoProvedorRepository,
             IProvedorRepository provedorRepository,
@@ -522,7 +522,7 @@ namespace ConsultaDocumentos.Application.Services.External
 
         // Métodos de conversão (SERPRO -> Documento)
 
-        private Documento ConverterSerprocCPFParaDocumento(SerprocCPFResponse response, string numeroDocumento)
+        private Documento ConverterSerprocCPFParaDocumento(SerprocCPFResponseMock response, string numeroDocumento)
         {
             var documento = Documento.CriarPessoaFisica(
                 DocumentoValidationHelper.RemoverFormatacao(numeroDocumento),
@@ -541,7 +541,7 @@ namespace ConsultaDocumentos.Application.Services.External
             return documento;
         }
 
-        private Documento ConverterSerprocCNPJPerfil1ParaDocumento(SerprocCNPJPerfil1Response response, string numeroDocumento)
+        private Documento ConverterSerprocCNPJPerfil1ParaDocumento(SerprocCNPJPerfil1ResponseMock response, string numeroDocumento)
         {
             var documento = Documento.CriarPessoaJuridica(
                 DocumentoValidationHelper.RemoverFormatacao(numeroDocumento),
@@ -555,7 +555,7 @@ namespace ConsultaDocumentos.Application.Services.External
             return documento;
         }
 
-        private Documento ConverterSerprocCNPJPerfil2ParaDocumento(SerprocCNPJPerfil2Response response, string numeroDocumento)
+        private Documento ConverterSerprocCNPJPerfil2ParaDocumento(SerprocCNPJPerfil2ResponseMock response, string numeroDocumento)
         {
             var documento = ConverterSerprocCNPJPerfil1ParaDocumento(response, numeroDocumento);
 
@@ -574,7 +574,7 @@ namespace ConsultaDocumentos.Application.Services.External
             return documento;
         }
 
-        private Documento ConverterSerprocCNPJPerfil3ParaDocumento(SerprocCNPJPerfil3Response response, string numeroDocumento)
+        private Documento ConverterSerprocCNPJPerfil3ParaDocumento(SerprocCNPJPerfil3ResponseMock response, string numeroDocumento)
         {
             var documento = ConverterSerprocCNPJPerfil2ParaDocumento(response, numeroDocumento);
 
@@ -604,7 +604,7 @@ namespace ConsultaDocumentos.Application.Services.External
 
         // Métodos de conversão (SERASA -> Documento)
 
-        private Documento ConverterSerasaCPFParaDocumento(SerasaCPFResponse response, string numeroDocumento)
+        private Documento ConverterSerasaCPFParaDocumento(SerasaCPFResponseMock response, string numeroDocumento)
         {
             if (response.Dados?.Identificacao == null)
             {
@@ -631,7 +631,7 @@ namespace ConsultaDocumentos.Application.Services.External
             return documento;
         }
 
-        private Documento ConverterSerasaCNPJParaDocumento(SerasaCNPJResponse response, string numeroDocumento)
+        private Documento ConverterSerasaCNPJParaDocumento(SerasaCNPJResponseMock response, string numeroDocumento)
         {
             if (response.Dados?.Identificacao == null)
             {

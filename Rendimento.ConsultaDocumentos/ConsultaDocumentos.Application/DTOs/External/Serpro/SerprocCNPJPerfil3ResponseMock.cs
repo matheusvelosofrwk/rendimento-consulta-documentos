@@ -2,9 +2,9 @@ using System.Text.Json.Serialization;
 
 namespace ConsultaDocumentos.Application.DTOs.External.Serpro
 {
-    public class SerprocCNPJPerfil3Response : SerprocCNPJPerfil2Response
+    public class SerprocCNPJPerfil3ResponseMock : SerprocCNPJPerfil2ResponseMock
     {
         [JsonPropertyName("socios")]
-        public List<SerprocSocioDTO>? Socios { get; set; }
+        public List<SerprocSocioDTOMock>? Socios { get; set; }
     }
 }

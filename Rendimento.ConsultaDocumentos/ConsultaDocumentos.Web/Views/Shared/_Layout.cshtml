@@ -1,132 +1,190 @@
-﻿<!DOCTYPE html>
-<html lang="en">
+<!DOCTYPE html>
+<html lang="pt-BR">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - ConsultaDocumentos.Web</title>
+    <meta name="description" content="Sistema de Consulta de Documentos">
+    <title>@ViewData["Title"] - Consulta Documentos</title>
+
+    <!-- CSS -->
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.7/css/dataTables.bootstrap5.min.css" />
+    <link rel="stylesheet" href="~/css/variables.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/components.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/ConsultaDocumentos.Web.styles.css" asp-append-version="true" />
 </head>
 <body>
-    <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
-            <div class="container-fluid">
-                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">ConsultaDocumentos.Web</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                        aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                    <ul class="navbar-nav flex-grow-1">
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
-                        </li>
+    <div class="wrapper">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <a asp-controller="Home" asp-action="Index" class="sidebar-brand">
+                <i class="fas fa-file-invoice"></i>
+                <span class="sidebar-brand-text">Consulta Docs</span>
+            </a>
 
-                        <!-- Dropdown: Cadastros -->
-                        <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle text-dark" href="#" id="cadastrosDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                Cadastros
-                            </a>
-                            <ul class="dropdown-menu" aria-labelledby="cadastrosDropdown">
-                                <li><a class="dropdown-item" asp-controller="Cliente" asp-action="Index">Clientes</a></li>
-                                <li><a class="dropdown-item" asp-controller="Provedor" asp-action="Index">Provedores</a></li>
-                                <li><a class="dropdown-item" asp-controller="Aplicacao" asp-action="Index">Aplicações</a></li>
-                            </ul>
-                        </li>
-
-                        <!-- Dropdown: Tabelas de Referência -->
-                        <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle text-dark" href="#" id="referenciasDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                Referências
-                            </a>
-                            <ul class="dropdown-menu" aria-labelledby="referenciasDropdown">
-                                <li><a class="dropdown-item" asp-controller="Nacionalidade" asp-action="Index">Nacionalidades</a></li>
-                                <li><a class="dropdown-item" asp-controller="SituacaoCadastral" asp-action="Index">Situações Cadastrais</a></li>
-                            </ul>
-                        </li>
-
-                        <!-- Dropdown: Configurações -->
-                        <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle text-dark" href="#" id="configuracoesDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                Configurações
-                            </a>
-                            <ul class="dropdown-menu" aria-labelledby="configuracoesDropdown">
-                                <li><a class="dropdown-item" asp-controller="AplicacaoProvedor" asp-action="Index">Aplicação-Provedor</a></li>
-                            </ul>
-                        </li>
-
-                        <!-- Dropdown: Logs e Auditoria -->
-                        <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle text-dark" href="#" id="logsDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                Logs & Auditoria
-                            </a>
-                            <ul class="dropdown-menu" aria-labelledby="logsDropdown">
-                                <li><a class="dropdown-item" asp-controller="LogAuditoria" asp-action="Index">Log de Auditoria</a></li>
-                                <li><a class="dropdown-item" asp-controller="LogErro" asp-action="Index">Log de Erro</a></li>
-                            </ul>
-                        </li>
-
-                        <!-- Dropdown: Consultas -->
-                        <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle text-dark" href="#" id="consultasDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                Consultas
-                            </a>
-                            <ul class="dropdown-menu" aria-labelledby="consultasDropdown">
-                                <li><a class="dropdown-item" asp-controller="Documento" asp-action="Consultar">Consultar Documento</a></li>
-                            </ul>
-                        </li>
-
-                        <!-- Dropdown: Administração -->
-                        <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle text-dark" href="#" id="adminDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                Administração
-                            </a>
-                            <ul class="dropdown-menu" aria-labelledby="adminDropdown">
-                                <li><a class="dropdown-item" asp-controller="User" asp-action="Index">Usuários</a></li>
-                                <li><a class="dropdown-item" asp-controller="Role" asp-action="Index">Perfis (Roles)</a></li>
-                            </ul>
-                        </li>
-                    </ul>
-                    <ul class="navbar-nav">
-                        @if (User.Identity?.IsAuthenticated == true)
-                        {
-                            <li class="nav-item">
-                                <span class="nav-link text-dark">Olá, @User.Identity.Name</span>
-                            </li>
-                            <li class="nav-item">
-                                <form asp-area="" asp-controller="Account" asp-action="Logout" method="post" class="d-inline">
-                                    <button type="submit" class="btn btn-link nav-link text-dark">Sair</button>
-                                </form>
-                            </li>
-                        }
-                        else
-                        {
-                            <li class="nav-item">
-                                <a class="nav-link text-dark" asp-area="" asp-controller="Account" asp-action="Login">Login</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link text-dark" asp-area="" asp-controller="Account" asp-action="Register">Registrar</a>
-                            </li>
-                        }
-                    </ul>
+            <nav class="sidebar-nav">
+                <!-- Home -->
+                <div class="nav-section">
+                    <a asp-controller="Home" asp-action="Index" class="nav-link-sidebar">
+                        <i class="fas fa-home"></i>
+                        <span>Dashboard</span>
+                    </a>
                 </div>
-            </div>
-        </nav>
-    </header>
-    <div class="container">
-        <main role="main" class="pb-3">
-            @RenderBody()
-        </main>
+
+                <!-- Cadastros -->
+                <div class="nav-section">
+                    <div class="nav-section-title">Cadastros</div>
+                    <a asp-controller="Cliente" asp-action="Index" class="nav-link-sidebar">
+                        <i class="fas fa-users"></i>
+                        <span>Clientes</span>
+                    </a>
+                    <a asp-controller="Provedor" asp-action="Index" class="nav-link-sidebar">
+                        <i class="fas fa-server"></i>
+                        <span>Provedores</span>
+                    </a>
+                    <a asp-controller="Aplicacao" asp-action="Index" class="nav-link-sidebar">
+                        <i class="fas fa-desktop"></i>
+                        <span>Aplicações</span>
+                    </a>
+                </div>
+
+                <!-- Referências -->
+                <div class="nav-section">
+                    <div class="nav-section-title">Referências</div>
+                    <a asp-controller="Nacionalidade" asp-action="Index" class="nav-link-sidebar">
+                        <i class="fas fa-flag"></i>
+                        <span>Nacionalidades</span>
+                    </a>
+                    <a asp-controller="SituacaoCadastral" asp-action="Index" class="nav-link-sidebar">
+                        <i class="fas fa-tags"></i>
+                        <span>Situações Cadastrais</span>
+                    </a>
+                </div>
+
+                <!-- Consultas -->
+                <div class="nav-section">
+                    <div class="nav-section-title">Consultas</div>
+                    <a asp-controller="Documento" asp-action="Consultar" class="nav-link-sidebar">
+                        <i class="fas fa-search"></i>
+                        <span>Consultar Documento</span>
+                    </a>
+                </div>
+
+                <!-- Configurações -->
+                <div class="nav-section">
+                    <div class="nav-section-title">Configurações</div>
+                    <a asp-controller="AplicacaoProvedor" asp-action="Index" class="nav-link-sidebar">
+                        <i class="fas fa-link"></i>
+                        <span>Aplicação-Provedor</span>
+                    </a>
+                </div>
+
+                <!-- Logs & Auditoria -->
+                <div class="nav-section">
+                    <div class="nav-section-title">Logs & Auditoria</div>
+                    <a asp-controller="LogAuditoria" asp-action="Index" class="nav-link-sidebar">
+                        <i class="fas fa-clipboard-list"></i>
+                        <span>Log de Auditoria</span>
+                    </a>
+                    <a asp-controller="LogErro" asp-action="Index" class="nav-link-sidebar">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <span>Log de Erro</span>
+                    </a>
+                </div>
+
+                <!-- Administração -->
+                <div class="nav-section">
+                    <div class="nav-section-title">Administração</div>
+                    <a asp-controller="User" asp-action="Index" class="nav-link-sidebar">
+                        <i class="fas fa-user-shield"></i>
+                        <span>Usuários</span>
+                    </a>
+                    <a asp-controller="Role" asp-action="Index" class="nav-link-sidebar">
+                        <i class="fas fa-user-tag"></i>
+                        <span>Perfis (Roles)</span>
+                    </a>
+                </div>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Top Navbar -->
+            <nav class="navbar-top">
+                <button class="navbar-toggle" type="button" aria-label="Toggle sidebar">
+                    <i class="fas fa-bars"></i>
+                </button>
+
+                <div class="navbar-user">
+                    @if (User.Identity?.IsAuthenticated == true)
+                    {
+                        <div class="user-dropdown">
+                            <button class="user-dropdown-toggle" type="button">
+                                <div class="user-avatar">
+                                    @(User.Identity.Name?.Substring(0, 1).ToUpper() ?? "U")
+                                </div>
+                                <div class="user-info">
+                                    <span class="user-name">@User.Identity.Name</span>
+                                    <span class="user-role">Usuário</span>
+                                </div>
+                                <i class="fas fa-chevron-down"></i>
+                            </button>
+                            <div class="user-dropdown-menu">
+                                <a href="#" class="user-dropdown-item">
+                                    <i class="fas fa-user"></i> Meu Perfil
+                                </a>
+                                <a href="#" class="user-dropdown-item">
+                                    <i class="fas fa-cog"></i> Configurações
+                                </a>
+                                <div class="divider"></div>
+                                <form asp-controller="Account" asp-action="Logout" method="post" style="margin: 0;">
+                                    <button type="submit" class="user-dropdown-item" style="width: 100%; text-align: left; border: none; background: none; cursor: pointer;">
+                                        <i class="fas fa-sign-out-alt"></i> Sair
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    }
+                    else
+                    {
+                        <a asp-controller="Account" asp-action="Login" class="btn btn-primary-modern btn-modern">
+                            <i class="fas fa-sign-in-alt"></i> Login
+                        </a>
+                        <a asp-controller="Account" asp-action="Register" class="btn btn-outline-primary">
+                            Registrar
+                        </a>
+                    }
+                </div>
+            </nav>
+
+            <!-- Page Content -->
+            <main class="container-main">
+                @RenderBody()
+            </main>
+
+            <!-- Footer -->
+            <footer class="footer-main">
+                <div>
+                    &copy; @DateTime.Now.Year - Consulta Documentos -
+                    <a asp-controller="Home" asp-action="Privacy">Política de Privacidade</a>
+                </div>
+                <div style="margin-top: 0.5rem; font-size: 0.75rem;">
+                    Desenvolvido com <i class="fas fa-heart" style="color: #e74a3b;"></i> por Rendimento
+                </div>
+            </footer>
+        </div>
     </div>
 
-    <footer class="border-top footer text-muted">
-        <div class="container">
-            &copy; 2025 - ConsultaDocumentos.Web - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
-        </div>
-    </footer>
+    <!-- Scripts -->
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.7/js/dataTables.bootstrap5.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.16/jquery.mask.min.js"></script>
+    <script src="~/js/app.js" asp-append-version="true"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
     @await RenderSectionAsync("Scripts", required: false)
 </body>

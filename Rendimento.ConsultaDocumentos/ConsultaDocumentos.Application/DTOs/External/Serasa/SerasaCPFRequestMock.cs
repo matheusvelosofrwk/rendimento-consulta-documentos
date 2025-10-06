@@ -2,7 +2,7 @@ using System.Text.Json.Serialization;
 
 namespace ConsultaDocumentos.Application.DTOs.External.Serasa
 {
-    public class SerasaCPFRequest
+    public class SerasaCPFRequestMock
     {
         [JsonPropertyName("cpf")]
         public string Cpf { get; set; }

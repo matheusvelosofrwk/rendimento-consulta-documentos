@@ -1,43 +1,121 @@
-﻿@model ConsultaDocumentos.Web.Models.ClienteViewModel
+@model ConsultaDocumentos.Web.Models.ClienteViewModel
 
 @{
-    ViewData["Title"] = "Create";
+    ViewData["Title"] = "Novo Cliente";
 }
 
-<h1>Create</h1>
-
-<h4>ClienteViewModel</h4>
-<hr />
-<div class="row">
-    <div class="col-md-4">
-        <form asp-action="Create">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <div class="form-group">
-                <label asp-for="Nome" class="control-label"></label>
-                <input asp-for="Nome" class="form-control" />
-                <span asp-validation-for="Nome" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="CPF" class="control-label"></label>
-                <input asp-for="CPF" class="form-control" />
-                <span asp-validation-for="CPF" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Endereco" class="control-label"></label>
-                <input asp-for="Endereco" class="form-control" />
-                <span asp-validation-for="Endereco" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <input type="submit" value="Create" class="btn btn-primary" />
-            </div>
-        </form>
+<!-- Page Header -->
+<div class="page-header fade-in">
+    <div class="d-flex justify-content-between align-items-center">
+        <div>
+            <h1><i class="fas fa-user-plus"></i> Novo Cliente</h1>
+            <p>Cadastre um novo cliente no sistema</p>
+        </div>
+        <div>
+            <a asp-action="Index" class="btn btn-secondary btn-icon">
+                <i class="fas fa-arrow-left"></i>
+                <span>Voltar</span>
+            </a>
+        </div>
     </div>
 </div>
 
-<div>
-    <a asp-action="Index">Back to List</a>
+<!-- Form Card -->
+<div class="row justify-content-center fade-in">
+    <div class="col-lg-8">
+        <div class="card-modern">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-info-circle"></i> Dados do Cliente
+                </h5>
+            </div>
+            <div class="card-body" style="padding: 2rem;">
+                <form asp-action="Create" method="post" class="form-modern">
+                    <div asp-validation-summary="ModelOnly" class="alert alert-modern alert-danger mb-4"></div>
+
+                    <!-- Nome -->
+                    <div class="form-group mb-4">
+                        <label asp-for="Nome" class="form-label">
+                            <i class="fas fa-user text-primary me-2"></i>Nome Completo
+                        </label>
+                        <div class="input-group input-group-modern">
+                            <span class="input-group-text">
+                                <i class="fas fa-signature"></i>
+                            </span>
+                            <input asp-for="Nome" class="form-control" placeholder="Digite o nome completo do cliente" />
+                        </div>
+                        <span asp-validation-for="Nome" class="text-danger small"></span>
+                    </div>
+
+                    <!-- CPF -->
+                    <div class="form-group mb-4">
+                        <label asp-for="CPF" class="form-label">
+                            <i class="fas fa-id-card text-primary me-2"></i>CPF
+                        </label>
+                        <div class="input-group input-group-modern">
+                            <span class="input-group-text">
+                                <i class="fas fa-hashtag"></i>
+                            </span>
+                            <input asp-for="CPF" class="form-control" placeholder="000.000.000-00" data-mask="cpf" />
+                        </div>
+                        <span asp-validation-for="CPF" class="text-danger small"></span>
+                        <small class="form-text text-muted">
+                            <i class="fas fa-info-circle"></i> Digite apenas números ou use o formato com pontos e hífen
+                        </small>
+                    </div>
+
+                    <!-- Endereço -->
+                    <div class="form-group mb-4">
+                        <label asp-for="Endereco" class="form-label">
+                            <i class="fas fa-map-marker-alt text-primary me-2"></i>Endereço
+                        </label>
+                        <div class="input-group input-group-modern">
+                            <span class="input-group-text">
+                                <i class="fas fa-home"></i>
+                            </span>
+                            <input asp-for="Endereco" class="form-control" placeholder="Digite o endereço completo" />
+                        </div>
+                        <span asp-validation-for="Endereco" class="text-danger small"></span>
+                    </div>
+
+                    <div class="divider my-4"></div>
+
+                    <!-- Botões de Ação -->
+                    <div class="d-flex gap-3 justify-content-end">
+                        <a asp-action="Index" class="btn btn-secondary btn-modern btn-icon">
+                            <i class="fas fa-times"></i>
+                            <span>Cancelar</span>
+                        </a>
+                        <button type="submit" class="btn btn-primary-modern btn-modern btn-icon">
+                            <i class="fas fa-save"></i>
+                            <span>Salvar Cliente</span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Informações Adicionais -->
+        <div class="alert alert-modern alert-info mt-4">
+            <i class="fas fa-lightbulb me-2"></i>
+            <strong>Dica:</strong> Certifique-se de que todos os dados estão corretos antes de salvar. O CPF deve ser válido.
+        </div>
+    </div>
 </div>
 
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script>
+        $(document).ready(function() {
+            // Focar no primeiro campo
+            $('input[name="Nome"]').focus();
+
+            // Animação ao submeter
+            $('form').on('submit', function() {
+                if ($(this).valid()) {
+                    showLoading();
+                }
+            });
+        });
+    </script>
 }

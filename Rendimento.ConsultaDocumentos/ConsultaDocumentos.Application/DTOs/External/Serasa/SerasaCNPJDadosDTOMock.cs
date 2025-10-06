@@ -2,31 +2,31 @@ using System.Text.Json.Serialization;
 
 namespace ConsultaDocumentos.Application.DTOs.External.Serasa
 {
-    public class SerasaCNPJDadosDTO
+    public class SerasaCNPJDadosDTOMock
     {
         [JsonPropertyName("identificacao")]
-        public SerasaCNPJIdentificacaoDTO? Identificacao { get; set; }
+        public SerasaCNPJIdentificacaoDTOMock? Identificacao { get; set; }
 
         [JsonPropertyName("atividade")]
-        public SerasaCNPJAtividadeDTO? Atividade { get; set; }
+        public SerasaCNPJAtividadeDTOMock? Atividade { get; set; }
 
         [JsonPropertyName("endereco")]
-        public SerasaEnderecoDTO? Endereco { get; set; }
+        public SerasaEnderecoDTOMock? Endereco { get; set; }
 
         [JsonPropertyName("contato")]
-        public SerasaContatoDTO? Contato { get; set; }
+        public SerasaContatoDTOMock? Contato { get; set; }
 
         [JsonPropertyName("dadosComplementares")]
-        public SerasaCNPJDadosComplementaresDTO? DadosComplementares { get; set; }
+        public SerasaCNPJDadosComplementaresDTOMock? DadosComplementares { get; set; }
 
         [JsonPropertyName("quadroSocietario")]
-        public List<SerasaQuadroSocietarioDTO>? QuadroSocietario { get; set; }
+        public List<SerasaQuadroSocietarioDTOMock>? QuadroSocietario { get; set; }
 
         [JsonPropertyName("analiseRisco")]
-        public SerasaAnaliseRiscoCNPJDTO? AnaliseRisco { get; set; }
+        public SerasaAnaliseRiscoCNPJDTOMock? AnaliseRisco { get; set; }
     }
 
-    public class SerasaCNPJIdentificacaoDTO
+    public class SerasaCNPJIdentificacaoDTOMock
     {
         [JsonPropertyName("razaoSocial")]
         public string? RazaoSocial { get; set; }
@@ -47,7 +47,7 @@ namespace ConsultaDocumentos.Application.DTOs.External.Serasa
         public string? DataSituacaoCadastral { get; set; }
     }
 
-    public class SerasaCNPJAtividadeDTO
+    public class SerasaCNPJAtividadeDTOMock
     {
         [JsonPropertyName("naturezaJuridica")]
         public string? NaturezaJuridica { get; set; }
@@ -62,7 +62,7 @@ namespace ConsultaDocumentos.Application.DTOs.External.Serasa
         public string? CnAEPrincipalDescricao { get; set; }
     }
 
-    public class SerasaCNPJDadosComplementaresDTO
+    public class SerasaCNPJDadosComplementaresDTOMock
     {
         [JsonPropertyName("capitalSocial")]
         public decimal? CapitalSocial { get; set; }
@@ -74,7 +74,7 @@ namespace ConsultaDocumentos.Application.DTOs.External.Serasa
         public string? DataUltimaAtualizacao { get; set; }
     }
 
-    public class SerasaQuadroSocietarioDTO
+    public class SerasaQuadroSocietarioDTOMock
     {
         [JsonPropertyName("cpfCnpj")]
         public string? CpfCnpj { get; set; }
@@ -95,7 +95,7 @@ namespace ConsultaDocumentos.Application.DTOs.External.Serasa
         public string? PercentualCapital { get; set; }
     }
 
-    public class SerasaAnaliseRiscoCNPJDTO
+    public class SerasaAnaliseRiscoCNPJDTOMock
     {
         [JsonPropertyName("score")]
         public int? Score { get; set; }
@@ -107,10 +107,10 @@ namespace ConsultaDocumentos.Application.DTOs.External.Serasa
         public string? DataUltimaAtualizacao { get; set; }
 
         [JsonPropertyName("indicadores")]
-        public SerasaIndicadoresRiscoDTO? Indicadores { get; set; }
+        public SerasaIndicadoresRiscoDTOMock? Indicadores { get; set; }
     }
 
-    public class SerasaIndicadoresRiscoDTO
+    public class SerasaIndicadoresRiscoDTOMock
     {
         [JsonPropertyName("protestos")]
         public int? Protestos { get; set; }

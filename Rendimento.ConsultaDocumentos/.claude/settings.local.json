@@ -14,7 +14,8 @@
       "Bash(while read file)",
       "Bash(do echo \"=== $file ===\")",
       "Bash(done)",
-      "Bash(dotnet add:*)"
+      "Bash(dotnet add:*)",
+      "Bash(del:*)"
     ],
     "deny": [],
     "ask": []

@@ -10,19 +10,19 @@ using System.Text.Json;
 
 namespace ConsultaDocumentos.Application.Services.External
 {
-    public class SerasaService : ISerasaService
+    public class SerasaServiceMock : ISerasaServiceMock
     {
         private readonly HttpClient _httpClient;
         private readonly IConfiguration _configuration;
-        private readonly ILogger<SerasaService> _logger;
+        private readonly ILogger<SerasaServiceMock> _logger;
         private readonly string _baseUrl;
         private readonly string _usuario;
         private readonly string _senha;
 
-        public SerasaService(
+        public SerasaServiceMock(
             HttpClient httpClient,
             IConfiguration configuration,
-            ILogger<SerasaService> logger)
+            ILogger<SerasaServiceMock> logger)
         {
             _httpClient = httpClient;
             _configuration = configuration;
@@ -46,7 +46,7 @@ namespace ConsultaDocumentos.Application.Services.External
             _httpClient.DefaultRequestHeaders.Add("Accept", "application/json");
         }
 
-        public async Task<SerasaCPFResponse> ConsultarCPFAsync(
+        public async Task<SerasaCPFResponseMock> ConsultarCPFAsync(
             string cpf,
             string tipoConsulta = "COMPLETA",
             CancellationToken cancellationToken = default)
@@ -59,7 +59,7 @@ namespace ConsultaDocumentos.Application.Services.External
                     throw new ExternalProviderException("SERASA", "CPF inválido");
                 }
 
-                var request = new SerasaCPFRequest
+                var request = new SerasaCPFRequestMock
                 {
                     Cpf = cpfLimpo,
                     TipoConsulta = tipoConsulta,
@@ -70,7 +70,7 @@ namespace ConsultaDocumentos.Application.Services.External
                 _logger.LogInformation("Consultando CPF {CPF} na SERASA (Tipo: {Tipo})",
                     MascararCPF(cpfLimpo), tipoConsulta);
 
-                var response = await PostAsync<SerasaCPFRequest, SerasaCPFResponse>(
+                var response = await PostAsync<SerasaCPFRequestMock, SerasaCPFResponseMock>(
                     "/cpf/consultar",
                     request,
                     cancellationToken);
@@ -96,7 +96,7 @@ namespace ConsultaDocumentos.Application.Services.External
             }
         }
 
-        public async Task<SerasaCNPJResponse> ConsultarCNPJAsync(
+        public async Task<SerasaCNPJResponseMock> ConsultarCNPJAsync(
             string cnpj,
             string tipoConsulta = "COMPLETA",
             CancellationToken cancellationToken = default)
@@ -109,7 +109,7 @@ namespace ConsultaDocumentos.Application.Services.External
                     throw new ExternalProviderException("SERASA", "CNPJ inválido");
                 }
 
-                var request = new SerasaCNPJRequest
+                var request = new SerasaCNPJRequestMock
                 {
                     Cnpj = cnpjLimpo,
                     TipoConsulta = tipoConsulta,
@@ -120,7 +120,7 @@ namespace ConsultaDocumentos.Application.Services.External
                 _logger.LogInformation("Consultando CNPJ {CNPJ} na SERASA (Tipo: {Tipo})",
                     MascararCNPJ(cnpjLimpo), tipoConsulta);
 
-                var response = await PostAsync<SerasaCNPJRequest, SerasaCNPJResponse>(
+                var response = await PostAsync<SerasaCNPJRequestMock, SerasaCNPJResponseMock>(
                     "/cnpj/consultar",
                     request,
                     cancellationToken);
@@ -146,7 +146,7 @@ namespace ConsultaDocumentos.Application.Services.External
             }
         }
 
-        public async Task<SerasaScoreResponse> ConsultarScoreAsync(
+        public async Task<SerasaScoreResponseMock> ConsultarScoreAsync(
             string documento,
             string tipoDocumento,
             CancellationToken cancellationToken = default)
@@ -175,7 +175,7 @@ namespace ConsultaDocumentos.Application.Services.External
                     throw new ExternalProviderException("SERASA", "Tipo de documento inválido. Use CPF ou CNPJ");
                 }
 
-                var request = new SerasaScoreRequest
+                var request = new SerasaScoreRequestMock
                 {
                     Documento = documentoLimpo,
                     TipoDocumento = tipoDocumento.ToUpperInvariant(),
@@ -186,7 +186,7 @@ namespace ConsultaDocumentos.Application.Services.External
                 _logger.LogInformation("Consultando Score de {Tipo} {Documento} na SERASA",
                     tipoDocumento, MascararDocumento(documentoLimpo, tipoDocumento));
 
-                var response = await PostAsync<SerasaScoreRequest, SerasaScoreResponse>(
+                var response = await PostAsync<SerasaScoreRequestMock, SerasaScoreResponseMock>(
                     "/score/consultar",
                     request,
                     cancellationToken);
@@ -212,7 +212,7 @@ namespace ConsultaDocumentos.Application.Services.External
             }
         }
 
-        public async Task<SerasaHealthCheckResponse> HealthCheckAsync(
+        public async Task<SerasaHealthCheckResponseMock> HealthCheckAsync(
             CancellationToken cancellationToken = default)
         {
             try
@@ -223,7 +223,7 @@ namespace ConsultaDocumentos.Application.Services.External
                 response.EnsureSuccessStatusCode();
 
                 var content = await response.Content.ReadAsStringAsync(cancellationToken);
-                var healthCheck = JsonSerializer.Deserialize<SerasaHealthCheckResponse>(
+                var healthCheck = JsonSerializer.Deserialize<SerasaHealthCheckResponseMock>(
                     content,
                     new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
 

@@ -2,7 +2,7 @@ using System.Text.Json.Serialization;
 
 namespace ConsultaDocumentos.Application.DTOs.External.Serpro
 {
-    public class SerprocCPFResponse
+    public class SerprocCPFResponseMock
     {
         [JsonPropertyName("nome")]
         public string? Nome { get; set; }

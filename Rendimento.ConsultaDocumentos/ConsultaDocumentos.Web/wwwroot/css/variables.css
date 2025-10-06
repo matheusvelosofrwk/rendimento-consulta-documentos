@@ -1,0 +1,129 @@
+/* ===================================
+   Design System - Variáveis CSS
+   =================================== */
+
+:root {
+    /* Cores Primárias */
+    --primary-color: #4e73df;
+    --primary-dark: #2e59d9;
+    --primary-light: #6f8ff7;
+
+    --secondary-color: #858796;
+    --secondary-dark: #60616f;
+    --secondary-light: #b7b9cc;
+
+    /* Cores de Status */
+    --success-color: #1cc88a;
+    --success-dark: #17a673;
+    --success-light: #5ae3ae;
+
+    --danger-color: #e74a3b;
+    --danger-dark: #be2617;
+    --danger-light: #f1948a;
+
+    --warning-color: #f6c23e;
+    --warning-dark: #dda20a;
+    --warning-light: #fcd873;
+
+    --info-color: #36b9cc;
+    --info-dark: #258391;
+    --info-light: #7dd3e0;
+
+    /* Cores Neutras */
+    --dark-color: #5a5c69;
+    --light-color: #f8f9fc;
+    --white: #ffffff;
+    --black: #000000;
+
+    /* Cores de Background */
+    --bg-main: #f8f9fc;
+    --bg-card: #ffffff;
+    --bg-sidebar: #4e73df;
+    --bg-sidebar-dark: #2e59d9;
+    --bg-navbar: #ffffff;
+    --bg-footer: #f8f9fc;
+
+    /* Cores de Texto */
+    --text-primary: #5a5c69;
+    --text-secondary: #858796;
+    --text-muted: #b7b9cc;
+    --text-white: #ffffff;
+    --text-dark: #3a3b45;
+
+    /* Cores de Borda */
+    --border-color: #e3e6f0;
+    --border-color-dark: #d1d3e2;
+
+    /* Sombras */
+    --shadow-sm: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+    --shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15);
+    --shadow-lg: 0 1rem 3rem rgba(0, 0, 0, 0.175);
+    --shadow-hover: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+
+    /* Raios de Borda */
+    --border-radius-sm: 0.2rem;
+    --border-radius: 0.35rem;
+    --border-radius-lg: 0.5rem;
+    --border-radius-xl: 1rem;
+
+    /* Espaçamentos */
+    --spacing-xs: 0.25rem;
+    --spacing-sm: 0.5rem;
+    --spacing-md: 1rem;
+    --spacing-lg: 1.5rem;
+    --spacing-xl: 2rem;
+    --spacing-2xl: 3rem;
+
+    /* Tipografia */
+    --font-family-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    --font-family-mono: SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+
+    --font-size-xs: 0.75rem;
+    --font-size-sm: 0.875rem;
+    --font-size-base: 1rem;
+    --font-size-lg: 1.125rem;
+    --font-size-xl: 1.25rem;
+    --font-size-2xl: 1.5rem;
+    --font-size-3xl: 2rem;
+
+    --font-weight-light: 300;
+    --font-weight-normal: 400;
+    --font-weight-medium: 500;
+    --font-weight-semibold: 600;
+    --font-weight-bold: 700;
+
+    /* Layout */
+    --sidebar-width: 260px;
+    --sidebar-collapsed-width: 80px;
+    --navbar-height: 70px;
+    --footer-height: 60px;
+
+    /* Transições */
+    --transition-base: all 0.3s ease-in-out;
+    --transition-fast: all 0.15s ease-in-out;
+    --transition-slow: all 0.5s ease-in-out;
+
+    /* Z-index */
+    --z-dropdown: 1000;
+    --z-sticky: 1020;
+    --z-fixed: 1030;
+    --z-modal-backdrop: 1040;
+    --z-modal: 1050;
+    --z-popover: 1060;
+    --z-tooltip: 1070;
+}
+
+/* Dark Mode (opcional para futuras implementações) */
+[data-theme="dark"] {
+    --bg-main: #1a1d2e;
+    --bg-card: #242837;
+    --bg-navbar: #1f2333;
+    --bg-footer: #1a1d2e;
+
+    --text-primary: #e4e6f0;
+    --text-secondary: #b7b9cc;
+    --text-muted: #858796;
+
+    --border-color: #3a3d4e;
+    --border-color-dark: #2a2d3e;
+}

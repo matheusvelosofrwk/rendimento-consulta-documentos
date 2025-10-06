@@ -2,28 +2,28 @@ using System.Text.Json.Serialization;
 
 namespace ConsultaDocumentos.Application.DTOs.External.Serasa
 {
-    public class SerasaCPFDadosDTO
+    public class SerasaCPFDadosDTOMock
     {
         [JsonPropertyName("identificacao")]
-        public SerasaCPFIdentificacaoDTO? Identificacao { get; set; }
+        public SerasaCPFIdentificacaoDTOMock? Identificacao { get; set; }
 
         [JsonPropertyName("documentos")]
-        public SerasaCPFDocumentosDTO? Documentos { get; set; }
+        public SerasaCPFDocumentosDTOMock? Documentos { get; set; }
 
         [JsonPropertyName("endereco")]
-        public SerasaEnderecoDTO? Endereco { get; set; }
+        public SerasaEnderecoDTOMock? Endereco { get; set; }
 
         [JsonPropertyName("contato")]
-        public SerasaContatoDTO? Contato { get; set; }
+        public SerasaContatoDTOMock? Contato { get; set; }
 
         [JsonPropertyName("dadosComplementares")]
-        public SerasaCPFDadosComplementaresDTO? DadosComplementares { get; set; }
+        public SerasaCPFDadosComplementaresDTOMock? DadosComplementares { get; set; }
 
         [JsonPropertyName("analiseRisco")]
-        public SerasaAnaliseRiscoCPFDTO? AnaliseRisco { get; set; }
+        public SerasaAnaliseRiscoCPFDTOMock? AnaliseRisco { get; set; }
     }
 
-    public class SerasaCPFIdentificacaoDTO
+    public class SerasaCPFIdentificacaoDTOMock
     {
         [JsonPropertyName("nome")]
         public string? Nome { get; set; }
@@ -44,7 +44,7 @@ namespace ConsultaDocumentos.Application.DTOs.External.Serasa
         public string? CodigoSituacao { get; set; }
     }
 
-    public class SerasaCPFDocumentosDTO
+    public class SerasaCPFDocumentosDTOMock
     {
         [JsonPropertyName("cpf")]
         public string? Cpf { get; set; }
@@ -65,7 +65,7 @@ namespace ConsultaDocumentos.Application.DTOs.External.Serasa
         public string? TituloEleitor { get; set; }
     }
 
-    public class SerasaCPFDadosComplementaresDTO
+    public class SerasaCPFDadosComplementaresDTOMock
     {
         [JsonPropertyName("profissao")]
         public string? Profissao { get; set; }
@@ -80,7 +80,7 @@ namespace ConsultaDocumentos.Application.DTOs.External.Serasa
         public string? EstadoCivil { get; set; }
     }
 
-    public class SerasaAnaliseRiscoCPFDTO
+    public class SerasaAnaliseRiscoCPFDTOMock
     {
         [JsonPropertyName("score")]
         public int? Score { get; set; }

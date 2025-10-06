@@ -8,13 +8,13 @@ namespace ConsultaDocumentos.Application.Services.External
 {
     public class ProviderHealthCheckService : IProviderHealthCheckService
     {
-        private readonly ISerproService _serproService;
-        private readonly ISerasaService _serasaService;
+        private readonly ISerproServiceMock _serproService;
+        private readonly ISerasaServiceMock _serasaService;
         private readonly ILogger<ProviderHealthCheckService> _logger;
 
         public ProviderHealthCheckService(
-            ISerproService serproService,
-            ISerasaService serasaService,
+            ISerproServiceMock serproService,
+            ISerasaServiceMock serasaService,
             ILogger<ProviderHealthCheckService> logger)
         {
             _serproService = serproService;
