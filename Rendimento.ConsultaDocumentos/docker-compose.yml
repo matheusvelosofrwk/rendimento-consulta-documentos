@@ -47,6 +47,9 @@ services:
       - "1433:1433"
     volumes:
       - sqlserver-data:/var/opt/mssql
+      - ./database:/docker-entrypoint-initdb.d
+      - ./database/entrypoint.sh:/usr/local/bin/entrypoint.sh
+    entrypoint: /bin/bash /usr/local/bin/entrypoint.sh
     networks:
       - consultadocumentos-network
     restart: unless-stopped
@@ -54,8 +57,8 @@ services:
       test: ["CMD-SHELL", "/opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P YourStrong@Password123 -C -Q 'SELECT 1' || exit 1"]
       interval: 30s
       timeout: 10s
-      retries: 5
-      start_period: 30s
+      retries: 10
+      start_period: 60s
 
   # Redis (Cache - Opcional)
   redis:
