@@ -4,44 +4,139 @@
     ViewData["Title"] = "Editar Aplicação";
 }
 
-<h2>Editar Aplicação</h2>
-
-<form asp-action="Edit" method="post">
-    @Html.HiddenFor(x => x.Id)
-    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-
-    <div class="form-group">
-        <label asp-for="Nome"></label>
-        <input asp-for="Nome" class="form-control" />
-        <span asp-validation-for="Nome" class="text-danger"></span>
+<!-- Page Header -->
+<div class="page-header fade-in">
+    <div class="d-flex justify-content-between align-items-center">
+        <div>
+            <h1><i class="fas fa-edit"></i> Editar Aplicação</h1>
+            <p>Atualize os dados da aplicação @Model.Nome</p>
+        </div>
+        <div>
+            <a asp-action="Index" class="btn btn-secondary btn-icon">
+                <i class="fas fa-arrow-left"></i>
+                <span>Voltar</span>
+            </a>
+        </div>
     </div>
+</div>
 
-    <div class="form-group">
-        <label asp-for="Descricao"></label>
-        <textarea asp-for="Descricao" class="form-control" rows="3"></textarea>
-        <span asp-validation-for="Descricao" class="text-danger"></span>
+<!-- Form Card -->
+<div class="row justify-content-center fade-in">
+    <div class="col-lg-8">
+        <div class="card-modern">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-info-circle"></i> Dados da Aplicação
+                </h5>
+            </div>
+            <div class="card-body" style="padding: 2rem;">
+                <form asp-action="Edit" method="post" class="form-modern">
+                    @Html.HiddenFor(x => x.Id)
+                    <div asp-validation-summary="ModelOnly" class="alert alert-modern alert-danger mb-4"></div>
+
+                    <!-- Nome -->
+                    <div class="form-group mb-4">
+                        <label asp-for="Nome" class="form-label">
+                            <i class="fas fa-tag text-primary me-2"></i>Nome da Aplicação
+                        </label>
+                        <div class="input-group input-group-modern">
+                            <span class="input-group-text">
+                                <i class="fas fa-desktop"></i>
+                            </span>
+                            <input asp-for="Nome" class="form-control" placeholder="Digite o nome da aplicação" />
+                        </div>
+                        <span asp-validation-for="Nome" class="text-danger small"></span>
+                    </div>
+
+                    <!-- Descrição -->
+                    <div class="form-group mb-4">
+                        <label asp-for="Descricao" class="form-label">
+                            <i class="fas fa-info-circle text-primary me-2"></i>Descrição
+                        </label>
+                        <div class="input-group input-group-modern">
+                            <span class="input-group-text">
+                                <i class="fas fa-align-left"></i>
+                            </span>
+                            <textarea asp-for="Descricao" class="form-control" rows="3" placeholder="Digite uma descrição para a aplicação"></textarea>
+                        </div>
+                        <span asp-validation-for="Descricao" class="text-danger small"></span>
+                    </div>
+
+                    <!-- Status -->
+                    <div class="form-group mb-4">
+                        <label asp-for="Status" class="form-label">
+                            <i class="fas fa-toggle-on text-primary me-2"></i>Status
+                        </label>
+                        <div class="input-group input-group-modern">
+                            <span class="input-group-text">
+                                <i class="fas fa-check-circle"></i>
+                            </span>
+                            <input asp-for="Status" class="form-control" placeholder="Digite o status" />
+                        </div>
+                        <span asp-validation-for="Status" class="text-danger small"></span>
+                    </div>
+
+                    <!-- Serpro -->
+                    <div class="form-group mb-4">
+                        <div class="form-check form-switch">
+                            <input asp-for="Serpro" class="form-check-input" type="checkbox" role="switch" />
+                            <label asp-for="Serpro" class="form-check-label">
+                                <i class="fas fa-shield-alt me-1"></i> Tem acesso ao provedor SERPRO
+                            </label>
+                        </div>
+                        <span asp-validation-for="Serpro" class="text-danger small"></span>
+                    </div>
+
+                    <div class="divider my-4"></div>
+
+                    <!-- Botões de Ação -->
+                    <div class="d-flex gap-3 justify-content-between">
+                        <button type="button" onclick="openDeleteConfirmation('@Model.Id', 'Aplicacao', '@Model.Nome')" class="btn btn-danger btn-modern btn-icon">
+                            <i class="fas fa-trash-alt"></i>
+                            <span>Excluir Aplicação</span>
+                        </button>
+                        <div class="d-flex gap-3">
+                            <a asp-action="Index" class="btn btn-secondary btn-modern btn-icon">
+                                <i class="fas fa-times"></i>
+                                <span>Cancelar</span>
+                            </a>
+                            <button type="submit" class="btn btn-primary-modern btn-modern btn-icon">
+                                <i class="fas fa-save"></i>
+                                <span>Salvar Alterações</span>
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Informações Adicionais -->
+        <div class="alert alert-modern alert-warning mt-4">
+            <i class="fas fa-exclamation-triangle me-2"></i>
+            <strong>Atenção:</strong> As alterações serão aplicadas imediatamente após salvar.
+        </div>
     </div>
+</div>
 
-    <div class="form-group">
-        <label asp-for="Status"></label>
-        <input asp-for="Status" class="form-control" />
-        <span asp-validation-for="Status" class="text-danger"></span>
-    </div>
+@Html.AntiForgeryToken()
 
-    <!-- NOVO CAMPO -->
-    <div class="form-check">
-        <input asp-for="Serpro" class="form-check-input" type="checkbox" />
-        <label asp-for="Serpro" class="form-check-label">
-            Tem acesso ao provedor SERPRO
-        </label>
-        <span asp-validation-for="Serpro" class="text-danger"></span>
-    </div>
-
-    <br />
-    <button type="submit" class="btn btn-primary">Salvar</button>
-    <a asp-action="Index" class="btn btn-secondary">Cancelar</a>
-</form>
+@* Modal de confirmação de exclusão *@
+@await Html.PartialAsync("_DeleteConfirmationModal")
 
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script src="~/js/delete-helper.js"></script>
+    <script>
+        $(document).ready(function() {
+            // Focar no primeiro campo
+            $('input[name="Nome"]').focus();
+
+            // Animação ao submeter
+            $('form').on('submit', function() {
+                if ($(this).valid()) {
+                    showLoading();
+                }
+            });
+        });
+    </script>
 }

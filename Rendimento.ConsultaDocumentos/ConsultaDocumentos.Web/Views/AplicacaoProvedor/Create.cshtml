@@ -1,66 +1,150 @@
 @model ConsultaDocumentos.Web.Models.AplicacaoProvedorViewModel
 
 @{
-    ViewData["Title"] = "Criar Aplicação-Provedor";
+    ViewData["Title"] = "Novo Vínculo";
 }
 
-<h1>Criar Aplicação-Provedor</h1>
+<!-- Page Header -->
+<div class="page-header fade-in">
+    <div class="d-flex justify-content-between align-items-center">
+        <div>
+            <h1><i class="fas fa-plus-circle"></i> Novo Vínculo</h1>
+            <p>Crie uma nova associação entre aplicação e provedor</p>
+        </div>
+        <div>
+            <a asp-action="Index" class="btn btn-secondary btn-icon">
+                <i class="fas fa-arrow-left"></i>
+                <span>Voltar</span>
+            </a>
+        </div>
+    </div>
+</div>
 
-<h4>Associar Provedor a uma Aplicação</h4>
-<hr />
-<div class="row">
-    <div class="col-md-6">
-        <form asp-action="Create">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-
-            <div class="form-group">
-                <label asp-for="AplicacaoId" class="control-label">Aplicação</label>
-                <select asp-for="AplicacaoId" class="form-control">
-                    <option value="">Selecione uma aplicação</option>
-                    @foreach (var app in ViewBag.Aplicacoes)
-                    {
-                        <option value="@app.Id">@app.Nome</option>
-                    }
-                </select>
-                <span asp-validation-for="AplicacaoId" class="text-danger"></span>
+<!-- Form Card -->
+<div class="row justify-content-center fade-in">
+    <div class="col-lg-8">
+        <div class="card-modern">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-info-circle"></i> Dados do Vínculo
+                </h5>
             </div>
+            <div class="card-body" style="padding: 2rem;">
+                <form asp-action="Create" method="post" class="form-modern">
+                    <div asp-validation-summary="ModelOnly" class="alert alert-modern alert-danger mb-4"></div>
 
-            <div class="form-group">
-                <label asp-for="ProvedorId" class="control-label">Provedor</label>
-                <select asp-for="ProvedorId" class="form-control">
-                    <option value="">Selecione um provedor</option>
-                    @foreach (var prov in ViewBag.Provedores)
-                    {
-                        <option value="@prov.Id">@prov.Nome</option>
-                    }
-                </select>
-                <span asp-validation-for="ProvedorId" class="text-danger"></span>
-            </div>
+                    <!-- Aplicação -->
+                    <div class="form-group mb-4">
+                        <label asp-for="AplicacaoId" class="form-label">
+                            <i class="fas fa-desktop text-primary me-2"></i>Aplicação
+                        </label>
+                        <div class="input-group input-group-modern">
+                            <span class="input-group-text">
+                                <i class="fas fa-laptop-code"></i>
+                            </span>
+                            <select asp-for="AplicacaoId" class="form-control">
+                                <option value="">Selecione uma aplicação</option>
+                                @foreach (var app in ViewBag.Aplicacoes)
+                                {
+                                    <option value="@app.Id">@app.Nome</option>
+                                }
+                            </select>
+                        </div>
+                        <span asp-validation-for="AplicacaoId" class="text-danger small"></span>
+                    </div>
 
-            <div class="form-group">
-                <label asp-for="Ordem" class="control-label">Ordem (Prioridade)</label>
-                <input asp-for="Ordem" class="form-control" type="number" min="1" />
-                <span asp-validation-for="Ordem" class="text-danger"></span>
-                <small class="form-text text-muted">1 = Mais prioritário</small>
-            </div>
+                    <!-- Provedor -->
+                    <div class="form-group mb-4">
+                        <label asp-for="ProvedorId" class="form-label">
+                            <i class="fas fa-server text-primary me-2"></i>Provedor
+                        </label>
+                        <div class="input-group input-group-modern">
+                            <span class="input-group-text">
+                                <i class="fas fa-cloud"></i>
+                            </span>
+                            <select asp-for="ProvedorId" class="form-control">
+                                <option value="">Selecione um provedor</option>
+                                @foreach (var prov in ViewBag.Provedores)
+                                {
+                                    <option value="@prov.Id">@prov.Nome</option>
+                                }
+                            </select>
+                        </div>
+                        <span asp-validation-for="ProvedorId" class="text-danger small"></span>
+                    </div>
 
-            <div class="form-group">
-                <label asp-for="Status" class="control-label">Status</label>
-                <select asp-for="Status" class="form-control">
-                    <option value="@((int)ConsultaDocumentos.Web.Enums.StatusEnum.Ativo)">Ativo</option>
-                    <option value="@((int)ConsultaDocumentos.Web.Enums.StatusEnum.Inativo)">Inativo</option>
-                </select>
-                <span asp-validation-for="Status" class="text-danger"></span>
-            </div>
+                    <!-- Ordem -->
+                    <div class="form-group mb-4">
+                        <label asp-for="Ordem" class="form-label">
+                            <i class="fas fa-sort text-primary me-2"></i>Ordem (Prioridade)
+                        </label>
+                        <div class="input-group input-group-modern">
+                            <span class="input-group-text">
+                                <i class="fas fa-hashtag"></i>
+                            </span>
+                            <input asp-for="Ordem" class="form-control" type="number" min="1" placeholder="Digite a ordem de prioridade" />
+                        </div>
+                        <span asp-validation-for="Ordem" class="text-danger small"></span>
+                        <small class="form-text text-muted">
+                            <i class="fas fa-info-circle"></i> 1 = Mais prioritário
+                        </small>
+                    </div>
 
-            <div class="form-group">
-                <input type="submit" value="Criar" class="btn btn-primary" />
-                <a asp-action="Index" class="btn btn-secondary">Cancelar</a>
+                    <!-- Status -->
+                    <div class="form-group mb-4">
+                        <label asp-for="Status" class="form-label">
+                            <i class="fas fa-toggle-on text-primary me-2"></i>Status
+                        </label>
+                        <div class="input-group input-group-modern">
+                            <span class="input-group-text">
+                                <i class="fas fa-check-circle"></i>
+                            </span>
+                            <select asp-for="Status" class="form-control">
+                                <option value="@((int)ConsultaDocumentos.Web.Enums.StatusEnum.Ativo)">Ativo</option>
+                                <option value="@((int)ConsultaDocumentos.Web.Enums.StatusEnum.Inativo)">Inativo</option>
+                            </select>
+                        </div>
+                        <span asp-validation-for="Status" class="text-danger small"></span>
+                    </div>
+
+                    <div class="divider my-4"></div>
+
+                    <!-- Botões de Ação -->
+                    <div class="d-flex gap-3 justify-content-end">
+                        <a asp-action="Index" class="btn btn-secondary btn-modern btn-icon">
+                            <i class="fas fa-times"></i>
+                            <span>Cancelar</span>
+                        </a>
+                        <button type="submit" class="btn btn-primary-modern btn-modern btn-icon">
+                            <i class="fas fa-save"></i>
+                            <span>Salvar Vínculo</span>
+                        </button>
+                    </div>
+                </form>
             </div>
-        </form>
+        </div>
+
+        <!-- Informações Adicionais -->
+        <div class="alert alert-modern alert-info mt-4">
+            <i class="fas fa-lightbulb me-2"></i>
+            <strong>Dica:</strong> A ordem define a prioridade de consulta ao provedor. Quanto menor o número, maior a prioridade.
+        </div>
     </div>
 </div>
 
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script>
+        $(document).ready(function() {
+            // Focar no primeiro campo
+            $('select[name="AplicacaoId"]').focus();
+
+            // Animação ao submeter
+            $('form').on('submit', function() {
+                if ($(this).valid()) {
+                    showLoading();
+                }
+            });
+        });
+    </script>
 }

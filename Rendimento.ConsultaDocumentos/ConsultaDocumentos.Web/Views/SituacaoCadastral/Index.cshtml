@@ -1,55 +1,148 @@
 @model IEnumerable<ConsultaDocumentos.Web.Models.SituacaoCadastralViewModel>
 
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Situações Cadastrais";
 }
 
-<h1>Index</h1>
+<!-- Page Header -->
+<div class="page-header fade-in">
+    <div class="d-flex justify-content-between align-items-center">
+        <div>
+            <h1><i class="fas fa-file-alt"></i> Situações Cadastrais</h1>
+            <p>Gerencie as situações cadastrais do sistema</p>
+        </div>
+        <div>
+            <a asp-action="Create" class="btn btn-primary-modern btn-modern btn-icon">
+                <i class="fas fa-plus"></i>
+                <span>Nova Situação Cadastral</span>
+            </a>
+        </div>
+    </div>
+</div>
 
-<p>
-    <a asp-action="Create">Create New</a>
-</p>
-
-@Html.AntiForgeryToken()
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.Descricao)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Ativo)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.DataCriacao)
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.Descricao)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Ativo)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.DataCriacao)
-            </td>
-            <td>
-                @Html.ActionLink("Edit", "Edit", new { id=item.Id  }) |
-                <a href="javascript:void(0);" onclick="openDeleteConfirmation('@item.Id', 'SituacaoCadastral', '@item.Descricao')" class="text-danger">Delete</a>
-            </td>
-        </tr>
-}
-    </tbody>
-</table>
+<!-- Card com Tabela -->
+<div class="card-modern fade-in">
+    <div class="card-header">
+        <h5 class="mb-0">
+            <i class="fas fa-list"></i> Lista de Situações Cadastrais
+        </h5>
+    </div>
+    <div class="card-body">
+        @if (Model != null && Model.Any())
+        {
+            @Html.AntiForgeryToken()
+            <div class="table-responsive">
+                <table id="situacoesCadastraisTable" class="table table-hover table-modern">
+                    <thead>
+                        <tr>
+                            <th>
+                                <i class="fas fa-info-circle me-1"></i>
+                                @Html.DisplayNameFor(model => model.Descricao)
+                            </th>
+                            <th>
+                                <i class="fas fa-toggle-on me-1"></i>
+                                @Html.DisplayNameFor(model => model.Ativo)
+                            </th>
+                            <th>
+                                <i class="fas fa-calendar me-1"></i>
+                                @Html.DisplayNameFor(model => model.DataCriacao)
+                            </th>
+                            <th class="text-center" style="width: 120px;">
+                                <i class="fas fa-cog me-1"></i>Ações
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model)
+                        {
+                            <tr>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <div class="user-avatar me-2" style="width: 32px; height: 32px; font-size: 0.875rem;">
+                                            @(item.Descricao?.Substring(0, 1).ToUpper() ?? "S")
+                                        </div>
+                                        <strong>@Html.DisplayFor(modelItem => item.Descricao)</strong>
+                                    </div>
+                                </td>
+                                <td>
+                                    @if (item.Ativo)
+                                    {
+                                        <span class="badge badge-modern bg-success">
+                                            <i class="fas fa-check-circle me-1"></i>Ativo
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge badge-modern bg-danger">
+                                            <i class="fas fa-times-circle me-1"></i>Inativo
+                                        </span>
+                                    }
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.DataCriacao)
+                                </td>
+                                <td>
+                                    <div class="action-buttons justify-content-center">
+                                        <a asp-action="Edit" asp-route-id="@item.Id"
+                                           class="btn-action edit"
+                                           data-bs-toggle="tooltip"
+                                           title="Editar">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+                                        <button onclick="openDeleteConfirmation('@item.Id', 'SituacaoCadastral', '@item.Descricao')"
+                                                class="btn-action delete"
+                                                data-bs-toggle="tooltip"
+                                                title="Excluir">
+                                            <i class="fas fa-trash-alt"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+        else
+        {
+            <!-- Empty State -->
+            <div class="empty-state">
+                <div class="empty-state-icon">
+                    <i class="fas fa-file-alt"></i>
+                </div>
+                <h3>Nenhuma situação cadastral encontrada</h3>
+                <p>Comece adicionando sua primeira situação cadastral ao sistema</p>
+                <a asp-action="Create" class="btn btn-primary-modern btn-modern btn-icon mt-3">
+                    <i class="fas fa-plus"></i>
+                    <span>Cadastrar Primeira Situação Cadastral</span>
+                </a>
+            </div>
+        }
+    </div>
+</div>
 
 @* Modal de confirmação de exclusão *@
 @await Html.PartialAsync("_DeleteConfirmationModal")
 
 @section Scripts {
     <script src="~/js/delete-helper.js"></script>
+    <script>
+        $(document).ready(function() {
+            // Inicializar DataTables
+            if ($('#situacoesCadastraisTable').length) {
+                initDataTable('#situacoesCadastraisTable', {
+                    order: [[0, 'asc']],
+                    columnDefs: [
+                        { orderable: false, targets: -1 } // Desabilitar ordenação na coluna de ações
+                    ]
+                });
+            }
+
+            // Inicializar tooltips
+            var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+            tooltipTriggerList.map(function (tooltipTriggerEl) {
+                return new bootstrap.Tooltip(tooltipTriggerEl);
+            });
+        });
+    </script>
 }

@@ -1,43 +1,114 @@
 @model ConsultaDocumentos.Web.Models.NacionalidadeViewModel
 
 @{
-    ViewData["Title"] = "Create";
+    ViewData["Title"] = "Nova Nacionalidade";
 }
 
-<h1>Create</h1>
-
-<h4>NacionalidadeViewModel</h4>
-<hr />
-<div class="row">
-    <div class="col-md-4">
-        <form asp-action="Create">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <div class="form-group">
-                <label asp-for="Descricao" class="control-label"></label>
-                <input asp-for="Descricao" class="form-control" />
-                <span asp-validation-for="Descricao" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Codigo" class="control-label"></label>
-                <input asp-for="Codigo" class="form-control" />
-                <span asp-validation-for="Codigo" class="text-danger"></span>
-            </div>
-            <div class="form-group form-check">
-                <label class="form-check-label">
-                    <input class="form-check-input" asp-for="Ativo" /> @Html.DisplayNameFor(model => model.Ativo)
-                </label>
-            </div>
-            <div class="form-group">
-                <input type="submit" value="Create" class="btn btn-primary" />
-            </div>
-        </form>
+<!-- Page Header -->
+<div class="page-header fade-in">
+    <div class="d-flex justify-content-between align-items-center">
+        <div>
+            <h1><i class="fas fa-plus-circle"></i> Nova Nacionalidade</h1>
+            <p>Cadastre uma nova nacionalidade no sistema</p>
+        </div>
+        <div>
+            <a asp-action="Index" class="btn btn-secondary btn-icon">
+                <i class="fas fa-arrow-left"></i>
+                <span>Voltar</span>
+            </a>
+        </div>
     </div>
 </div>
 
-<div>
-    <a asp-action="Index">Back to List</a>
+<!-- Form Card -->
+<div class="row justify-content-center fade-in">
+    <div class="col-lg-8">
+        <div class="card-modern">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-info-circle"></i> Dados da Nacionalidade
+                </h5>
+            </div>
+            <div class="card-body" style="padding: 2rem;">
+                <form asp-action="Create" method="post" class="form-modern">
+                    <div asp-validation-summary="ModelOnly" class="alert alert-modern alert-danger mb-4"></div>
+
+                    <!-- Descrição -->
+                    <div class="form-group mb-4">
+                        <label asp-for="Descricao" class="form-label">
+                            <i class="fas fa-info-circle text-primary me-2"></i>Descrição
+                        </label>
+                        <div class="input-group input-group-modern">
+                            <span class="input-group-text">
+                                <i class="fas fa-flag"></i>
+                            </span>
+                            <input asp-for="Descricao" class="form-control" placeholder="Digite a descrição da nacionalidade" />
+                        </div>
+                        <span asp-validation-for="Descricao" class="text-danger small"></span>
+                    </div>
+
+                    <!-- Código -->
+                    <div class="form-group mb-4">
+                        <label asp-for="Codigo" class="form-label">
+                            <i class="fas fa-hashtag text-primary me-2"></i>Código
+                        </label>
+                        <div class="input-group input-group-modern">
+                            <span class="input-group-text">
+                                <i class="fas fa-hashtag"></i>
+                            </span>
+                            <input asp-for="Codigo" class="form-control" placeholder="Digite o código da nacionalidade" />
+                        </div>
+                        <span asp-validation-for="Codigo" class="text-danger small"></span>
+                    </div>
+
+                    <!-- Ativo -->
+                    <div class="form-group mb-4">
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" asp-for="Ativo" id="ativoSwitch">
+                            <label class="form-check-label" for="ativoSwitch">
+                                <i class="fas fa-check-circle text-success me-2"></i>@Html.DisplayNameFor(model => model.Ativo)
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="divider my-4"></div>
+
+                    <!-- Botões de Ação -->
+                    <div class="d-flex gap-3 justify-content-end">
+                        <a asp-action="Index" class="btn btn-secondary btn-modern btn-icon">
+                            <i class="fas fa-times"></i>
+                            <span>Cancelar</span>
+                        </a>
+                        <button type="submit" class="btn btn-primary-modern btn-modern btn-icon">
+                            <i class="fas fa-save"></i>
+                            <span>Salvar Nacionalidade</span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Informações Adicionais -->
+        <div class="alert alert-modern alert-info mt-4">
+            <i class="fas fa-lightbulb me-2"></i>
+            <strong>Dica:</strong> Certifique-se de que todos os dados estão corretos antes de salvar. A descrição e o código são obrigatórios.
+        </div>
+    </div>
 </div>
 
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script>
+        $(document).ready(function() {
+            // Focar no primeiro campo
+            $('input[name="Descricao"]').focus();
+
+            // Animação ao submeter
+            $('form').on('submit', function() {
+                if ($(this).valid()) {
+                    showLoading();
+                }
+            });
+        });
+    </script>
 }
