@@ -7,8 +7,6 @@ namespace ConsultaDocumentos.Infra.Data.Context
 {
     public class ApplicationDbContext : IdentityDbContext<IdentityUser>
     {
-        public DbSet<Cliente> Cliente { get; set; }
-
         public DbSet<Aplicacao> Aplicacao { get; set; }
 
         public DbSet<Provedor> Provedor { get; set; }

@@ -3,6 +3,7 @@ using ConsultaDocumentos.Infra.Data.Context;
 using ConsultaDocumentos.Infra.Ioc;
 using HealthChecks.UI.Client;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -83,14 +84,86 @@ builder.Services.AddAutoMapper();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
+// Aplicar migrations automaticamente e fazer seed de dados
+using (var scope = app.Services.CreateScope())
 {
-    app.UseSwagger();
-    app.UseSwaggerUI();
+    var services = scope.ServiceProvider;
+    try
+    {
+        var context = services.GetRequiredService<ApplicationDbContext>();
+        var logger = services.GetRequiredService<ILogger<Program>>();
+
+        logger.LogInformation("Aplicando migrations...");
+        context.Database.Migrate();
+        logger.LogInformation("Migrations aplicadas com sucesso!");
+
+        // Seed de dados inicial (Identity roles e usuário admin)
+        var userManager = services.GetRequiredService<Microsoft.AspNetCore.Identity.UserManager<Microsoft.AspNetCore.Identity.IdentityUser>>();
+        var roleManager = services.GetRequiredService<Microsoft.AspNetCore.Identity.RoleManager<Microsoft.AspNetCore.Identity.IdentityRole>>();
+
+        await SeedData(userManager, roleManager, logger);
+    }
+    catch (Exception ex)
+    {
+        var logger = services.GetRequiredService<ILogger<Program>>();
+        logger.LogError(ex, "Erro ao aplicar migrations ou fazer seed de dados");
+    }
 }
 
-app.UseHttpsRedirection();
+static async Task SeedData(
+    Microsoft.AspNetCore.Identity.UserManager<Microsoft.AspNetCore.Identity.IdentityUser> userManager,
+    Microsoft.AspNetCore.Identity.RoleManager<Microsoft.AspNetCore.Identity.IdentityRole> roleManager,
+    ILogger logger)
+{
+    // Criar roles padrão
+    string[] roles = { "Admin", "User", "Manager" };
+    foreach (var roleName in roles)
+    {
+        if (!await roleManager.RoleExistsAsync(roleName))
+        {
+            await roleManager.CreateAsync(new Microsoft.AspNetCore.Identity.IdentityRole(roleName));
+            logger.LogInformation($"Role '{roleName}' criada");
+        }
+    }
+
+    // Criar usuário admin padrão
+    var adminEmail = "admin@consultadocumentos.com";
+    var adminUser = await userManager.FindByEmailAsync(adminEmail);
+
+    if (adminUser == null)
+    {
+        adminUser = new Microsoft.AspNetCore.Identity.IdentityUser
+        {
+            UserName = adminEmail,
+            Email = adminEmail,
+            EmailConfirmed = true
+        };
+
+        var result = await userManager.CreateAsync(adminUser, "Admin@123");
+
+        if (result.Succeeded)
+        {
+            await userManager.AddToRoleAsync(adminUser, "Admin");
+            logger.LogInformation($"Usuário admin criado: {adminEmail}");
+        }
+        else
+        {
+            logger.LogError($"Erro ao criar usuário admin: {string.Join(", ", result.Errors.Select(e => e.Description))}");
+        }
+    }
+}
+
+// Configure the HTTP request pipeline.
+// Habilitar Swagger em todos os ambientes (Development e Production)
+app.UseSwagger();
+app.UseSwaggerUI(c =>
+{
+    c.SwaggerEndpoint("/swagger/v1/swagger.json", "ConsultaDocumentos API v1");
+    c.RoutePrefix = string.Empty; // Acessível na raiz: /
+});
+
+// Comentado pois causa problemas no Docker onde não temos HTTPS configurado
+// app.UseHttpsRedirection();
 
 app.UseAuthentication();
 app.UseAuthorization();
