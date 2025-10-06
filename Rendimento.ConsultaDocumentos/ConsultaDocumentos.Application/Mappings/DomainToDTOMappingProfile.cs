@@ -8,7 +8,6 @@ namespace ConsultaDocumentos.Application.Mappings
     {
         public DomainToDTOMappingProfile()
         {
-            CreateMap<ClienteDTO, Cliente>().ReverseMap();
             CreateMap<AplicacaoDTO, Aplicacao>().ReverseMap();
             CreateMap<ProvedorDTO, Provedor>().ReverseMap();
             CreateMap<NacionalidadeDTO, Nacionalidade>().ReverseMap();

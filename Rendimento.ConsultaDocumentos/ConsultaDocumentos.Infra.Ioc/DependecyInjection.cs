@@ -96,7 +96,6 @@ namespace ConsultaDocumentos.Infra.Ioc
                 };
             });
 
-            services.AddScoped<IClienteRepository, ClienteRepository>();
             services.AddScoped<IAplicacaoRepository, AplicacaoRepository>();
             services.AddScoped<IProvedorRepository, ProvedorRepository>();
             services.AddScoped<INacionalidadeRepository, NacionalidadeRepository>();
@@ -110,7 +109,6 @@ namespace ConsultaDocumentos.Infra.Ioc
             services.AddScoped<ILogAuditoriaRepository, LogAuditoriaRepository>();
             services.AddScoped<ILogErroRepository, LogErroRepository>();
 
-            services.AddScoped<IClienteService, ClienteService>();
             services.AddScoped<IAplicacaoService, AplicacaoService>();
             services.AddScoped<IProvedorService, ProvedorService>();
             services.AddScoped<IAuthService, AuthService>();

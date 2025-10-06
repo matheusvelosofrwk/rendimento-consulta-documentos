@@ -35,6 +35,31 @@ services:
     volumes:
       - ./logs:/app/logs
 
+  # WEB - Aplicação MVC
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile.web
+    container_name: consultadocumentos-web
+    ports:
+      - "5002:8080"  # Porta HTTP Web UI
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+      - ASPNETCORE_URLS=http://+:8080
+      - ApiClients__JsonPlaceholder__BaseUrl=http://api:8080/api
+    depends_on:
+      api:
+        condition: service_healthy
+    networks:
+      - consultadocumentos-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
   # SQL Server
   sqlserver:
     image: mcr.microsoft.com/mssql/server:2022-latest
