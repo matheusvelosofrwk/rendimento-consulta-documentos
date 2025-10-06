@@ -19,8 +19,17 @@ namespace ConsultaDocumentos.Application.Services.External
 {
     public class ExternalDocumentConsultaService : IExternalDocumentConsultaService
     {
-        private readonly ISerproServiceMock _serproService;
-        private readonly ISerasaServiceMock _serasaService;
+        // Serviços Mock
+        private readonly ISerproServiceMock _serproServiceMock;
+        private readonly ISerasaServiceMock _serasaServiceMock;
+
+        // Serviços Reais
+        private readonly ISerproService? _serproServiceReal;
+        private readonly ISerasaService? _serasaServiceReal;
+
+        // Seletor de provedor
+        private readonly IProviderSelector _providerSelector;
+
         private readonly IDocumentoService _documentoService;
         private readonly IAplicacaoProvedorRepository _aplicacaoProvedorRepository;
         private readonly IProvedorRepository _provedorRepository;
@@ -33,8 +42,9 @@ namespace ConsultaDocumentos.Application.Services.External
         private readonly ILogger<ExternalDocumentConsultaService> _logger;
 
         public ExternalDocumentConsultaService(
-            ISerproServiceMock serproService,
-            ISerasaServiceMock serasaService,
+            ISerproServiceMock serproServiceMock,
+            ISerasaServiceMock serasaServiceMock,
+            IProviderSelector providerSelector,
             IDocumentoService documentoService,
             IAplicacaoProvedorRepository aplicacaoProvedorRepository,
             IProvedorRepository provedorRepository,
@@ -44,10 +54,15 @@ namespace ConsultaDocumentos.Application.Services.External
             IMemoryCache memoryCache,
             IHttpContextAccessor httpContextAccessor,
             IMapper mapper,
-            ILogger<ExternalDocumentConsultaService> logger)
+            ILogger<ExternalDocumentConsultaService> logger,
+            ISerproService? serproServiceReal = null,
+            ISerasaService? serasaServiceReal = null)
         {
-            _serproService = serproService;
-            _serasaService = serasaService;
+            _serproServiceMock = serproServiceMock;
+            _serasaServiceMock = serasaServiceMock;
+            _serproServiceReal = serproServiceReal;
+            _serasaServiceReal = serasaServiceReal;
+            _providerSelector = providerSelector;
             _documentoService = documentoService;
             _aplicacaoProvedorRepository = aplicacaoProvedorRepository;
             _provedorRepository = provedorRepository;
@@ -58,6 +73,9 @@ namespace ConsultaDocumentos.Application.Services.External
             _httpContextAccessor = httpContextAccessor;
             _mapper = mapper;
             _logger = logger;
+
+            _logger.LogInformation("ExternalDocumentConsultaService inicializado no modo: {Modo}",
+                _providerSelector.ObterModoAtual());
         }
 
         public async Task<ConsultaDocumentoResponse> ConsultarDocumentoAsync(
@@ -282,10 +300,10 @@ namespace ConsultaDocumentos.Application.Services.External
                 _logger.LogInformation("Consultando score de {Tipo} {Numero}",
                     request.TipoDocumento, request.NumeroDocumento);
 
-                // Por enquanto, apenas SERASA oferece consulta de score
+                // Por enquanto, apenas SERASA oferece consulta de score (usando Mock)
                 var tipoDocumentoStr = request.TipoDocumento == TipoDocumento.CPF ? "CPF" : "CNPJ";
 
-                var scoreResponse = await _serasaService.ConsultarScoreAsync(
+                var scoreResponse = await _serasaServiceMock.ConsultarScoreAsync(
                     request.NumeroDocumento,
                     tipoDocumentoStr,
                     cancellationToken);
@@ -477,28 +495,59 @@ namespace ConsultaDocumentos.Application.Services.External
             int perfilCNPJ,
             CancellationToken cancellationToken)
         {
+            var usarMock = _providerSelector.UsarMock();
+
             if (tipoDocumento == TipoDocumento.CPF)
             {
-                var response = await _serproService.ConsultarCPFAsync(numeroDocumento, cancellationToken);
-                return ConverterSerprocCPFParaDocumento(response, numeroDocumento);
+                if (usarMock)
+                {
+                    // Usar Mock
+                    var response = await _serproServiceMock.ConsultarCPFAsync(numeroDocumento, cancellationToken);
+                    return ConverterSerprocCPFParaDocumento(response, numeroDocumento);
+                }
+                else
+                {
+                    // Usar Real
+                    if (_serproServiceReal == null)
+                    {
+                        throw new InvalidOperationException("Serviço real SERPRO não configurado");
+                    }
+
+                    var response = await _serproServiceReal.ConsultarCPFAsync(numeroDocumento, cancellationToken);
+                    return ConverterSerprocCPFRealParaDocumento(response, numeroDocumento);
+                }
             }
             else
             {
-                // Consulta CNPJ conforme perfil solicitado
-                switch (perfilCNPJ)
+                if (usarMock)
                 {
-                    case 1:
-                        var response1 = await _serproService.ConsultarCNPJPerfil1Async(numeroDocumento, cancellationToken);
-                        return ConverterSerprocCNPJPerfil1ParaDocumento(response1, numeroDocumento);
+                    // Consulta CNPJ Mock conforme perfil solicitado
+                    switch (perfilCNPJ)
+                    {
+                        case 1:
+                            var response1 = await _serproServiceMock.ConsultarCNPJPerfil1Async(numeroDocumento, cancellationToken);
+                            return ConverterSerprocCNPJPerfil1ParaDocumento(response1, numeroDocumento);
 
-                    case 2:
-                        var response2 = await _serproService.ConsultarCNPJPerfil2Async(numeroDocumento, cancellationToken);
-                        return ConverterSerprocCNPJPerfil2ParaDocumento(response2, numeroDocumento);
+                        case 2:
+                            var response2 = await _serproServiceMock.ConsultarCNPJPerfil2Async(numeroDocumento, cancellationToken);
+                            return ConverterSerprocCNPJPerfil2ParaDocumento(response2, numeroDocumento);
 
-                    case 3:
-                    default:
-                        var response3 = await _serproService.ConsultarCNPJPerfil3Async(numeroDocumento, cancellationToken);
-                        return ConverterSerprocCNPJPerfil3ParaDocumento(response3, numeroDocumento);
+                        case 3:
+                        default:
+                            var response3 = await _serproServiceMock.ConsultarCNPJPerfil3Async(numeroDocumento, cancellationToken);
+                            return ConverterSerprocCNPJPerfil3ParaDocumento(response3, numeroDocumento);
+                    }
+                }
+                else
+                {
+                    // Consulta CNPJ Real - usar sempre Perfil 7 (completo)
+                    if (_serproServiceReal == null)
+                    {
+                        throw new InvalidOperationException("Serviço real SERPRO não configurado");
+                    }
+
+                    var response = await _serproServiceReal.ConsultarCNPJPerfil7Async(numeroDocumento, "SISTEMA", cancellationToken);
+                    return ConverterSerprocCNPJPerfil7RealParaDocumento(response, numeroDocumento);
                 }
             }
         }
@@ -508,19 +557,51 @@ namespace ConsultaDocumentos.Application.Services.External
             TipoDocumento tipoDocumento,
             CancellationToken cancellationToken)
         {
+            var usarMock = _providerSelector.UsarMock();
+
             if (tipoDocumento == TipoDocumento.CPF)
             {
-                var response = await _serasaService.ConsultarCPFAsync(numeroDocumento, "COMPLETA", cancellationToken);
-                return ConverterSerasaCPFParaDocumento(response, numeroDocumento);
+                if (usarMock)
+                {
+                    // Usar Mock
+                    var response = await _serasaServiceMock.ConsultarCPFAsync(numeroDocumento, "COMPLETA", cancellationToken);
+                    return ConverterSerasaCPFParaDocumento(response, numeroDocumento);
+                }
+                else
+                {
+                    // Usar Real
+                    if (_serasaServiceReal == null)
+                    {
+                        throw new InvalidOperationException("Serviço real SERASA não configurado");
+                    }
+
+                    var response = await _serasaServiceReal.ConsultarCPFAsync(numeroDocumento, 1, cancellationToken);
+                    return ConverterSerasaCPFRealParaDocumento(response, numeroDocumento);
+                }
             }
             else
             {
-                var response = await _serasaService.ConsultarCNPJAsync(numeroDocumento, "COMPLETA", cancellationToken);
-                return ConverterSerasaCNPJParaDocumento(response, numeroDocumento);
+                if (usarMock)
+                {
+                    // Usar Mock
+                    var response = await _serasaServiceMock.ConsultarCNPJAsync(numeroDocumento, "COMPLETA", cancellationToken);
+                    return ConverterSerasaCNPJParaDocumento(response, numeroDocumento);
+                }
+                else
+                {
+                    // Usar Real
+                    if (_serasaServiceReal == null)
+                    {
+                        throw new InvalidOperationException("Serviço real SERASA não configurado");
+                    }
+
+                    var response = await _serasaServiceReal.ConsultarCNPJAsync(numeroDocumento, 1, cancellationToken);
+                    return ConverterSerasaCNPJRealParaDocumento(response, numeroDocumento);
+                }
             }
         }
 
-        // Métodos de conversão (SERPRO -> Documento)
+        // Métodos de conversão (SERPRO Mock -> Documento)
 
         private Documento ConverterSerprocCPFParaDocumento(SerprocCPFResponseMock response, string numeroDocumento)
         {
@@ -676,6 +757,128 @@ namespace ConsultaDocumentos.Application.Services.External
             }
 
             // TODO: Adicionar endereços, telefones e emails
+
+            return documento;
+        }
+
+        // Métodos de conversão (SERPRO Real -> Documento)
+
+        private Documento ConverterSerprocCPFRealParaDocumento(SerprocCPFResponse response, string numeroDocumento)
+        {
+            var dadosCPF = response.RetornoConsultada?.FirstOrDefault();
+            if (dadosCPF == null || !dadosCPF.DadosValidos)
+            {
+                throw new ExternalProviderException("SERPRO", "Dados de CPF inválidos ou não encontrados");
+            }
+
+            var documento = Documento.CriarPessoaFisica(
+                DocumentoValidationHelper.RemoverFormatacao(numeroDocumento),
+                dadosCPF.NomeContribuinte ?? string.Empty,
+                DateConversionHelper.ParseSerproDateDDMMYYYY(dadosCPF.DataNascimento) ?? DateTime.MinValue);
+
+            documento.NomeMae = dadosCPF.NomeMae;
+            documento.Sexo = dadosCPF.CodSexo == "1" ? "M" : dadosCPF.CodSexo == "2" ? "F" : null;
+            documento.ResidenteExterior = dadosCPF.IndResidExt == "S";
+            documento.AnoObito = DateConversionHelper.ParseAnoObito(dadosCPF.AnoObito);
+            documento.IdSituacao = SituacaoCadastralMapper.MapearSituacaoSerpro(dadosCPF.CodSitCad);
+            documento.OrigemBureau = "SERPRO";
+
+            return documento;
+        }
+
+        private Documento ConverterSerprocCNPJPerfil7RealParaDocumento(SerprocCNPJPerfil7Response response, string numeroDocumento)
+        {
+            if (response.TemErro)
+            {
+                throw new ExternalProviderException("SERPRO", response.Erro ?? "Erro desconhecido");
+            }
+
+            var documento = Documento.CriarPessoaJuridica(
+                DocumentoValidationHelper.RemoverFormatacao(numeroDocumento),
+                response.NomeEmpresarial ?? string.Empty,
+                DateConversionHelper.ParseSerproDateSlash(response.DataAbertura));
+
+            documento.NomeFantasia = response.NomeFantasia;
+            documento.Matriz = response.Estabelecimento?.ToUpperInvariant() == "0001";
+            documento.DataSituacao = DateConversionHelper.ParseSerproDateSlash(response.DataSituacaoCadastral);
+            documento.IdSituacao = SituacaoCadastralMapper.MapearSituacao(response.SituacaoCadastral);
+            documento.OrigemBureau = "SERPRO";
+
+            if (int.TryParse(response.NaturezaJuridica?.Split('-').FirstOrDefault()?.Trim(), out int naturezaJuridica))
+            {
+                documento.NaturezaJuridica = naturezaJuridica;
+            }
+            documento.DescricaoNaturezaJuridica = response.NaturezaJuridica;
+
+            // Adicionar sócios do Perfil 7
+            if (response.Sociedade != null && response.Sociedade.Any())
+            {
+                foreach (var socioDTO in response.Sociedade)
+                {
+                    var socio = QuadroSocietario.Criar(
+                        documento.Id,
+                        socioDTO.CPFCNPJSocio ?? string.Empty,
+                        socioDTO.NomeSocio ?? string.Empty,
+                        socioDTO.QualificacaoSocio);
+
+                    socio.DataEntrada = DateConversionHelper.ParseSerproDateSlash(socioDTO.DataEntrada);
+                    socio.CpfRepresentanteLegal = socioDTO.CPFRepresentante;
+                    socio.NomeRepresentanteLegal = socioDTO.NomeRepresentante;
+                    socio.QualificacaoRepresentanteLegal = socioDTO.QualificacaoRepresentante;
+
+                    documento.AdicionarQuadroSocietario(socio);
+                }
+            }
+
+            return documento;
+        }
+
+        // Métodos de conversão (SERASA Real -> Documento)
+
+        private Documento ConverterSerasaCPFRealParaDocumento(SerasaCPFResponse response, string numeroDocumento)
+        {
+            if (response.TemErro)
+            {
+                throw new ExternalProviderException("SERASA", response.Erro ?? "Erro desconhecido");
+            }
+
+            if (string.IsNullOrWhiteSpace(response.Nome))
+            {
+                throw new ExternalProviderException("SERASA", "Nome em branco");
+            }
+
+            var documento = Documento.CriarPessoaFisica(
+                DocumentoValidationHelper.RemoverFormatacao(numeroDocumento),
+                response.Nome,
+                DateTime.MinValue); // Data de nascimento não vem no retorno básico
+
+            documento.IdSituacao = SituacaoCadastralMapper.MapearSituacao(response.Situacao);
+            documento.CodControle = response.Codigo_de_Controle;
+            documento.OrigemBureau = "SERASA";
+
+            return documento;
+        }
+
+        private Documento ConverterSerasaCNPJRealParaDocumento(SerasaCNPJResponse response, string numeroDocumento)
+        {
+            if (response.TemErro)
+            {
+                throw new ExternalProviderException("SERASA", response.Erro ?? "Erro desconhecido");
+            }
+
+            if (string.IsNullOrWhiteSpace(response.Nome))
+            {
+                throw new ExternalProviderException("SERASA", "Nome em branco");
+            }
+
+            var documento = Documento.CriarPessoaJuridica(
+                DocumentoValidationHelper.RemoverFormatacao(numeroDocumento),
+                response.Nome,
+                DateConversionHelper.ParseSerasaDate(response.DataAbertura));
+
+            documento.DataSituacao = DateConversionHelper.ParseSerasaDate(response.DataSituacao);
+            documento.IdSituacao = SituacaoCadastralMapper.MapearSituacao(response.Situacao);
+            documento.OrigemBureau = "SERASA";
 
             return documento;
         }

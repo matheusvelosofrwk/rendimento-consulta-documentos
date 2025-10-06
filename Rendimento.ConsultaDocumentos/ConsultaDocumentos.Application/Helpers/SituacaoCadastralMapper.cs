@@ -64,5 +64,27 @@ namespace ConsultaDocumentos.Application.Helpers
 
             return situacaoNormalizada == "ATIVA" || situacaoNormalizada == "REGULAR";
         }
+
+        /// <summary>
+        /// Mapeia código de situação cadastral do Serpro Real (CPF)
+        /// Códigos: 0=Regular, 2=Suspensa, 3=Titular Falecido, 4=Pendente Regulariz., 5=Cancelada, 8=Nula, 9=Cancelada por Mult.
+        /// </summary>
+        public static Guid? MapearSituacaoSerpro(string? codigoSituacao)
+        {
+            if (string.IsNullOrWhiteSpace(codigoSituacao))
+                return null;
+
+            return codigoSituacao.Trim() switch
+            {
+                "0" => SituacoesCadastralMap["REGULAR"],      // Regular = Ativa
+                "2" => SituacoesCadastralMap["SUSPENSA"],     // Suspensa
+                "3" => SituacoesCadastralMap["CANCELADA"],    // Titular Falecido = Cancelada
+                "4" => SituacoesCadastralMap["PENDENTE DE REGULARIZACAO"],  // Pendente Regularização
+                "5" => SituacoesCadastralMap["CANCELADA"],    // Cancelada
+                "8" => SituacoesCadastralMap["NULA"],         // Nula
+                "9" => SituacoesCadastralMap["CANCELADA"],    // Cancelada por Multiplicidade
+                _ => null
+            };
+        }
     }
 }

@@ -5,6 +5,8 @@ namespace ConsultaDocumentos.Application.Helpers
     public static class DateConversionHelper
     {
         private static readonly string[] SerproFormats = { "dd/MM/yyyy", "ddMMyyyy", "yyyy-MM-ddTHH:mm:ss" };
+        private static readonly string[] SerproDateSlashFormats = { "dd/MM/yyyy" };
+        private static readonly string[] SerproDateDDMMYYYYFormats = { "ddMMyyyy" };
         private static readonly string[] SerasaFormats = { "dd/MM/yyyy", "yyyy-MM-dd", "dd-MM-yyyy", "yyyy-MM-ddTHH:mm:ss" };
 
         public static DateTime? ParseSerproDate(string? dateString)
@@ -80,6 +82,46 @@ namespace ConsultaDocumentos.Application.Helpers
                    valorUpper == "1" ||
                    valorUpper == "YES" ||
                    valorUpper == "Y";
+        }
+
+        /// <summary>
+        /// Parse data no formato dd/MM/yyyy (Serpro Real - CNPJ)
+        /// </summary>
+        public static DateTime? ParseSerproDateSlash(string? dateString)
+        {
+            if (string.IsNullOrWhiteSpace(dateString))
+                return null;
+
+            foreach (var format in SerproDateSlashFormats)
+            {
+                if (DateTime.TryParseExact(dateString, format, CultureInfo.InvariantCulture,
+                    DateTimeStyles.None, out var date))
+                {
+                    return date;
+                }
+            }
+
+            return ParseSerproDate(dateString);
+        }
+
+        /// <summary>
+        /// Parse data no formato ddMMyyyy (Serpro Real - CPF)
+        /// </summary>
+        public static DateTime? ParseSerproDateDDMMYYYY(string? dateString)
+        {
+            if (string.IsNullOrWhiteSpace(dateString))
+                return null;
+
+            foreach (var format in SerproDateDDMMYYYYFormats)
+            {
+                if (DateTime.TryParseExact(dateString, format, CultureInfo.InvariantCulture,
+                    DateTimeStyles.None, out var date))
+                {
+                    return date;
+                }
+            }
+
+            return ParseSerproDate(dateString);
         }
     }
 }
