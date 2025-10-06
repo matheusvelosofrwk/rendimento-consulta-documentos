@@ -416,3 +416,8 @@ FodyWeavers.xsd
 *.msix
 *.msm
 *.msp
+/.idea/misc.xml
+/.idea/modules.xml
+/.idea/rendimento-consulta-documentos.iml
+/.idea/vcs.xml
+/.idea/workspace.xml
