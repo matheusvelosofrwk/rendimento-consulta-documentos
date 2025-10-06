@@ -15,7 +15,10 @@
       "Bash(do echo \"=== $file ===\")",
       "Bash(done)",
       "Bash(dotnet add:*)",
-      "Bash(del:*)"
+      "Bash(del:*)",
+      "Bash(docker-compose:*)",
+      "Bash(curl:*)",
+      "Bash(docker exec:*)"
     ],
     "deny": [],
     "ask": []
