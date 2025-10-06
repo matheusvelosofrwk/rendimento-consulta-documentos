@@ -421,3 +421,4 @@ FodyWeavers.xsd
 /.idea/rendimento-consulta-documentos.iml
 /.idea/vcs.xml
 /.idea/workspace.xml
+/.claude/settings.local.json
