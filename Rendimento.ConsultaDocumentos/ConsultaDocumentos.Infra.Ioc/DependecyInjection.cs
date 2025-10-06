@@ -1,5 +1,6 @@
 ﻿using ConsultaDocumentos.Application.Interfaces;
 using ConsultaDocumentos.Application.Services;
+using ConsultaDocumentos.Application.Services.External;
 using ConsultaDocumentos.Domain.Intefaces;
 using ConsultaDocumentos.Infra.Data.Context;
 using ConsultaDocumentos.Infra.Data.Repositories;
@@ -88,6 +89,27 @@ namespace ConsultaDocumentos.Infra.Ioc
             services.AddScoped<IEmailService, EmailService>();
             services.AddScoped<IQuadroSocietarioService, QuadroSocietarioService>();
             services.AddScoped<IAplicacaoProvedorService, AplicacaoProvedorService>();
+
+            // Configurar HttpClients para APIs Externas
+            // HttpClient para SERPRO
+            services.AddHttpClient<ISerproService, SerproService>((serviceProvider, client) =>
+            {
+                var config = serviceProvider.GetRequiredService<IConfiguration>();
+                var timeout = config.GetValue<int?>("ExternalProviders:Serpro:Timeout") ?? 30000;
+                client.Timeout = TimeSpan.FromMilliseconds(timeout);
+            });
+
+            // HttpClient para SERASA
+            services.AddHttpClient<ISerasaService, SerasaService>((serviceProvider, client) =>
+            {
+                var config = serviceProvider.GetRequiredService<IConfiguration>();
+                var timeout = config.GetValue<int?>("ExternalProviders:Serasa:Timeout") ?? 30000;
+                client.Timeout = TimeSpan.FromMilliseconds(timeout);
+            });
+
+            // Serviços de Integração Externa
+            services.AddScoped<IExternalDocumentConsultaService, ExternalDocumentConsultaService>();
+            services.AddScoped<IProviderHealthCheckService, ProviderHealthCheckService>();
 
             return services;
         }
