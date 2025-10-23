@@ -5,22 +5,22 @@ namespace ConsultaDocumentos.Web.Clients
 {
     public interface IUserApi
     {
-        [Get("/user")]
+        [Get("/User")]
         Task<Result<IEnumerable<UserViewModel>>> GetAllAsync();
 
-        [Get("/user/{id}")]
+        [Get("/User/{id}")]
         Task<Result<UserViewModel>> GetByIdAsync(string id);
 
-        [Post("/user")]
+        [Post("/User")]
         Task<Result<UserViewModel>> CreateAsync([Body] CreateUserViewModel model);
 
-        [Put("/user/{id}")]
+        [Put("/User/{id}")]
         Task<Result<UserViewModel>> UpdateAsync(string id, [Body] UpdateUserViewModel model);
 
-        [Delete("/user/{id}")]
+        [Delete("/User/{id}")]
         Task<Result<bool>> DeleteAsync(string id);
 
-        [Put("/user/{id}/roles")]
+        [Put("/User/{id}/roles")]
         Task<Result<bool>> ManageRolesAsync(string id, [Body] ManageUserRolesViewModel model);
     }
 }

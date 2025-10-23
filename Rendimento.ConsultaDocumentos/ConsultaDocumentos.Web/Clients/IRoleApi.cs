@@ -5,19 +5,19 @@ namespace ConsultaDocumentos.Web.Clients
 {
     public interface IRoleApi
     {
-        [Get("/role")]
+        [Get("/Role")]
         Task<Result<IEnumerable<RoleViewModel>>> GetAllAsync();
 
-        [Get("/role/{id}")]
+        [Get("/Role/{id}")]
         Task<Result<RoleViewModel>> GetByIdAsync(string id);
 
-        [Post("/role")]
+        [Post("/Role")]
         Task<Result<RoleViewModel>> CreateAsync([Body] CreateRoleViewModel model);
 
-        [Put("/role/{id}")]
+        [Put("/Role/{id}")]
         Task<Result<RoleViewModel>> UpdateAsync(string id, [Body] UpdateRoleViewModel model);
 
-        [Delete("/role/{id}")]
+        [Delete("/Role/{id}")]
         Task<Result<bool>> DeleteAsync(string id);
     }
 }

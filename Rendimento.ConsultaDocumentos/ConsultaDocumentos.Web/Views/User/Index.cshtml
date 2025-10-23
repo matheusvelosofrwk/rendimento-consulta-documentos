@@ -30,6 +30,16 @@
     </div>
 }
 
+<!-- Alert de Erro -->
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-modern alert-danger alert-dismissible fade show fade-in" role="alert">
+        <i class="fas fa-exclamation-circle me-2"></i>
+        @TempData["ErrorMessage"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
 <!-- Card com Tabela -->
 <div class="card-modern fade-in">
     <div class="card-header">
