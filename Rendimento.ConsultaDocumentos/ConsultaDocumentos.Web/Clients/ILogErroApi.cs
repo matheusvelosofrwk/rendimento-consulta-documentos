@@ -16,5 +16,13 @@ namespace ConsultaDocumentos.Web.Clients
 
         [Get("/LogErro/usuario/{usuario}")]
         Task<Result<IList<LogErroViewModel>>> GetByUsuarioAsync(string usuario);
+
+        [Get("/LogErro/filtrar")]
+        Task<Result<IList<LogErroViewModel>>> GetWithFiltersAsync(
+            [Query] DateTime? dataInicio,
+            [Query] DateTime? dataFim,
+            [Query] string? numeroDocumento,
+            [Query] Guid? aplicacaoProvedorId,
+            [Query] int? tipoDocumento);
     }
 }
