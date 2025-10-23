@@ -22,9 +22,18 @@ namespace ConsultaDocumentos.Web.Controllers
         }
 
         // GET: AplicacaoProvedorController
-        public async Task<ActionResult> Index()
+        public async Task<ActionResult> Index(Guid? aplicacaoId)
         {
-            var result = await _api.GetAllAsync();
+            Result<IList<AplicacaoProvedorViewModel>> result;
+
+            if (aplicacaoId.HasValue && aplicacaoId.Value != Guid.Empty)
+            {
+                result = await _api.GetByAplicacaoIdAsync(aplicacaoId.Value);
+            }
+            else
+            {
+                result = await _api.GetAllAsync();
+            }
 
             if (!result.Success)
             {
@@ -34,6 +43,11 @@ namespace ConsultaDocumentos.Web.Controllers
                 }
                 return View(new List<AplicacaoProvedorViewModel>());
             }
+
+            // Carregar lista de aplicações para o filtro
+            var aplicacoesResult = await _aplicacaoApi.GetAllAsync();
+            ViewBag.Aplicacoes = aplicacoesResult.Success ? aplicacoesResult.Data : new List<AplicacaoViewModel>();
+            ViewBag.AplicacaoIdSelecionada = aplicacaoId;
 
             return View(result.Data);
         }

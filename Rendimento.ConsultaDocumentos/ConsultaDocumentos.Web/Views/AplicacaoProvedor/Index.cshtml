@@ -20,6 +20,40 @@
     </div>
 </div>
 
+<!-- Filtro por Aplicação -->
+<div class="card-modern fade-in mb-3">
+    <div class="card-body" style="padding: 1rem;">
+        <form method="get" asp-action="Index" id="filtroForm">
+            <div class="row align-items-end">
+                <div class="col-md-10">
+                    <label for="aplicacaoId" class="form-label">
+                        <i class="fas fa-filter text-primary me-2"></i>Filtrar por Aplicação
+                    </label>
+                    <select name="aplicacaoId" id="aplicacaoId" class="form-select" onchange="document.getElementById('filtroForm').submit();">
+                        <option value="">Todas as Aplicações</option>
+                        @if (ViewBag.Aplicacoes != null)
+                        {
+                            var aplicacaoIdSelecionada = ViewBag.AplicacaoIdSelecionada?.ToString();
+                            foreach (var app in (IEnumerable<ConsultaDocumentos.Web.Models.AplicacaoViewModel>)ViewBag.Aplicacoes)
+                            {
+                                var isSelected = aplicacaoIdSelecionada != null && aplicacaoIdSelecionada == app.Id.ToString();
+                                <option value="@app.Id" selected="@isSelected">
+                                    @app.Nome
+                                </option>
+                            }
+                        }
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <a asp-action="Index" class="btn btn-secondary btn-modern w-100">
+                        <i class="fas fa-times me-1"></i>Limpar
+                    </a>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
 <!-- Card com Tabela -->
 <div class="card-modern fade-in">
     <div class="card-header">

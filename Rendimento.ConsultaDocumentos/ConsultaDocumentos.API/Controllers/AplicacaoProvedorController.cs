@@ -50,5 +50,12 @@ namespace ConsultaDocumentos.API.Controllers
             var result = await _service.DeleteAsync(id);
             return Ok(result);
         }
+
+        [HttpGet("ByAplicacao/{aplicacaoId}")]
+        public virtual async Task<IActionResult> GetByAplicacaoId([FromRoute] Guid aplicacaoId, CancellationToken ct = default)
+        {
+            var result = await _service.GetByAplicacaoIdAsync(aplicacaoId);
+            return Ok(result);
+        }
     }
 }

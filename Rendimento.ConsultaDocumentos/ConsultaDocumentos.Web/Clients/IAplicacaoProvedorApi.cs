@@ -11,6 +11,9 @@ namespace ConsultaDocumentos.Web.Clients
         [Get("/AplicacaoProvedor/{id}")]
         Task<Result<AplicacaoProvedorViewModel>> GetByIdAsync(Guid id);
 
+        [Get("/AplicacaoProvedor/ByAplicacao/{aplicacaoId}")]
+        Task<Result<IList<AplicacaoProvedorViewModel>>> GetByAplicacaoIdAsync(Guid aplicacaoId);
+
         [Post("/AplicacaoProvedor")]
         Task<Result<AplicacaoProvedorViewModel>> CreateAsync([Body] AplicacaoProvedorViewModel model);
 

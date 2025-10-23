@@ -5,5 +5,6 @@ namespace ConsultaDocumentos.Domain.Intefaces
 {
     public interface IAplicacaoProvedorRepository : IBaseRepository<AplicacaoProvedor>
     {
+        Task<IEnumerable<AplicacaoProvedor>> GetByAplicacaoIdAsync(Guid aplicacaoId);
     }
 }

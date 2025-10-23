@@ -8,10 +8,17 @@ namespace ConsultaDocumentos.Web.Controllers
     public class AplicacaoController : Controller
     {
         private readonly IAplicacaoApi _api;
+        private readonly IAplicacaoProvedorApi _aplicacaoProvedorApi;
+        private readonly IProvedorApi _provedorApi;
 
-        public AplicacaoController(IAplicacaoApi api)
+        public AplicacaoController(
+            IAplicacaoApi api,
+            IAplicacaoProvedorApi aplicacaoProvedorApi,
+            IProvedorApi provedorApi)
         {
             _api = api;
+            _aplicacaoProvedorApi = aplicacaoProvedorApi;
+            _provedorApi = provedorApi;
         }
 
         // GET: AplicacaoController
@@ -70,15 +77,40 @@ namespace ConsultaDocumentos.Web.Controllers
                 return RedirectToAction(nameof(Index));
             }
 
-            return View(result.Data);
+            // Carregar provedores vinculados
+            var provedoresVinculadosResult = await _aplicacaoProvedorApi.GetByAplicacaoIdAsync(id);
+            var provedoresDisponiveisResult = await _provedorApi.GetAllAsync();
+
+            var viewModel = new AplicacaoComProvedoresViewModel
+            {
+                Id = result.Data.Id,
+                Nome = result.Data.Nome,
+                Descricao = result.Data.Descricao,
+                Status = result.Data.Status,
+                Serpro = result.Data.Serpro,
+                ProvedoresVinculados = provedoresVinculadosResult.Success ? provedoresVinculadosResult.Data.ToList() : new List<AplicacaoProvedorViewModel>(),
+                ProvedoresDisponiveis = provedoresDisponiveisResult.Success ? provedoresDisponiveisResult.Data.ToList() : new List<ProvedorViewModel>()
+            };
+
+            return View(viewModel);
         }
 
         // POST: AplicacaoController/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> Edit(Guid id, AplicacaoViewModel model)
+        public async Task<ActionResult> Edit(Guid id, AplicacaoComProvedoresViewModel viewModel)
         {
-            var result = await _api.UpdateAsync(id, model);
+            // Criar o modelo de aplicação para atualização
+            var aplicacaoModel = new AplicacaoViewModel
+            {
+                Id = viewModel.Id,
+                Nome = viewModel.Nome,
+                Descricao = viewModel.Descricao,
+                Status = viewModel.Status,
+                Serpro = viewModel.Serpro
+            };
+
+            var result = await _api.UpdateAsync(id, aplicacaoModel);
 
             if (!result.Success)
             {
@@ -86,7 +118,15 @@ namespace ConsultaDocumentos.Web.Controllers
                 {
                     ModelState.AddModelError(string.Empty, notification);
                 }
-                return View(model);
+
+                // Recarregar dados para exibir a view novamente
+                var provedoresVinculadosResult = await _aplicacaoProvedorApi.GetByAplicacaoIdAsync(id);
+                var provedoresDisponiveisResult = await _provedorApi.GetAllAsync();
+
+                viewModel.ProvedoresVinculados = provedoresVinculadosResult.Success ? provedoresVinculadosResult.Data.ToList() : new List<AplicacaoProvedorViewModel>();
+                viewModel.ProvedoresDisponiveis = provedoresDisponiveisResult.Success ? provedoresDisponiveisResult.Data.ToList() : new List<ProvedorViewModel>();
+
+                return View(viewModel);
             }
 
             return RedirectToAction(nameof(Index));
@@ -123,6 +163,57 @@ namespace ConsultaDocumentos.Web.Controllers
             }
 
             return RedirectToAction(nameof(Index));
+        }
+
+        // AJAX: Adicionar provedor à aplicação
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<JsonResult> AdicionarProvedor([FromBody] AplicacaoProvedorViewModel model)
+        {
+            var result = await _aplicacaoProvedorApi.CreateAsync(model);
+
+            if (result.Success)
+            {
+                return Json(new { success = true, data = result.Data });
+            }
+            else
+            {
+                return Json(new { success = false, errors = result.Notifications });
+            }
+        }
+
+        // AJAX: Atualizar provedor da aplicação
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<JsonResult> AtualizarProvedor(Guid id, [FromBody] AplicacaoProvedorViewModel model)
+        {
+            var result = await _aplicacaoProvedorApi.UpdateAsync(id, model);
+
+            if (result.Success)
+            {
+                return Json(new { success = true, data = result.Data });
+            }
+            else
+            {
+                return Json(new { success = false, errors = result.Notifications });
+            }
+        }
+
+        // AJAX: Remover provedor da aplicação
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<JsonResult> RemoverProvedor(Guid id)
+        {
+            var result = await _aplicacaoProvedorApi.DeleteAsync(id);
+
+            if (result.Success)
+            {
+                return Json(new { success = true });
+            }
+            else
+            {
+                return Json(new { success = false, errors = result.Notifications });
+            }
         }
     }
 }

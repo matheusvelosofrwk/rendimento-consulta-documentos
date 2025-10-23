@@ -1,4 +1,4 @@
-@model ConsultaDocumentos.Web.Models.AplicacaoViewModel
+@model ConsultaDocumentos.Web.Models.AplicacaoComProvedoresViewModel
 
 @{
     ViewData["Title"] = "Editar Aplicação";
@@ -21,31 +21,47 @@
 </div>
 
 <!-- Form Card -->
-<div class="row justify-content-center fade-in">
-    <div class="col-lg-8">
-        <div class="card-modern">
+<div class="row fade-in">
+    <div class="col-lg-12">
+        <div class="card-modern mb-4">
             <div class="card-header">
                 <h5 class="mb-0">
                     <i class="fas fa-info-circle"></i> Dados da Aplicação
                 </h5>
             </div>
             <div class="card-body" style="padding: 2rem;">
-                <form asp-action="Edit" method="post" class="form-modern">
+                <form asp-action="Edit" method="post" class="form-modern" id="formAplicacao">
                     @Html.HiddenFor(x => x.Id)
                     <div asp-validation-summary="ModelOnly" class="alert alert-modern alert-danger mb-4"></div>
 
-                    <!-- Nome -->
-                    <div class="form-group mb-4">
-                        <label asp-for="Nome" class="form-label">
-                            <i class="fas fa-tag text-primary me-2"></i>Nome da Aplicação
-                        </label>
-                        <div class="input-group input-group-modern">
-                            <span class="input-group-text">
-                                <i class="fas fa-desktop"></i>
-                            </span>
-                            <input asp-for="Nome" class="form-control" placeholder="Digite o nome da aplicação" />
+                    <div class="row">
+                        <!-- Nome -->
+                        <div class="col-md-6 form-group mb-4">
+                            <label asp-for="Nome" class="form-label">
+                                <i class="fas fa-tag text-primary me-2"></i>Nome da Aplicação
+                            </label>
+                            <div class="input-group input-group-modern">
+                                <span class="input-group-text">
+                                    <i class="fas fa-desktop"></i>
+                                </span>
+                                <input asp-for="Nome" class="form-control" placeholder="Digite o nome da aplicação" />
+                            </div>
+                            <span asp-validation-for="Nome" class="text-danger small"></span>
                         </div>
-                        <span asp-validation-for="Nome" class="text-danger small"></span>
+
+                        <!-- Status -->
+                        <div class="col-md-6 form-group mb-4">
+                            <label asp-for="Status" class="form-label">
+                                <i class="fas fa-toggle-on text-primary me-2"></i>Status
+                            </label>
+                            <div class="input-group input-group-modern">
+                                <span class="input-group-text">
+                                    <i class="fas fa-check-circle"></i>
+                                </span>
+                                <input asp-for="Status" class="form-control" placeholder="Digite o status" />
+                            </div>
+                            <span asp-validation-for="Status" class="text-danger small"></span>
+                        </div>
                     </div>
 
                     <!-- Descrição -->
@@ -60,20 +76,6 @@
                             <textarea asp-for="Descricao" class="form-control" rows="3" placeholder="Digite uma descrição para a aplicação"></textarea>
                         </div>
                         <span asp-validation-for="Descricao" class="text-danger small"></span>
-                    </div>
-
-                    <!-- Status -->
-                    <div class="form-group mb-4">
-                        <label asp-for="Status" class="form-label">
-                            <i class="fas fa-toggle-on text-primary me-2"></i>Status
-                        </label>
-                        <div class="input-group input-group-modern">
-                            <span class="input-group-text">
-                                <i class="fas fa-check-circle"></i>
-                            </span>
-                            <input asp-for="Status" class="form-control" placeholder="Digite o status" />
-                        </div>
-                        <span asp-validation-for="Status" class="text-danger small"></span>
                     </div>
 
                     <!-- Serpro -->
@@ -110,15 +112,151 @@
             </div>
         </div>
 
-        <!-- Informações Adicionais -->
-        <div class="alert alert-modern alert-warning mt-4">
-            <i class="fas fa-exclamation-triangle me-2"></i>
-            <strong>Atenção:</strong> As alterações serão aplicadas imediatamente após salvar.
+        <!-- Seção de Provedores Vinculados -->
+        <div class="card-modern">
+            <div class="card-header">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">
+                        <i class="fas fa-server"></i> Provedores Vinculados
+                    </h5>
+                    <button type="button" class="btn btn-primary-modern btn-modern btn-icon btn-sm" onclick="abrirModalAdicionarProvedor()">
+                        <i class="fas fa-plus"></i>
+                        <span>Adicionar Provedor</span>
+                    </button>
+                </div>
+            </div>
+            <div class="card-body">
+                @if (Model.ProvedoresVinculados != null && Model.ProvedoresVinculados.Any())
+                {
+                    <div class="table-responsive">
+                        <table id="provedoresTable" class="table table-hover table-modern">
+                            <thead>
+                                <tr>
+                                    <th><i class="fas fa-server me-1"></i> Provedor</th>
+                                    <th><i class="fas fa-sort me-1"></i> Ordem</th>
+                                    <th><i class="fas fa-toggle-on me-1"></i> Status</th>
+                                    <th><i class="fas fa-calendar me-1"></i> Data Criação</th>
+                                    <th class="text-center" style="width: 100px;"><i class="fas fa-cog me-1"></i> Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody id="provedoresTableBody">
+                                @foreach (var provedor in Model.ProvedoresVinculados.OrderBy(p => p.Ordem))
+                                {
+                                    <tr data-id="@provedor.Id">
+                                        <td><strong>@provedor.NomeProvedor</strong></td>
+                                        <td>
+                                            <span class="badge badge-modern bg-info">@provedor.Ordem</span>
+                                        </td>
+                                        <td>
+                                            @if (provedor.Status == ConsultaDocumentos.Web.Enums.StatusEnum.Ativo)
+                                            {
+                                                <span class="badge badge-modern bg-success">Ativo</span>
+                                            }
+                                            else
+                                            {
+                                                <span class="badge badge-modern bg-secondary">Inativo</span>
+                                            }
+                                        </td>
+                                        <td>@provedor.DataCriacao.ToString("dd/MM/yyyy HH:mm")</td>
+                                        <td>
+                                            <div class="action-buttons justify-content-center">
+                                                <button onclick="editarProvedor('@provedor.Id', '@provedor.ProvedorId', @provedor.Ordem, '@provedor.Status')"
+                                                        class="btn-action edit"
+                                                        data-bs-toggle="tooltip"
+                                                        title="Editar">
+                                                    <i class="fas fa-edit"></i>
+                                                </button>
+                                                <button onclick="removerProvedor('@provedor.Id')"
+                                                        class="btn-action delete"
+                                                        data-bs-toggle="tooltip"
+                                                        title="Remover">
+                                                    <i class="fas fa-trash-alt"></i>
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+                else
+                {
+                    <div class="empty-state">
+                        <div class="empty-state-icon">
+                            <i class="fas fa-server"></i>
+                        </div>
+                        <h3>Nenhum provedor vinculado</h3>
+                        <p>Adicione provedores para esta aplicação poder realizar consultas</p>
+                        <button type="button" class="btn btn-primary-modern btn-modern btn-icon mt-3" onclick="abrirModalAdicionarProvedor()">
+                            <i class="fas fa-plus"></i>
+                            <span>Adicionar Primeiro Provedor</span>
+                        </button>
+                    </div>
+                }
+            </div>
         </div>
     </div>
 </div>
 
 @Html.AntiForgeryToken()
+
+<!-- Modal para Adicionar/Editar Provedor -->
+<div class="modal fade" id="modalProvedor" tabindex="-1" aria-labelledby="modalProvedorLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalProvedorLabel">
+                    <i class="fas fa-server me-2"></i><span id="modalProvedorTitulo">Adicionar Provedor</span>
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="provedorVinculoId" />
+                <input type="hidden" id="aplicacaoId" value="@Model.Id" />
+
+                <div class="form-group mb-3">
+                    <label for="provedorSelect" class="form-label">
+                        <i class="fas fa-server text-primary me-2"></i>Provedor
+                    </label>
+                    <select id="provedorSelect" class="form-select">
+                        <option value="">Selecione um provedor</option>
+                        @foreach (var prov in Model.ProvedoresDisponiveis)
+                        {
+                            <option value="@prov.Id">@prov.Nome</option>
+                        }
+                    </select>
+                </div>
+
+                <div class="form-group mb-3">
+                    <label for="ordemInput" class="form-label">
+                        <i class="fas fa-sort text-primary me-2"></i>Ordem
+                    </label>
+                    <input type="number" id="ordemInput" class="form-control" min="1" value="1" />
+                    <small class="text-muted">Define a prioridade de consulta (menor número = maior prioridade)</small>
+                </div>
+
+                <div class="form-group mb-3">
+                    <label for="statusSelect" class="form-label">
+                        <i class="fas fa-toggle-on text-primary me-2"></i>Status
+                    </label>
+                    <select id="statusSelect" class="form-select">
+                        <option value="1">Ativo</option>
+                        <option value="0">Inativo</option>
+                    </select>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary btn-modern" data-bs-dismiss="modal">
+                    <i class="fas fa-times me-1"></i>Cancelar
+                </button>
+                <button type="button" class="btn btn-primary-modern btn-modern" onclick="salvarProvedor()">
+                    <i class="fas fa-save me-1"></i>Salvar
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
 
 @* Modal de confirmação de exclusão *@
 @await Html.PartialAsync("_DeleteConfirmationModal")
@@ -127,16 +265,145 @@
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
     <script src="~/js/delete-helper.js"></script>
     <script>
+        let modalProvedor;
+
         $(document).ready(function() {
             // Focar no primeiro campo
             $('input[name="Nome"]').focus();
 
-            // Animação ao submeter
-            $('form').on('submit', function() {
+            // Inicializar modal
+            modalProvedor = new bootstrap.Modal(document.getElementById('modalProvedor'));
+
+            // Inicializar tooltips
+            var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+            tooltipTriggerList.map(function (tooltipTriggerEl) {
+                return new bootstrap.Tooltip(tooltipTriggerEl);
+            });
+
+            // Animação ao submeter formulário principal
+            $('#formAplicacao').on('submit', function() {
                 if ($(this).valid()) {
                     showLoading();
                 }
             });
         });
+
+        function abrirModalAdicionarProvedor() {
+            $('#modalProvedorTitulo').text('Adicionar Provedor');
+            $('#provedorVinculoId').val('');
+            $('#provedorSelect').val('').prop('disabled', false);
+            $('#ordemInput').val(@((Model.ProvedoresVinculados?.Any() ?? false) ? Model.ProvedoresVinculados.Max(p => p.Ordem) + 1 : 1));
+            $('#statusSelect').val('1');
+            modalProvedor.show();
+        }
+
+        function editarProvedor(id, provedorId, ordem, status) {
+            $('#modalProvedorTitulo').text('Editar Provedor');
+            $('#provedorVinculoId').val(id);
+            $('#provedorSelect').val(provedorId).prop('disabled', true);
+            $('#ordemInput').val(ordem);
+            $('#statusSelect').val(status === 'Ativo' ? '1' : '0');
+            modalProvedor.show();
+        }
+
+        async function salvarProvedor() {
+            const vinculoId = $('#provedorVinculoId').val();
+            const aplicacaoId = $('#aplicacaoId').val();
+            const provedorId = $('#provedorSelect').val();
+            const ordem = parseInt($('#ordemInput').val());
+            const status = parseInt($('#statusSelect').val());
+
+            if (!provedorId) {
+                alert('Por favor, selecione um provedor');
+                return;
+            }
+
+            if (!ordem || ordem < 1) {
+                alert('Por favor, informe uma ordem válida');
+                return;
+            }
+
+            const data = {
+                id: vinculoId || '00000000-0000-0000-0000-000000000000',
+                aplicacaoId: aplicacaoId,
+                provedorId: provedorId,
+                ordem: ordem,
+                status: status,
+                criadoPor: 'Sistema',
+                atualizadoPor: 'Sistema'
+            };
+
+            const token = $('input[name="__RequestVerificationToken"]').val();
+
+            try {
+                showLoading();
+
+                const url = vinculoId
+                    ? '@Url.Action("AtualizarProvedor", "Aplicacao")' + '?id=' + vinculoId
+                    : '@Url.Action("AdicionarProvedor", "Aplicacao")';
+
+                const response = await fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'RequestVerificationToken': token
+                    },
+                    body: JSON.stringify(data)
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    modalProvedor.hide();
+                    location.reload(); // Recarregar para atualizar a tabela
+                } else {
+                    hideLoading();
+                    alert('Erro: ' + (result.errors ? result.errors.join(', ') : 'Erro desconhecido'));
+                }
+            } catch (error) {
+                hideLoading();
+                alert('Erro ao salvar provedor: ' + error.message);
+            }
+        }
+
+        async function removerProvedor(id) {
+            if (!confirm('Tem certeza que deseja remover este provedor?')) {
+                return;
+            }
+
+            const token = $('input[name="__RequestVerificationToken"]').val();
+
+            try {
+                showLoading();
+
+                const response = await fetch('@Url.Action("RemoverProvedor", "Aplicacao")' + '?id=' + id, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'RequestVerificationToken': token
+                    }
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    location.reload(); // Recarregar para atualizar a tabela
+                } else {
+                    hideLoading();
+                    alert('Erro: ' + (result.errors ? result.errors.join(', ') : 'Erro desconhecido'));
+                }
+            } catch (error) {
+                hideLoading();
+                alert('Erro ao remover provedor: ' + error.message);
+            }
+        }
+
+        function showLoading() {
+            // Implementar loading spinner se disponível
+        }
+
+        function hideLoading() {
+            // Esconder loading spinner se disponível
+        }
     </script>
 }
