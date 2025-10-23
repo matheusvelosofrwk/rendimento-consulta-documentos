@@ -1,4 +1,5 @@
 using ConsultaDocumentos.Domain.Entities;
+using ConsultaDocumentos.Domain.Enums;
 
 namespace ConsultaDocumentos.Domain.Intefaces
 {
@@ -11,6 +12,12 @@ namespace ConsultaDocumentos.Domain.Intefaces
         Task<IList<LogAuditoria>> GetByDocumentoNumeroAsync(string documentoNumero);
         Task<IList<LogAuditoria>> GetByDataAsync(DateTime dataInicio, DateTime dataFim);
         Task<IList<LogAuditoria>> GetByConsultaSucessoAsync(bool consultaSucesso);
+        Task<IList<LogAuditoria>> GetWithFiltersAsync(
+            DateTime? dataInicio = null,
+            DateTime? dataFim = null,
+            string? numeroDocumento = null,
+            Guid? aplicacaoProvedorId = null,
+            TipoDocumento? tipoDocumento = null);
 
         // Método de inserção
         Task AddAsync(LogAuditoria logAuditoria);

@@ -16,5 +16,13 @@ namespace ConsultaDocumentos.Web.Clients
 
         [Get("/LogAuditoria/documento/{documentoNumero}")]
         Task<Result<IList<LogAuditoriaViewModel>>> GetByDocumentoNumeroAsync(string documentoNumero);
+
+        [Get("/LogAuditoria/filtrar")]
+        Task<Result<IList<LogAuditoriaViewModel>>> GetWithFiltersAsync(
+            [Query] DateTime? dataInicio,
+            [Query] DateTime? dataFim,
+            [Query] string? numeroDocumento,
+            [Query] Guid? aplicacaoProvedorId,
+            [Query] int? tipoDocumento);
     }
 }

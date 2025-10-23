@@ -67,6 +67,39 @@ namespace ConsultaDocumentos.Infra.Data.Repositories
                 .ToListAsync();
         }
 
+        public async Task<IList<LogAuditoria>> GetWithFiltersAsync(
+            DateTime? dataInicio = null,
+            DateTime? dataFim = null,
+            string? numeroDocumento = null,
+            Guid? aplicacaoProvedorId = null,
+            Domain.Enums.TipoDocumento? tipoDocumento = null)
+        {
+            var query = _dbSet.Include(x => x.Aplicacao).AsQueryable();
+
+            if (dataInicio.HasValue)
+                query = query.Where(x => x.DataHoraConsulta >= dataInicio.Value);
+
+            if (dataFim.HasValue)
+            {
+                // Adicionar 23:59:59 ao final do dia
+                var dataFimComHora = dataFim.Value.Date.AddDays(1).AddSeconds(-1);
+                query = query.Where(x => x.DataHoraConsulta <= dataFimComHora);
+            }
+
+            if (!string.IsNullOrWhiteSpace(numeroDocumento))
+                query = query.Where(x => x.DocumentoNumero.Contains(numeroDocumento));
+
+            if (aplicacaoProvedorId.HasValue)
+                query = query.Where(x => x.AplicacaoId == aplicacaoProvedorId.Value);
+
+            if (tipoDocumento.HasValue)
+                query = query.Where(x => x.TipoDocumento == tipoDocumento.Value);
+
+            return await query
+                .OrderByDescending(x => x.DataHoraConsulta)
+                .ToListAsync();
+        }
+
         public async Task AddAsync(LogAuditoria logAuditoria)
         {
             await _dbSet.AddAsync(logAuditoria);

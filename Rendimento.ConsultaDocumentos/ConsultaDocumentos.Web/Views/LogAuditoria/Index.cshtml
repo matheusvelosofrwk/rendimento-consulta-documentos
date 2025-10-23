@@ -14,6 +14,113 @@
     </div>
 </div>
 
+<!-- Card de Filtros -->
+<div class="card-modern fade-in mb-4">
+    <div class="card-header">
+        <h5 class="mb-0">
+            <i class="fas fa-filter"></i> Filtros
+        </h5>
+    </div>
+    <div class="card-body">
+        <form method="get" asp-action="Index" id="filtrosForm">
+            <div class="row g-3">
+                <!-- Data Início -->
+                <div class="col-md-3">
+                    <label for="DataInicio" class="form-label">
+                        <i class="fas fa-calendar-alt me-1"></i>Data Início
+                    </label>
+                    <input type="date"
+                           class="form-control"
+                           id="DataInicio"
+                           name="DataInicio"
+                           value="@Context.Request.Query["DataInicio"]" />
+                </div>
+
+                <!-- Data Fim -->
+                <div class="col-md-3">
+                    <label for="DataFim" class="form-label">
+                        <i class="fas fa-calendar-alt me-1"></i>Data Fim
+                    </label>
+                    <input type="date"
+                           class="form-control"
+                           id="DataFim"
+                           name="DataFim"
+                           value="@Context.Request.Query["DataFim"]" />
+                </div>
+
+                <!-- Número Documento -->
+                <div class="col-md-3">
+                    <label for="NumeroDocumento" class="form-label">
+                        <i class="fas fa-file-alt me-1"></i>Número Documento
+                    </label>
+                    <input type="text"
+                           class="form-control"
+                           id="NumeroDocumento"
+                           name="NumeroDocumento"
+                           placeholder="CPF ou CNPJ"
+                           value="@Context.Request.Query["NumeroDocumento"]" />
+                </div>
+
+                <!-- Aplicação -->
+                <div class="col-md-3">
+                    <label for="AplicacaoProvedorId" class="form-label">
+                        <i class="fas fa-desktop me-1"></i>Aplicação
+                    </label>
+                    <select class="form-select"
+                            id="AplicacaoProvedorId"
+                            name="AplicacaoProvedorId">
+                        <option value="">Todas</option>
+                        @if (ViewBag.Aplicacoes != null)
+                        {
+                            @foreach (var item in (IEnumerable<SelectListItem>)ViewBag.Aplicacoes)
+                            {
+                                <option value="@item.Value"
+                                        selected="@(Context.Request.Query["AplicacaoProvedorId"] == item.Value)">
+                                    @item.Text
+                                </option>
+                            }
+                        }
+                    </select>
+                </div>
+
+                <!-- Tipo Documento -->
+                <div class="col-md-3">
+                    <label for="TipoDocumento" class="form-label">
+                        <i class="fas fa-id-card me-1"></i>Tipo Documento
+                    </label>
+                    <select class="form-select"
+                            id="TipoDocumento"
+                            name="TipoDocumento">
+                        <option value="">Todos</option>
+                        @if (ViewBag.TiposDocumento != null)
+                        {
+                            @foreach (var item in (IEnumerable<SelectListItem>)ViewBag.TiposDocumento)
+                            {
+                                <option value="@item.Value"
+                                        selected="@(Context.Request.Query["TipoDocumento"] == item.Value)">
+                                    @item.Text
+                                </option>
+                            }
+                        }
+                    </select>
+                </div>
+
+                <!-- Botões -->
+                <div class="col-md-9 d-flex align-items-end">
+                    <button type="submit" class="btn btn-primary-modern btn-modern btn-icon me-2">
+                        <i class="fas fa-search"></i>
+                        <span>Filtrar</span>
+                    </button>
+                    <button type="button" class="btn btn-secondary btn-modern btn-icon" onclick="limparFiltros()">
+                        <i class="fas fa-eraser"></i>
+                        <span>Limpar Filtros</span>
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
 @if (TempData["Error"] != null)
 {
     <div class="alert alert-danger alert-modern alert-dismissible fade show" role="alert">
@@ -185,5 +292,17 @@
                 return new bootstrap.Tooltip(tooltipTriggerEl);
             });
         });
+
+        function limparFiltros() {
+            // Limpar todos os campos do formulário
+            document.getElementById('DataInicio').value = '';
+            document.getElementById('DataFim').value = '';
+            document.getElementById('NumeroDocumento').value = '';
+            document.getElementById('AplicacaoProvedorId').selectedIndex = 0;
+            document.getElementById('TipoDocumento').selectedIndex = 0;
+
+            // Submeter o formulário para recarregar sem filtros
+            document.getElementById('filtrosForm').submit();
+        }
     </script>
 }
