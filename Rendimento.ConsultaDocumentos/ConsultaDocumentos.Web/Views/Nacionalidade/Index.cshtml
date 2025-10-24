@@ -40,6 +40,10 @@
                                 @Html.DisplayNameFor(model => model.Descricao)
                             </th>
                             <th>
+                                <i class="fas fa-globe me-1"></i>
+                                @Html.DisplayNameFor(model => model.Pais)
+                            </th>
+                            <th>
                                 <i class="fas fa-hashtag me-1"></i>
                                 @Html.DisplayNameFor(model => model.Codigo)
                             </th>
@@ -63,6 +67,9 @@
                                         </div>
                                         <strong>@Html.DisplayFor(modelItem => item.Descricao)</strong>
                                     </div>
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.Pais)
                                 </td>
                                 <td>
                                     <span class="badge badge-modern bg-primary">

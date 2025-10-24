@@ -47,6 +47,20 @@
                         <span asp-validation-for="Descricao" class="text-danger small"></span>
                     </div>
 
+                    <!-- País -->
+                    <div class="form-group mb-4">
+                        <label asp-for="Pais" class="form-label">
+                            <i class="fas fa-globe text-primary me-2"></i>País
+                        </label>
+                        <div class="input-group input-group-modern">
+                            <span class="input-group-text">
+                                <i class="fas fa-globe"></i>
+                            </span>
+                            <input asp-for="Pais" class="form-control" placeholder="Digite o país da nacionalidade" />
+                        </div>
+                        <span asp-validation-for="Pais" class="text-danger small"></span>
+                    </div>
+
                     <!-- Código -->
                     <div class="form-group mb-4">
                         <label asp-for="Codigo" class="form-label">

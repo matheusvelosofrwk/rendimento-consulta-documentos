@@ -14,6 +14,9 @@ namespace ConsultaDocumentos.Infra.Data.EntitiesConfiguration
                 .HasMaxLength(100)
                 .IsRequired();
 
+            builder.Property(x => x.Pais)
+                .HasMaxLength(100);
+
             builder.Property(x => x.Codigo)
                 .HasMaxLength(10);
 
