@@ -1,6 +1,7 @@
 using ConsultaDocumentos.Web.Clients;
 using ConsultaDocumentos.Web.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using System.Threading.Tasks;
 
 namespace ConsultaDocumentos.Web.Controllers
@@ -15,9 +16,21 @@ namespace ConsultaDocumentos.Web.Controllers
         }
 
         // GET: SituacaoCadastralController
-        public async Task<ActionResult> Index()
+        public async Task<ActionResult> Index(string tipoPessoa = null)
         {
-            var result = await _api.GetAllAsync();
+            Result<IList<SituacaoCadastralViewModel>> result;
+
+            // Se filtrar por tipo de pessoa específico
+            if (!string.IsNullOrEmpty(tipoPessoa) && tipoPessoa != "T")
+            {
+                char tipoPessoaChar = tipoPessoa[0];
+                result = await _api.GetByTipoPessoaAsync(tipoPessoaChar);
+            }
+            else
+            {
+                // Buscar todas
+                result = await _api.GetAllAsync();
+            }
 
             if (!result.Success)
             {
@@ -28,12 +41,22 @@ namespace ConsultaDocumentos.Web.Controllers
                 return View(new List<SituacaoCadastralViewModel>());
             }
 
+            // Popula dropdown de filtro de tipo de pessoa
+            ViewBag.TipoPessoaFiltro = new SelectList(new[]
+            {
+                new { Value = "T", Text = "Todos" },
+                new { Value = "F", Text = "Pessoa Física" },
+                new { Value = "J", Text = "Pessoa Jurídica" },
+                new { Value = "A", Text = "Ambos" }
+            }, "Value", "Text", tipoPessoa ?? "T");
+
             return View(result.Data);
         }
 
         // GET: SituacaoCadastralController/Create
         public ActionResult Create()
         {
+            PopulateTipoPessoaDropdown();
             return View();
         }
 
@@ -50,6 +73,7 @@ namespace ConsultaDocumentos.Web.Controllers
                 {
                     ModelState.AddModelError(string.Empty, notification);
                 }
+                PopulateTipoPessoaDropdown(model.TipoPessoa);
                 return View(model);
             }
 
@@ -70,6 +94,7 @@ namespace ConsultaDocumentos.Web.Controllers
                 return RedirectToAction(nameof(Index));
             }
 
+            PopulateTipoPessoaDropdown(result.Data.TipoPessoa);
             return View(result.Data);
         }
 
@@ -86,10 +111,22 @@ namespace ConsultaDocumentos.Web.Controllers
                 {
                     ModelState.AddModelError(string.Empty, notification);
                 }
+                PopulateTipoPessoaDropdown(model.TipoPessoa);
                 return View(model);
             }
 
             return RedirectToAction(nameof(Index));
+        }
+
+        // Helper para popular dropdown de tipo de pessoa
+        private void PopulateTipoPessoaDropdown(char? selectedValue = null)
+        {
+            ViewBag.TipoPessoaList = new SelectList(new[]
+            {
+                new { Value = 'F', Text = "Pessoa Física" },
+                new { Value = 'J', Text = "Pessoa Jurídica" },
+                new { Value = 'A', Text = "Ambos" }
+            }, "Value", "Text", selectedValue ?? 'A');
         }
 
         // POST: SituacaoCadastralController/Delete/5

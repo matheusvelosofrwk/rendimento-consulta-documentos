@@ -8,6 +8,9 @@ namespace ConsultaDocumentos.Web.Clients
         [Get("/SituacaoCadastral")]
         Task<Result<IList<SituacaoCadastralViewModel>>> GetAllAsync();
 
+        [Get("/SituacaoCadastral/tipo/{tipoPessoa}")]
+        Task<Result<IList<SituacaoCadastralViewModel>>> GetByTipoPessoaAsync(char tipoPessoa);
+
         [Get("/SituacaoCadastral/{id}")]
         Task<Result<SituacaoCadastralViewModel>> GetByIdAsync(Guid id);
 

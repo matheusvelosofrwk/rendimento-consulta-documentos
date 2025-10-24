@@ -5,5 +5,6 @@ namespace ConsultaDocumentos.Domain.Intefaces
 {
     public interface ISituacaoCadastralRepository : IBaseRepository<SituacaoCadastral>
     {
+        Task<IEnumerable<SituacaoCadastral>> GetByTipoPessoaAsync(char tipoPessoa);
     }
 }

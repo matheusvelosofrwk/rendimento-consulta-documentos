@@ -47,6 +47,26 @@
                         <span asp-validation-for="Descricao" class="text-danger small"></span>
                     </div>
 
+                    <!-- Tipo de Pessoa -->
+                    <div class="form-group mb-4">
+                        <label asp-for="TipoPessoa" class="form-label">
+                            <i class="fas fa-user text-primary me-2"></i>Tipo de Pessoa
+                        </label>
+                        <div class="input-group input-group-modern">
+                            <span class="input-group-text">
+                                <i class="fas fa-users"></i>
+                            </span>
+                            <select asp-for="TipoPessoa" asp-items="ViewBag.TipoPessoaList" class="form-select">
+                                <option value="">Selecione...</option>
+                            </select>
+                        </div>
+                        <span asp-validation-for="TipoPessoa" class="text-danger small"></span>
+                        <small class="form-text text-muted">
+                            <i class="fas fa-info-circle me-1"></i>
+                            Selecione "Ambos" se a situação for válida tanto para PF quanto para PJ
+                        </small>
+                    </div>
+
                     <!-- Ativo -->
                     <div class="form-group mb-4">
                         <label class="form-label">

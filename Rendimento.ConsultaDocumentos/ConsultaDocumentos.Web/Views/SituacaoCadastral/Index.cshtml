@@ -20,6 +20,25 @@
     </div>
 </div>
 
+<!-- Card de Filtros -->
+<div class="card-modern fade-in mb-3">
+    <div class="card-body">
+        <form method="get" asp-action="Index" class="row g-3">
+            <div class="col-md-4">
+                <label class="form-label">
+                    <i class="fas fa-filter me-1"></i>Tipo de Pessoa
+                </label>
+                <select name="tipoPessoa" class="form-select" onchange="this.form.submit()">
+                    @foreach (var item in ViewBag.TipoPessoaFiltro)
+                    {
+                        <option value="@item.Value" selected="@item.Selected">@item.Text</option>
+                    }
+                </select>
+            </div>
+        </form>
+    </div>
+</div>
+
 <!-- Card com Tabela -->
 <div class="card-modern fade-in">
     <div class="card-header">
@@ -38,6 +57,10 @@
                             <th>
                                 <i class="fas fa-info-circle me-1"></i>
                                 @Html.DisplayNameFor(model => model.Descricao)
+                            </th>
+                            <th>
+                                <i class="fas fa-user me-1"></i>
+                                @Html.DisplayNameFor(model => model.TipoPessoa)
                             </th>
                             <th>
                                 <i class="fas fa-toggle-on me-1"></i>
@@ -63,6 +86,26 @@
                                         </div>
                                         <strong>@Html.DisplayFor(modelItem => item.Descricao)</strong>
                                     </div>
+                                </td>
+                                <td>
+                                    @if (item.TipoPessoa == 'F')
+                                    {
+                                        <span class="badge badge-modern bg-info">
+                                            <i class="fas fa-user me-1"></i>Pessoa Física
+                                        </span>
+                                    }
+                                    else if (item.TipoPessoa == 'J')
+                                    {
+                                        <span class="badge badge-modern bg-primary">
+                                            <i class="fas fa-building me-1"></i>Pessoa Jurídica
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge badge-modern bg-secondary">
+                                            <i class="fas fa-users me-1"></i>Ambos
+                                        </span>
+                                    }
                                 </td>
                                 <td>
                                     @if (item.Ativo)

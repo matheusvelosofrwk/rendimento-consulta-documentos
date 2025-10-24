@@ -22,6 +22,13 @@ namespace ConsultaDocumentos.API.Controllers
             return Ok(result);
         }
 
+        [HttpGet("tipo/{tipoPessoa}")]
+        public virtual async Task<IActionResult> GetByTipoPessoa([FromRoute] char tipoPessoa, CancellationToken ct = default)
+        {
+            var result = await _service.GetByTipoPessoaAsync(tipoPessoa);
+            return Ok(result);
+        }
+
         [HttpGet("{id}")]
         public virtual async Task<IActionResult> GetById([FromRoute] Guid id, CancellationToken ct = default)
         {

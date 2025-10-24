@@ -17,8 +17,16 @@ namespace ConsultaDocumentos.Infra.Data.EntitiesConfiguration
             builder.Property(x => x.Ativo)
                 .IsRequired();
 
+            builder.Property(x => x.TipoPessoa)
+                .HasColumnType("char(1)")
+                .IsRequired()
+                .HasDefaultValue('A'); // Default: Ambos
+
             builder.Property(x => x.DataCriacao)
                 .IsRequired();
+
+            // Índice para filtro por tipo de pessoa
+            builder.HasIndex(x => x.TipoPessoa);
         }
     }
 }
