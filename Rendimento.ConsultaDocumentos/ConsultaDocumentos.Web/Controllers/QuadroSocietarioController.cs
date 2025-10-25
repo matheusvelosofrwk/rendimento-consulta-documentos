@@ -1,10 +1,12 @@
 using ConsultaDocumentos.Web.Services.Http;
 using ConsultaDocumentos.Web.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace ConsultaDocumentos.Web.Controllers
 {
+    [Authorize]
     public class QuadroSocietarioController : Controller
     {
         private readonly QuadroSocietarioHttpService _quadroSocietarioService;

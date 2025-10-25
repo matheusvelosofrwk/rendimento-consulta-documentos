@@ -1,10 +1,12 @@
 using ConsultaDocumentos.Web.Services.Http;
 using ConsultaDocumentos.Web.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace ConsultaDocumentos.Web.Controllers
 {
+    [Authorize]
     public class DocumentoController : Controller
     {
         private readonly DocumentoHttpService _documentoService;
