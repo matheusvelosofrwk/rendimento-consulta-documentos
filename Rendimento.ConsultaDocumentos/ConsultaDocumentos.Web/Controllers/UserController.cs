@@ -1,4 +1,4 @@
-using ConsultaDocumentos.Web.Clients;
+using ConsultaDocumentos.Web.Services.Http;
 using ConsultaDocumentos.Web.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -8,19 +8,19 @@ namespace ConsultaDocumentos.Web.Controllers
     [Authorize]
     public class UserController : Controller
     {
-        private readonly IUserApi _userApi;
-        private readonly IRoleApi _roleApi;
+        private readonly UserHttpService _userService;
+        private readonly RoleHttpService _roleService;
 
-        public UserController(IUserApi userApi, IRoleApi roleApi)
+        public UserController(UserHttpService userService, RoleHttpService roleService)
         {
-            _userApi = userApi;
-            _roleApi = roleApi;
+            _userService = userService;
+            _roleService = roleService;
         }
 
         // GET: User
         public async Task<IActionResult> Index()
         {
-            var result = await _userApi.GetAllAsync();
+            var result = await _userService.GetAllAsync();
             if (!result.Success)
             {
                 TempData["ErrorMessage"] = string.Join(", ", result.Notifications);
@@ -43,7 +43,7 @@ namespace ConsultaDocumentos.Web.Controllers
         {
             if (ModelState.IsValid)
             {
-                var result = await _userApi.CreateAsync(model);
+                var result = await _userService.CreateAsync(model);
 
                 if (result.Success)
                 {
@@ -68,7 +68,7 @@ namespace ConsultaDocumentos.Web.Controllers
                 return NotFound();
             }
 
-            var result = await _userApi.GetByIdAsync(id);
+            var result = await _userService.GetByIdAsync(id);
             if (!result.Success || result.Data == null)
             {
                 return NotFound();
@@ -102,7 +102,7 @@ namespace ConsultaDocumentos.Web.Controllers
 
             if (ModelState.IsValid)
             {
-                var result = await _userApi.UpdateAsync(id, model);
+                var result = await _userService.UpdateAsync(id, model);
 
                 if (result.Success)
                 {
@@ -127,13 +127,13 @@ namespace ConsultaDocumentos.Web.Controllers
                 return NotFound();
             }
 
-            var userResult = await _userApi.GetByIdAsync(id);
+            var userResult = await _userService.GetByIdAsync(id);
             if (!userResult.Success || userResult.Data == null)
             {
                 return NotFound();
             }
 
-            var rolesResult = await _roleApi.GetAllAsync();
+            var rolesResult = await _roleService.GetAllAsync();
             if (!rolesResult.Success)
             {
                 TempData["ErrorMessage"] = "Erro ao carregar perfis";
@@ -167,7 +167,7 @@ namespace ConsultaDocumentos.Web.Controllers
                 RoleNames = selectedRoles
             };
 
-            var result = await _userApi.ManageRolesAsync(model.UserId, manageRolesDto);
+            var result = await _userService.ManageRolesAsync(model.UserId, manageRolesDto);
 
             if (result.Success)
             {
@@ -188,7 +188,7 @@ namespace ConsultaDocumentos.Web.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(string id)
         {
-            var result = await _userApi.DeleteAsync(id);
+            var result = await _userService.DeleteAsync(id);
 
             // Se for requisição AJAX, retornar JSON
             if (Request.Headers["X-Requested-With"] == "XMLHttpRequest" ||

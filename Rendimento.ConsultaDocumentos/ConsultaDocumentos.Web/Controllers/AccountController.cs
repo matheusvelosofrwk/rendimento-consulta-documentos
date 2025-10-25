@@ -1,5 +1,5 @@
-using ConsultaDocumentos.Web.Clients;
 using ConsultaDocumentos.Web.Models;
+using ConsultaDocumentos.Web.Services.Http;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
@@ -10,11 +10,11 @@ namespace ConsultaDocumentos.Web.Controllers
 {
     public class AccountController : Controller
     {
-        private readonly IAuthApi _authApi;
+        private readonly AuthHttpService _authService;
 
-        public AccountController(IAuthApi authApi)
+        public AccountController(AuthHttpService authService)
         {
-            _authApi = authApi;
+            _authService = authService;
         }
 
         [HttpGet]
@@ -35,7 +35,7 @@ namespace ConsultaDocumentos.Web.Controllers
                 return View(model);
             }
 
-            var result = await _authApi.LoginAsync(model);
+            var result = await _authService.LoginAsync(model);
 
             if (!result.Success)
             {
@@ -89,7 +89,7 @@ namespace ConsultaDocumentos.Web.Controllers
                 return View(model);
             }
 
-            var result = await _authApi.RegisterAsync(model);
+            var result = await _authService.RegisterAsync(model);
 
             if (!result.Success)
             {

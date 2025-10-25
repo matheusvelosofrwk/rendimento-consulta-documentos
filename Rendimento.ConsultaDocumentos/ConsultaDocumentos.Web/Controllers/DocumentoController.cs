@@ -1,4 +1,4 @@
-using ConsultaDocumentos.Web.Clients;
+using ConsultaDocumentos.Web.Services.Http;
 using ConsultaDocumentos.Web.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -7,13 +7,13 @@ namespace ConsultaDocumentos.Web.Controllers
 {
     public class DocumentoController : Controller
     {
-        private readonly IDocumentoApi _documentoApi;
-        private readonly IAplicacaoApi _aplicacaoApi;
+        private readonly DocumentoHttpService _documentoService;
+        private readonly AplicacaoHttpService _aplicacaoService;
 
-        public DocumentoController(IDocumentoApi documentoApi, IAplicacaoApi aplicacaoApi)
+        public DocumentoController(DocumentoHttpService documentoService, AplicacaoHttpService aplicacaoService)
         {
-            _documentoApi = documentoApi;
-            _aplicacaoApi = aplicacaoApi;
+            _documentoService = documentoService;
+            _aplicacaoService = aplicacaoService;
         }
 
         // GET: Documento/Consultar
@@ -36,27 +36,29 @@ namespace ConsultaDocumentos.Web.Controllers
 
             try
             {
-                ConsultaDocumentoResultViewModel? resultado = null;
+                Result<ConsultaDocumentoResultViewModel>? resultWrapper = null;
 
                 if (model.TipoDocumento == "CPF")
                 {
-                    resultado = await _documentoApi.ConsultarCPFAsync(
+                    resultWrapper = await _documentoService.ConsultarCPFAsync(
                         model.NumeroDocumento,
                         model.AplicacaoId,
-                        model.TipoConsulta,
-                        model.OrigemConsulta,
+                        model.TipoConsulta.ToString(),
+                        model.OrigemConsulta.ToString(),
                         model.ConsultarVencidos);
                 }
                 else
                 {
-                    resultado = await _documentoApi.ConsultarCNPJAsync(
+                    resultWrapper = await _documentoService.ConsultarCNPJAsync(
                         model.NumeroDocumento,
                         model.AplicacaoId,
-                        model.PerfilCNPJ,
-                        model.TipoConsulta,
-                        model.OrigemConsulta,
+                        model.PerfilCNPJ.ToString(),
+                        model.TipoConsulta.ToString(),
+                        model.OrigemConsulta.ToString(),
                         model.ConsultarVencidos);
                 }
+
+                ConsultaDocumentoResultViewModel? resultado = resultWrapper?.Data;
 
                 // Garantir que resultado tenha valores padrão se vier null
                 if (resultado == null)
@@ -73,14 +75,10 @@ namespace ConsultaDocumentos.Web.Controllers
                 await CarregarAplicacoesAsync();
                 return View(model);
             }
-            catch (Refit.ApiException apiEx)
+            catch (HttpRequestException httpEx)
             {
                 // Erro da API
-                var errorMessage = $"Erro na API: {apiEx.Message}";
-                if (apiEx.HasContent)
-                {
-                    errorMessage += $" - Detalhes: {apiEx.Content}";
-                }
+                var errorMessage = $"Erro ao comunicar com a API: {httpEx.Message}";
 
                 ViewBag.Resultado = new ConsultaDocumentoResultViewModel
                 {
@@ -110,7 +108,7 @@ namespace ConsultaDocumentos.Web.Controllers
         {
             try
             {
-                var aplicacoesResult = await _aplicacaoApi.GetAllAsync();
+                var aplicacoesResult = await _aplicacaoService.GetAllAsync();
                 if (aplicacoesResult.Success && aplicacoesResult.Data != null)
                 {
                     ViewBag.Aplicacoes = new SelectList(aplicacoesResult.Data, "Id", "Nome");

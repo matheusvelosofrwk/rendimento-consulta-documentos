@@ -1,4 +1,4 @@
-using ConsultaDocumentos.Web.Clients;
+using ConsultaDocumentos.Web.Services.Http;
 using ConsultaDocumentos.Web.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -7,19 +7,19 @@ namespace ConsultaDocumentos.Web.Controllers
 {
     public class QuadroSocietarioController : Controller
     {
-        private readonly IQuadroSocietarioApi _api;
-        private readonly INacionalidadeApi _nacionalidadeApi;
+        private readonly QuadroSocietarioHttpService _quadroSocietarioService;
+        private readonly NacionalidadeHttpService _nacionalidadeService;
 
-        public QuadroSocietarioController(IQuadroSocietarioApi api, INacionalidadeApi nacionalidadeApi)
+        public QuadroSocietarioController(QuadroSocietarioHttpService quadroSocietarioService, NacionalidadeHttpService nacionalidadeService)
         {
-            _api = api;
-            _nacionalidadeApi = nacionalidadeApi;
+            _quadroSocietarioService = quadroSocietarioService;
+            _nacionalidadeService = nacionalidadeService;
         }
 
         // GET: QuadroSocietarioController
         public async Task<ActionResult> Index()
         {
-            var result = await _api.GetAllAsync();
+            var result = await _quadroSocietarioService.GetAllAsync();
 
             if (!result.Success)
             {
@@ -45,7 +45,7 @@ namespace ConsultaDocumentos.Web.Controllers
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> CreateAsync(QuadroSocietarioViewModel model)
         {
-            var result = await _api.CreateAsync(model);
+            var result = await _quadroSocietarioService.CreateAsync(model);
 
             if (!result.Success)
             {
@@ -63,7 +63,7 @@ namespace ConsultaDocumentos.Web.Controllers
         // GET: QuadroSocietarioController/Edit/5
         public async Task<ActionResult> Edit(Guid id)
         {
-            var result = await _api.GetByIdAsync(id);
+            var result = await _quadroSocietarioService.GetByIdAsync(id);
 
             if (!result.Success)
             {
@@ -83,7 +83,7 @@ namespace ConsultaDocumentos.Web.Controllers
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> Edit(Guid id, QuadroSocietarioViewModel model)
         {
-            var result = await _api.UpdateAsync(id, model);
+            var result = await _quadroSocietarioService.UpdateAsync(id, model);
 
             if (!result.Success)
             {
@@ -103,7 +103,7 @@ namespace ConsultaDocumentos.Web.Controllers
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> DeleteConfirmed(Guid id)
         {
-            var result = await _api.DeleteAsync(id);
+            var result = await _quadroSocietarioService.DeleteAsync(id);
 
             // Se for requisição AJAX, retornar JSON
             if (Request.Headers["X-Requested-With"] == "XMLHttpRequest" ||
@@ -133,7 +133,7 @@ namespace ConsultaDocumentos.Web.Controllers
 
         private async Task CarregarNacionalidades(Guid? nacionalidadeSelecionada = null)
         {
-            var nacionalidades = await _nacionalidadeApi.GetAllAsync();
+            var nacionalidades = await _nacionalidadeService.GetAllAsync();
 
             if (nacionalidades.Success && nacionalidades.Data != null)
             {

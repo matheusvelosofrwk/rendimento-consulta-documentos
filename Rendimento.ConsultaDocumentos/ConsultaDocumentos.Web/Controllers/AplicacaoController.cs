@@ -1,5 +1,5 @@
-using ConsultaDocumentos.Web.Clients;
 using ConsultaDocumentos.Web.Models;
+using ConsultaDocumentos.Web.Services.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
 
@@ -7,24 +7,24 @@ namespace ConsultaDocumentos.Web.Controllers
 {
     public class AplicacaoController : Controller
     {
-        private readonly IAplicacaoApi _api;
-        private readonly IAplicacaoProvedorApi _aplicacaoProvedorApi;
-        private readonly IProvedorApi _provedorApi;
+        private readonly AplicacaoHttpService _aplicacaoService;
+        private readonly AplicacaoProvedorHttpService _aplicacaoProvedorService;
+        private readonly ProvedorHttpService _provedorService;
 
         public AplicacaoController(
-            IAplicacaoApi api,
-            IAplicacaoProvedorApi aplicacaoProvedorApi,
-            IProvedorApi provedorApi)
+            AplicacaoHttpService aplicacaoService,
+            AplicacaoProvedorHttpService aplicacaoProvedorService,
+            ProvedorHttpService provedorService)
         {
-            _api = api;
-            _aplicacaoProvedorApi = aplicacaoProvedorApi;
-            _provedorApi = provedorApi;
+            _aplicacaoService = aplicacaoService;
+            _aplicacaoProvedorService = aplicacaoProvedorService;
+            _provedorService = provedorService;
         }
 
         // GET: AplicacaoController
         public async Task<ActionResult> Index()
         {
-            var result = await _api.GetAllAsync();
+            var result = await _aplicacaoService.GetAllAsync();
 
             if (!result.Success)
             {
@@ -49,7 +49,7 @@ namespace ConsultaDocumentos.Web.Controllers
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> CreateAsync(AplicacaoViewModel model)
         {
-            var result = await _api.CreateAsync(model);
+            var result = await _aplicacaoService.CreateAsync(model);
 
             if (!result.Success)
             {
@@ -66,7 +66,7 @@ namespace ConsultaDocumentos.Web.Controllers
         // GET: AplicacaoController/Edit/5
         public async Task<ActionResult> Edit(Guid id)
         {
-            var result = await _api.GetByIdAsync(id);
+            var result = await _aplicacaoService.GetByIdAsync(id);
 
             if (!result.Success)
             {
@@ -78,8 +78,8 @@ namespace ConsultaDocumentos.Web.Controllers
             }
 
             // Carregar provedores vinculados
-            var provedoresVinculadosResult = await _aplicacaoProvedorApi.GetByAplicacaoIdAsync(id);
-            var provedoresDisponiveisResult = await _provedorApi.GetAllAsync();
+            var provedoresVinculadosResult = await _aplicacaoProvedorService.GetByAplicacaoIdAsync(id);
+            var provedoresDisponiveisResult = await _provedorService.GetAllAsync();
 
             var viewModel = new AplicacaoComProvedoresViewModel
             {
@@ -110,7 +110,7 @@ namespace ConsultaDocumentos.Web.Controllers
                 Serpro = viewModel.Serpro
             };
 
-            var result = await _api.UpdateAsync(id, aplicacaoModel);
+            var result = await _aplicacaoService.UpdateAsync(id, aplicacaoModel);
 
             if (!result.Success)
             {
@@ -120,8 +120,8 @@ namespace ConsultaDocumentos.Web.Controllers
                 }
 
                 // Recarregar dados para exibir a view novamente
-                var provedoresVinculadosResult = await _aplicacaoProvedorApi.GetByAplicacaoIdAsync(id);
-                var provedoresDisponiveisResult = await _provedorApi.GetAllAsync();
+                var provedoresVinculadosResult = await _aplicacaoProvedorService.GetByAplicacaoIdAsync(id);
+                var provedoresDisponiveisResult = await _provedorService.GetAllAsync();
 
                 viewModel.ProvedoresVinculados = provedoresVinculadosResult.Success ? provedoresVinculadosResult.Data.ToList() : new List<AplicacaoProvedorViewModel>();
                 viewModel.ProvedoresDisponiveis = provedoresDisponiveisResult.Success ? provedoresDisponiveisResult.Data.ToList() : new List<ProvedorViewModel>();
@@ -137,7 +137,7 @@ namespace ConsultaDocumentos.Web.Controllers
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> DeleteConfirmed(Guid id)
         {
-            var result = await _api.DeleteAsync(id);
+            var result = await _aplicacaoService.DeleteAsync(id);
 
             // Se for requisição AJAX, retornar JSON
             if (Request.Headers["X-Requested-With"] == "XMLHttpRequest" ||
@@ -170,7 +170,7 @@ namespace ConsultaDocumentos.Web.Controllers
         [ValidateAntiForgeryToken]
         public async Task<JsonResult> AdicionarProvedor([FromBody] AplicacaoProvedorViewModel model)
         {
-            var result = await _aplicacaoProvedorApi.CreateAsync(model);
+            var result = await _aplicacaoProvedorService.CreateAsync(model);
 
             if (result.Success)
             {
@@ -187,7 +187,7 @@ namespace ConsultaDocumentos.Web.Controllers
         [ValidateAntiForgeryToken]
         public async Task<JsonResult> AtualizarProvedor(Guid id, [FromBody] AplicacaoProvedorViewModel model)
         {
-            var result = await _aplicacaoProvedorApi.UpdateAsync(id, model);
+            var result = await _aplicacaoProvedorService.UpdateAsync(id, model);
 
             if (result.Success)
             {
@@ -204,7 +204,7 @@ namespace ConsultaDocumentos.Web.Controllers
         [ValidateAntiForgeryToken]
         public async Task<JsonResult> RemoverProvedor(Guid id)
         {
-            var result = await _aplicacaoProvedorApi.DeleteAsync(id);
+            var result = await _aplicacaoProvedorService.DeleteAsync(id);
 
             if (result.Success)
             {

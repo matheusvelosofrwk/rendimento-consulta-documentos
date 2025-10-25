@@ -1,4 +1,4 @@
-using ConsultaDocumentos.Web.Clients;
+using ConsultaDocumentos.Web.Services.Http;
 using ConsultaDocumentos.Web.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -8,17 +8,17 @@ namespace ConsultaDocumentos.Web.Controllers
     [Authorize]
     public class RoleController : Controller
     {
-        private readonly IRoleApi _roleApi;
+        private readonly RoleHttpService _roleService;
 
-        public RoleController(IRoleApi roleApi)
+        public RoleController(RoleHttpService roleService)
         {
-            _roleApi = roleApi;
+            _roleService = roleService;
         }
 
         // GET: Role
         public async Task<IActionResult> Index()
         {
-            var result = await _roleApi.GetAllAsync();
+            var result = await _roleService.GetAllAsync();
             if (!result.Success)
             {
                 TempData["ErrorMessage"] = string.Join(", ", result.Notifications);
@@ -41,7 +41,7 @@ namespace ConsultaDocumentos.Web.Controllers
         {
             if (ModelState.IsValid)
             {
-                var result = await _roleApi.CreateAsync(model);
+                var result = await _roleService.CreateAsync(model);
 
                 if (result.Success)
                 {
@@ -66,7 +66,7 @@ namespace ConsultaDocumentos.Web.Controllers
                 return NotFound();
             }
 
-            var result = await _roleApi.GetByIdAsync(id);
+            var result = await _roleService.GetByIdAsync(id);
             if (!result.Success || result.Data == null)
             {
                 return NotFound();
@@ -93,7 +93,7 @@ namespace ConsultaDocumentos.Web.Controllers
 
             if (ModelState.IsValid)
             {
-                var result = await _roleApi.UpdateAsync(id, model);
+                var result = await _roleService.UpdateAsync(id, model);
 
                 if (result.Success)
                 {
@@ -115,7 +115,7 @@ namespace ConsultaDocumentos.Web.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(string id)
         {
-            var result = await _roleApi.DeleteAsync(id);
+            var result = await _roleService.DeleteAsync(id);
 
             // Se for requisição AJAX, retornar JSON
             if (Request.Headers["X-Requested-With"] == "XMLHttpRequest" ||

@@ -20,7 +20,7 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
 // Adicionar HttpContextAccessor para o AuthDelegatingHandler
 builder.Services.AddHttpContextAccessor();
 
-builder.Services.AddRefitConfiguration(builder.Configuration);
+builder.Services.AddHttpClientConfiguration(builder.Configuration);
 
 
 var app = builder.Build();

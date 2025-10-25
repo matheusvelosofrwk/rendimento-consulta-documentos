@@ -1,4 +1,4 @@
-using ConsultaDocumentos.Web.Clients;
+using ConsultaDocumentos.Web.Services.Http;
 using ConsultaDocumentos.Web.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -9,13 +9,13 @@ namespace ConsultaDocumentos.Web.Controllers
     [Authorize]
     public class LogAuditoriaController : Controller
     {
-        private readonly ILogAuditoriaApi _logAuditoriaApi;
-        private readonly IAplicacaoApi _aplicacaoApi;
+        private readonly LogAuditoriaHttpService _logAuditoriaService;
+        private readonly AplicacaoHttpService _aplicacaoService;
 
-        public LogAuditoriaController(ILogAuditoriaApi logAuditoriaApi, IAplicacaoApi aplicacaoApi)
+        public LogAuditoriaController(LogAuditoriaHttpService logAuditoriaService, AplicacaoHttpService aplicacaoService)
         {
-            _logAuditoriaApi = logAuditoriaApi;
-            _aplicacaoApi = aplicacaoApi;
+            _logAuditoriaService = logAuditoriaService;
+            _aplicacaoService = aplicacaoService;
         }
 
         public async Task<IActionResult> Index(LogAuditoriaFiltrosViewModel? filtros)
@@ -32,16 +32,11 @@ namespace ConsultaDocumentos.Web.Controllers
                     !string.IsNullOrWhiteSpace(filtros.NumeroDocumento) || filtros.AplicacaoProvedorId.HasValue ||
                     filtros.TipoDocumento.HasValue))
                 {
-                    result = await _logAuditoriaApi.GetWithFiltersAsync(
-                        filtros.DataInicio,
-                        filtros.DataFim,
-                        filtros.NumeroDocumento,
-                        filtros.AplicacaoProvedorId,
-                        filtros.TipoDocumento);
+                    result = await _logAuditoriaService.GetByFiltrosAsync(filtros);
                 }
                 else
                 {
-                    result = await _logAuditoriaApi.GetAllAsync();
+                    result = await _logAuditoriaService.GetAllAsync();
                 }
 
                 if (!result.Success)
@@ -66,7 +61,7 @@ namespace ConsultaDocumentos.Web.Controllers
             try
             {
                 // Carregar aplicações
-                var aplicacoesResult = await _aplicacaoApi.GetAllAsync();
+                var aplicacoesResult = await _aplicacaoService.GetAllAsync();
                 if (aplicacoesResult.Success && aplicacoesResult.Data != null)
                 {
                     ViewBag.Aplicacoes = new SelectList(aplicacoesResult.Data, "Id", "Nome");
@@ -94,7 +89,7 @@ namespace ConsultaDocumentos.Web.Controllers
         {
             try
             {
-                var result = await _logAuditoriaApi.GetByIdAsync(id);
+                var result = await _logAuditoriaService.GetByIdAsync(id);
 
                 if (!result.Success)
                 {

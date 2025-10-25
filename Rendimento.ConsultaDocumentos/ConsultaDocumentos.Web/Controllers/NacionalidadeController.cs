@@ -1,5 +1,5 @@
-using ConsultaDocumentos.Web.Clients;
 using ConsultaDocumentos.Web.Models;
+using ConsultaDocumentos.Web.Services.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
 
@@ -7,17 +7,17 @@ namespace ConsultaDocumentos.Web.Controllers
 {
     public class NacionalidadeController : Controller
     {
-        private readonly INacionalidadeApi _api;
+        private readonly NacionalidadeHttpService _nacionalidadeService;
 
-        public NacionalidadeController(INacionalidadeApi api)
+        public NacionalidadeController(NacionalidadeHttpService nacionalidadeService)
         {
-            _api = api;
+            _nacionalidadeService = nacionalidadeService;
         }
 
         // GET: NacionalidadeController
         public async Task<ActionResult> Index()
         {
-            var result = await _api.GetAllAsync();
+            var result = await _nacionalidadeService.GetAllAsync();
 
             if (!result.Success)
             {
@@ -42,7 +42,7 @@ namespace ConsultaDocumentos.Web.Controllers
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> CreateAsync(NacionalidadeViewModel model)
         {
-            var result = await _api.CreateAsync(model);
+            var result = await _nacionalidadeService.CreateAsync(model);
 
             if (!result.Success)
             {
@@ -59,7 +59,7 @@ namespace ConsultaDocumentos.Web.Controllers
         // GET: NacionalidadeController/Edit/5
         public async Task<ActionResult> Edit(Guid id)
         {
-            var result = await _api.GetByIdAsync(id);
+            var result = await _nacionalidadeService.GetByIdAsync(id);
 
             if (!result.Success)
             {
@@ -78,7 +78,7 @@ namespace ConsultaDocumentos.Web.Controllers
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> Edit(Guid id, NacionalidadeViewModel model)
         {
-            var result = await _api.UpdateAsync(id, model);
+            var result = await _nacionalidadeService.UpdateAsync(id, model);
 
             if (!result.Success)
             {
@@ -97,7 +97,7 @@ namespace ConsultaDocumentos.Web.Controllers
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> DeleteConfirmed(Guid id)
         {
-            var result = await _api.DeleteAsync(id);
+            var result = await _nacionalidadeService.DeleteAsync(id);
 
             // Se for requisição AJAX, retornar JSON
             if (Request.Headers["X-Requested-With"] == "XMLHttpRequest" ||

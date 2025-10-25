@@ -1,4 +1,4 @@
-using ConsultaDocumentos.Web.Clients;
+using ConsultaDocumentos.Web.Services.Http;
 using ConsultaDocumentos.Web.Models;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
@@ -7,18 +7,18 @@ namespace ConsultaDocumentos.Web.Controllers
 {
     public class AplicacaoProvedorController : Controller
     {
-        private readonly IAplicacaoProvedorApi _api;
-        private readonly IAplicacaoApi _aplicacaoApi;
-        private readonly IProvedorApi _provedorApi;
+        private readonly AplicacaoProvedorHttpService _aplicacaoProvedorService;
+        private readonly AplicacaoHttpService _aplicacaoService;
+        private readonly ProvedorHttpService _provedorService;
 
         public AplicacaoProvedorController(
-            IAplicacaoProvedorApi api,
-            IAplicacaoApi aplicacaoApi,
-            IProvedorApi provedorApi)
+            AplicacaoProvedorHttpService aplicacaoProvedorService,
+            AplicacaoHttpService aplicacaoService,
+            ProvedorHttpService provedorService)
         {
-            _api = api;
-            _aplicacaoApi = aplicacaoApi;
-            _provedorApi = provedorApi;
+            _aplicacaoProvedorService = aplicacaoProvedorService;
+            _aplicacaoService = aplicacaoService;
+            _provedorService = provedorService;
         }
 
         // GET: AplicacaoProvedorController
@@ -28,11 +28,11 @@ namespace ConsultaDocumentos.Web.Controllers
 
             if (aplicacaoId.HasValue && aplicacaoId.Value != Guid.Empty)
             {
-                result = await _api.GetByAplicacaoIdAsync(aplicacaoId.Value);
+                result = await _aplicacaoProvedorService.GetByAplicacaoIdAsync(aplicacaoId.Value);
             }
             else
             {
-                result = await _api.GetAllAsync();
+                result = await _aplicacaoProvedorService.GetAllAsync();
             }
 
             if (!result.Success)
@@ -45,7 +45,7 @@ namespace ConsultaDocumentos.Web.Controllers
             }
 
             // Carregar lista de aplicações para o filtro
-            var aplicacoesResult = await _aplicacaoApi.GetAllAsync();
+            var aplicacoesResult = await _aplicacaoService.GetAllAsync();
             ViewBag.Aplicacoes = aplicacoesResult.Success ? aplicacoesResult.Data : new List<AplicacaoViewModel>();
             ViewBag.AplicacaoIdSelecionada = aplicacaoId;
 
@@ -64,7 +64,7 @@ namespace ConsultaDocumentos.Web.Controllers
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> CreateAsync(AplicacaoProvedorViewModel model)
         {
-            var result = await _api.CreateAsync(model);
+            var result = await _aplicacaoProvedorService.CreateAsync(model);
 
             if (!result.Success)
             {
@@ -82,7 +82,7 @@ namespace ConsultaDocumentos.Web.Controllers
         // GET: AplicacaoProvedorController/Edit/5
         public async Task<ActionResult> Edit(Guid id)
         {
-            var result = await _api.GetByIdAsync(id);
+            var result = await _aplicacaoProvedorService.GetByIdAsync(id);
 
             if (!result.Success)
             {
@@ -102,7 +102,7 @@ namespace ConsultaDocumentos.Web.Controllers
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> Edit(Guid id, AplicacaoProvedorViewModel model)
         {
-            var result = await _api.UpdateAsync(id, model);
+            var result = await _aplicacaoProvedorService.UpdateAsync(id, model);
 
             if (!result.Success)
             {
@@ -122,7 +122,7 @@ namespace ConsultaDocumentos.Web.Controllers
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> DeleteConfirmed(Guid id)
         {
-            var result = await _api.DeleteAsync(id);
+            var result = await _aplicacaoProvedorService.DeleteAsync(id);
 
             // Se for requisição AJAX, retornar JSON
             if (Request.Headers["X-Requested-With"] == "XMLHttpRequest" ||
@@ -152,8 +152,8 @@ namespace ConsultaDocumentos.Web.Controllers
 
         private async Task LoadSelectLists()
         {
-            var aplicacoesResult = await _aplicacaoApi.GetAllAsync();
-            var provedoresResult = await _provedorApi.GetAllAsync();
+            var aplicacoesResult = await _aplicacaoService.GetAllAsync();
+            var provedoresResult = await _provedorService.GetAllAsync();
 
             ViewBag.Aplicacoes = aplicacoesResult.Success ? aplicacoesResult.Data : new List<AplicacaoViewModel>();
             ViewBag.Provedores = provedoresResult.Success ? provedoresResult.Data : new List<ProvedorViewModel>();

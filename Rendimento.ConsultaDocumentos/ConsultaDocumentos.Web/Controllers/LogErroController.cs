@@ -1,4 +1,4 @@
-using ConsultaDocumentos.Web.Clients;
+using ConsultaDocumentos.Web.Services.Http;
 using ConsultaDocumentos.Web.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -9,13 +9,13 @@ namespace ConsultaDocumentos.Web.Controllers
     [Authorize]
     public class LogErroController : Controller
     {
-        private readonly ILogErroApi _logErroApi;
-        private readonly IAplicacaoApi _aplicacaoApi;
+        private readonly LogErroHttpService _logErroService;
+        private readonly AplicacaoHttpService _aplicacaoService;
 
-        public LogErroController(ILogErroApi logErroApi, IAplicacaoApi aplicacaoApi)
+        public LogErroController(LogErroHttpService logErroService, AplicacaoHttpService aplicacaoService)
         {
-            _logErroApi = logErroApi;
-            _aplicacaoApi = aplicacaoApi;
+            _logErroService = logErroService;
+            _aplicacaoService = aplicacaoService;
         }
 
         public async Task<IActionResult> Index(LogErroFiltrosViewModel? filtros)
@@ -32,16 +32,11 @@ namespace ConsultaDocumentos.Web.Controllers
                     !string.IsNullOrWhiteSpace(filtros.NumeroDocumento) || filtros.AplicacaoProvedorId.HasValue ||
                     filtros.TipoDocumento.HasValue))
                 {
-                    result = await _logErroApi.GetWithFiltersAsync(
-                        filtros.DataInicio,
-                        filtros.DataFim,
-                        filtros.NumeroDocumento,
-                        filtros.AplicacaoProvedorId,
-                        filtros.TipoDocumento);
+                    result = await _logErroService.GetByFiltrosAsync(filtros);
                 }
                 else
                 {
-                    result = await _logErroApi.GetAllAsync();
+                    result = await _logErroService.GetAllAsync();
                 }
 
                 if (!result.Success)
@@ -66,7 +61,7 @@ namespace ConsultaDocumentos.Web.Controllers
             try
             {
                 // Carregar aplicações
-                var aplicacoesResult = await _aplicacaoApi.GetAllAsync();
+                var aplicacoesResult = await _aplicacaoService.GetAllAsync();
                 if (aplicacoesResult.Success && aplicacoesResult.Data != null)
                 {
                     ViewBag.Aplicacoes = new SelectList(aplicacoesResult.Data, "Id", "Nome");
@@ -94,7 +89,7 @@ namespace ConsultaDocumentos.Web.Controllers
         {
             try
             {
-                var result = await _logErroApi.GetByIdAsync(id);
+                var result = await _logErroService.GetByIdAsync(id);
 
                 if (!result.Success)
                 {

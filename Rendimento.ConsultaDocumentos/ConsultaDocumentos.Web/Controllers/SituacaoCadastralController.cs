@@ -1,4 +1,4 @@
-using ConsultaDocumentos.Web.Clients;
+using ConsultaDocumentos.Web.Services.Http;
 using ConsultaDocumentos.Web.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -8,11 +8,11 @@ namespace ConsultaDocumentos.Web.Controllers
 {
     public class SituacaoCadastralController : Controller
     {
-        private readonly ISituacaoCadastralApi _api;
+        private readonly SituacaoCadastralHttpService _situacaoCadastralService;
 
-        public SituacaoCadastralController(ISituacaoCadastralApi api)
+        public SituacaoCadastralController(SituacaoCadastralHttpService situacaoCadastralService)
         {
-            _api = api;
+            _situacaoCadastralService = situacaoCadastralService;
         }
 
         // GET: SituacaoCadastralController
@@ -24,12 +24,12 @@ namespace ConsultaDocumentos.Web.Controllers
             if (!string.IsNullOrEmpty(tipoPessoa) && tipoPessoa != "T")
             {
                 char tipoPessoaChar = tipoPessoa[0];
-                result = await _api.GetByTipoPessoaAsync(tipoPessoaChar);
+                result = await _situacaoCadastralService.GetByTipoPessoaAsync(tipoPessoaChar);
             }
             else
             {
                 // Buscar todas
-                result = await _api.GetAllAsync();
+                result = await _situacaoCadastralService.GetAllAsync();
             }
 
             if (!result.Success)
@@ -65,7 +65,7 @@ namespace ConsultaDocumentos.Web.Controllers
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> CreateAsync(SituacaoCadastralViewModel model)
         {
-            var result = await _api.CreateAsync(model);
+            var result = await _situacaoCadastralService.CreateAsync(model);
 
             if (!result.Success)
             {
@@ -83,7 +83,7 @@ namespace ConsultaDocumentos.Web.Controllers
         // GET: SituacaoCadastralController/Edit/5
         public async Task<ActionResult> Edit(Guid id)
         {
-            var result = await _api.GetByIdAsync(id);
+            var result = await _situacaoCadastralService.GetByIdAsync(id);
 
             if (!result.Success)
             {
@@ -103,7 +103,7 @@ namespace ConsultaDocumentos.Web.Controllers
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> Edit(Guid id, SituacaoCadastralViewModel model)
         {
-            var result = await _api.UpdateAsync(id, model);
+            var result = await _situacaoCadastralService.UpdateAsync(id, model);
 
             if (!result.Success)
             {
@@ -134,7 +134,7 @@ namespace ConsultaDocumentos.Web.Controllers
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> DeleteConfirmed(Guid id)
         {
-            var result = await _api.DeleteAsync(id);
+            var result = await _situacaoCadastralService.DeleteAsync(id);
 
             // Se for requisição AJAX, retornar JSON
             if (Request.Headers["X-Requested-With"] == "XMLHttpRequest" ||

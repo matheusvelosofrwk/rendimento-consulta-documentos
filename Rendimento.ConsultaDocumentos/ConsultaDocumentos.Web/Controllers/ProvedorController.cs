@@ -1,5 +1,5 @@
-using ConsultaDocumentos.Web.Clients;
 using ConsultaDocumentos.Web.Models;
+using ConsultaDocumentos.Web.Services.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
 
@@ -7,17 +7,17 @@ namespace ConsultaDocumentos.Web.Controllers
 {
     public class ProvedorController : Controller
     {
-        private readonly IProvedorApi _api;
+        private readonly ProvedorHttpService _provedorService;
 
-        public ProvedorController(IProvedorApi api)
+        public ProvedorController(ProvedorHttpService provedorService)
         {
-            _api = api;
+            _provedorService = provedorService;
         }
 
         // GET: ProvedorController
         public async Task<ActionResult> Index()
         {
-            var result = await _api.GetAllAsync();
+            var result = await _provedorService.GetAllAsync();
 
             if (!result.Success)
             {
@@ -42,7 +42,7 @@ namespace ConsultaDocumentos.Web.Controllers
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> CreateAsync(ProvedorViewModel model)
         {
-            var result = await _api.CreateAsync(model);
+            var result = await _provedorService.CreateAsync(model);
 
             if (!result.Success)
             {
@@ -59,7 +59,7 @@ namespace ConsultaDocumentos.Web.Controllers
         // GET: ProvedorController/Edit/5
         public async Task<ActionResult> Edit(Guid id)
         {
-            var result = await _api.GetByIdAsync(id);
+            var result = await _provedorService.GetByIdAsync(id);
 
             if (!result.Success)
             {
@@ -78,7 +78,7 @@ namespace ConsultaDocumentos.Web.Controllers
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> Edit(Guid id, ProvedorViewModel model)
         {
-            var result = await _api.UpdateAsync(id, model);
+            var result = await _provedorService.UpdateAsync(id, model);
 
             if (!result.Success)
             {
@@ -97,7 +97,7 @@ namespace ConsultaDocumentos.Web.Controllers
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> DeleteConfirmed(Guid id)
         {
-            var result = await _api.DeleteAsync(id);
+            var result = await _provedorService.DeleteAsync(id);
 
             // Se for requisição AJAX, retornar JSON
             if (Request.Headers["X-Requested-With"] == "XMLHttpRequest" ||
