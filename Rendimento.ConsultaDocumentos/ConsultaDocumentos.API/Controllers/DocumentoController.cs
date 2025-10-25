@@ -2,10 +2,12 @@ using ConsultaDocumentos.Application.DTOs;
 using ConsultaDocumentos.Application.DTOs.External;
 using ConsultaDocumentos.Application.Interfaces;
 using ConsultaDocumentos.Domain.Enums;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ConsultaDocumentos.API.Controllers
 {
+    [Authorize]
     [ApiController]
     [Route("api/[controller]")]
     public class DocumentoController : ControllerBase
@@ -190,6 +192,7 @@ namespace ConsultaDocumentos.API.Controllers
         /// </summary>
         /// <param name="ct">Cancellation token</param>
         /// <returns>Status de cada provedor configurado</returns>
+        [AllowAnonymous]
         [HttpGet("providers/health")]
         public async Task<IActionResult> VerificarSaudeProvedores(CancellationToken ct = default)
         {
@@ -203,6 +206,7 @@ namespace ConsultaDocumentos.API.Controllers
         /// <param name="providerName">Nome do provedor (SERPRO ou SERASA)</param>
         /// <param name="ct">Cancellation token</param>
         /// <returns>Status do provedor</returns>
+        [AllowAnonymous]
         [HttpGet("providers/health/{providerName}")]
         public async Task<IActionResult> VerificarSaudeProvedor(
             [FromRoute] string providerName,

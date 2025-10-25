@@ -4,10 +4,12 @@ using ConsultaDocumentos.Application.Results;
 using ConsultaDocumentos.Domain.Entities;
 using ConsultaDocumentos.Domain.Enums;
 using ConsultaDocumentos.Domain.Intefaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ConsultaDocumentos.API.Controllers
 {
+    [Authorize]
     [ApiController]
     [Route("api/[controller]")]
     public class LogAuditoriaController : ControllerBase
