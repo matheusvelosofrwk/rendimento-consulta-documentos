@@ -36,24 +36,71 @@ namespace ConsultaDocumentos.Web.Controllers
 
             try
             {
-                ConsultaDocumentoResultViewModel resultado;
+                ConsultaDocumentoResultViewModel? resultado = null;
 
                 if (model.TipoDocumento == "CPF")
                 {
-                    resultado = await _documentoApi.ConsultarCPFAsync(model.NumeroDocumento, model.AplicacaoId);
+                    resultado = await _documentoApi.ConsultarCPFAsync(
+                        model.NumeroDocumento,
+                        model.AplicacaoId,
+                        model.TipoConsulta,
+                        model.OrigemConsulta,
+                        model.ConsultarVencidos);
                 }
                 else
                 {
-                    resultado = await _documentoApi.ConsultarCNPJAsync(model.NumeroDocumento, model.AplicacaoId, model.PerfilCNPJ);
+                    resultado = await _documentoApi.ConsultarCNPJAsync(
+                        model.NumeroDocumento,
+                        model.AplicacaoId,
+                        model.PerfilCNPJ,
+                        model.TipoConsulta,
+                        model.OrigemConsulta,
+                        model.ConsultarVencidos);
+                }
+
+                // Garantir que resultado tenha valores padrão se vier null
+                if (resultado == null)
+                {
+                    resultado = new ConsultaDocumentoResultViewModel
+                    {
+                        Sucesso = false,
+                        Mensagem = "Nenhuma resposta recebida do servidor",
+                        Erro = "O servidor não retornou uma resposta válida"
+                    };
                 }
 
                 ViewBag.Resultado = resultado;
                 await CarregarAplicacoesAsync();
                 return View(model);
             }
+            catch (Refit.ApiException apiEx)
+            {
+                // Erro da API
+                var errorMessage = $"Erro na API: {apiEx.Message}";
+                if (apiEx.HasContent)
+                {
+                    errorMessage += $" - Detalhes: {apiEx.Content}";
+                }
+
+                ViewBag.Resultado = new ConsultaDocumentoResultViewModel
+                {
+                    Sucesso = false,
+                    Mensagem = "Erro ao consultar documento",
+                    Erro = errorMessage
+                };
+
+                await CarregarAplicacoesAsync();
+                return View(model);
+            }
             catch (Exception ex)
             {
-                ModelState.AddModelError(string.Empty, $"Erro ao consultar documento: {ex.Message}");
+                ViewBag.Resultado = new ConsultaDocumentoResultViewModel
+                {
+                    Sucesso = false,
+                    Mensagem = "Erro inesperado ao consultar documento",
+                    Erro = ex.Message
+                };
+
                 await CarregarAplicacoesAsync();
                 return View(model);
             }

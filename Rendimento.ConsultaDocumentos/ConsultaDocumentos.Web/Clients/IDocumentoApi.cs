@@ -21,9 +21,20 @@ namespace ConsultaDocumentos.Web.Clients
         Task<Result<bool>> DeleteAsync(Guid id);
 
         [Get("/Documento/consultar/cpf/{cpf}")]
-        Task<ConsultaDocumentoResultViewModel> ConsultarCPFAsync(string cpf, [Query] Guid aplicacaoId);
+        Task<ConsultaDocumentoResultViewModel> ConsultarCPFAsync(
+            string cpf,
+            [Query] Guid aplicacaoId,
+            [Query] int tipoConsulta = 1,
+            [Query] int origemConsulta = 1,
+            [Query] bool consultarVencidos = false);
 
         [Get("/Documento/consultar/cnpj/{cnpj}")]
-        Task<ConsultaDocumentoResultViewModel> ConsultarCNPJAsync(string cnpj, [Query] Guid aplicacaoId, [Query] int perfil = 3);
+        Task<ConsultaDocumentoResultViewModel> ConsultarCNPJAsync(
+            string cnpj,
+            [Query] Guid aplicacaoId,
+            [Query] int perfil = 3,
+            [Query] int tipoConsulta = 1,
+            [Query] int origemConsulta = 1,
+            [Query] bool consultarVencidos = false);
     }
 }

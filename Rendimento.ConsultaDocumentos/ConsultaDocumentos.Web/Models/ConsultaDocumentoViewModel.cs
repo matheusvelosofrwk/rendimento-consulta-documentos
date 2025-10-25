@@ -19,5 +19,15 @@ namespace ConsultaDocumentos.Web.Models
         [Required(ErrorMessage = "A aplicação é obrigatória")]
         [Display(Name = "Aplicação")]
         public Guid AplicacaoId { get; set; }
+
+        // Novos campos
+        [Display(Name = "Tipo de Consulta")]
+        public int TipoConsulta { get; set; } = 1; // 1=Completa, 2=Simples, 3=Validade, 4=Sócio
+
+        [Display(Name = "Origem da Consulta")]
+        public int OrigemConsulta { get; set; } = 1; // 1=Repositório e Hubs, 2=Apenas Repositório, 3=Apenas Hubs
+
+        [Display(Name = "Incluir documentos vencidos")]
+        public bool ConsultarVencidos { get; set; } = false;
     }
 }

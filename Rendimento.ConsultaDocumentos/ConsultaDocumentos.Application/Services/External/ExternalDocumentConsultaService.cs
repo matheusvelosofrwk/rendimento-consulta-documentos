@@ -93,37 +93,69 @@ namespace ConsultaDocumentos.Application.Services.External
                     "Iniciando consulta de documento {Tipo} {Numero} para aplicação {AplicacaoId}",
                     request.TipoDocumento, request.NumeroDocumento, request.AplicacaoId);
 
-                // Verifica se existe em cache
+                // Verifica origem da consulta e cache conforme solicitado
                 var documentoLimpo = DocumentoValidationHelper.RemoverFormatacao(request.NumeroDocumento);
                 var cacheKey = $"documento:{documentoLimpo}";
 
-                var documentoCacheDTO = await _cacheService.GetAsync<DocumentoDTO>(cacheKey, cancellationToken);
-                if (documentoCacheDTO != null)
+                // Se origem for "ApenasHubs", pular verificação de cache
+                if (request.OrigemConsulta != OrigemConsulta.ApenasHubs)
                 {
-                    _logger.LogInformation("Documento encontrado em cache válido");
-                    stopwatch.Stop();
+                    var documentoCacheDTO = await _cacheService.GetAsync<DocumentoDTO>(cacheKey, cancellationToken);
+                    if (documentoCacheDTO != null)
+                    {
+                        // Verificar validade se ConsultarVencidos = false
+                        bool documentoValido = request.ConsultarVencidos ||
+                            documentoCacheDTO.DataConsultaValidade > DateTime.UtcNow;
 
-                    await RegistrarAuditoriaAsync(
-                        request.AplicacaoId,
-                        request.NumeroDocumento,
-                        request.TipoDocumento,
-                        true,
-                        "CACHE",
-                        "CACHE",
-                        stopwatch.ElapsedMilliseconds,
-                        true,
-                        "Documento retornado do cache");
+                        if (documentoValido)
+                        {
+                            _logger.LogInformation("Documento encontrado em cache válido");
+                            stopwatch.Stop();
+
+                            await RegistrarAuditoriaAsync(
+                                request.AplicacaoId,
+                                request.NumeroDocumento,
+                                request.TipoDocumento,
+                                true,
+                                "CACHE",
+                                "CACHE",
+                                stopwatch.ElapsedMilliseconds,
+                                true,
+                                "Documento retornado do cache");
+
+                            return new ConsultaDocumentoResponse
+                            {
+                                Sucesso = true,
+                                Mensagem = "Documento retornado do cache",
+                                ProvedorUtilizado = "CACHE",
+                                ProvedoresTentados = new List<string> { "CACHE" },
+                                OrigemCache = true,
+                                TempoProcessamentoMs = stopwatch.ElapsedMilliseconds,
+                                DataConsulta = DateTime.UtcNow,
+                                Documento = documentoCacheDTO
+                            };
+                        }
+                        else
+                        {
+                            _logger.LogInformation("Documento em cache, mas está vencido. Consultando nos hubs.");
+                        }
+                    }
+                }
+
+                // Se origem for "ApenasRepositorio" e não encontrou no cache, retornar erro
+                if (request.OrigemConsulta == OrigemConsulta.ApenasRepositorio)
+                {
+                    _logger.LogWarning("Origem definida como 'ApenasRepositorio' mas documento não encontrado no cache");
+                    stopwatch.Stop();
 
                     return new ConsultaDocumentoResponse
                     {
-                        Sucesso = true,
-                        Mensagem = "Documento retornado do cache",
-                        ProvedorUtilizado = "CACHE",
+                        Sucesso = false,
+                        Mensagem = "Documento não encontrado no repositório local",
                         ProvedoresTentados = new List<string> { "CACHE" },
-                        OrigemCache = true,
                         TempoProcessamentoMs = stopwatch.ElapsedMilliseconds,
                         DataConsulta = DateTime.UtcNow,
-                        Documento = documentoCacheDTO
+                        Erro = "Documento não existe no cache e a origem está configurada para consultar apenas no repositório"
                     };
                 }
 
@@ -152,6 +184,7 @@ namespace ConsultaDocumentos.Application.Services.External
                             request.NumeroDocumento,
                             request.TipoDocumento,
                             request.PerfilCNPJ,
+                            request.TipoConsulta,
                             cancellationToken);
 
                         if (documentoConsultado != null)
@@ -473,6 +506,7 @@ namespace ConsultaDocumentos.Application.Services.External
             string numeroDocumento,
             TipoDocumento tipoDocumento,
             int perfilCNPJ,
+            TipoConsulta tipoConsulta,
             CancellationToken cancellationToken)
         {
             switch (nomeProvedor.ToUpperInvariant())
@@ -481,7 +515,7 @@ namespace ConsultaDocumentos.Application.Services.External
                     return await ConsultarSerproAsync(numeroDocumento, tipoDocumento, perfilCNPJ, cancellationToken);
 
                 case "SERASA":
-                    return await ConsultarSerasaAsync(numeroDocumento, tipoDocumento, cancellationToken);
+                    return await ConsultarSerasaAsync(numeroDocumento, tipoDocumento, tipoConsulta, cancellationToken);
 
                 default:
                     _logger.LogWarning("Provedor {Provedor} não implementado", nomeProvedor);
@@ -555,16 +589,20 @@ namespace ConsultaDocumentos.Application.Services.External
         private async Task<Documento?> ConsultarSerasaAsync(
             string numeroDocumento,
             TipoDocumento tipoDocumento,
+            TipoConsulta tipoConsulta,
             CancellationToken cancellationToken)
         {
             var usarMock = _providerSelector.UsarMock();
+
+            // Mapear TipoConsulta enum para string da Serasa
+            string tipoConsultaStr = MapearTipoConsulta(tipoConsulta);
 
             if (tipoDocumento == TipoDocumento.CPF)
             {
                 if (usarMock)
                 {
                     // Usar Mock
-                    var response = await _serasaServiceMock.ConsultarCPFAsync(numeroDocumento, "COMPLETA", cancellationToken);
+                    var response = await _serasaServiceMock.ConsultarCPFAsync(numeroDocumento, tipoConsultaStr, cancellationToken);
                     return ConverterSerasaCPFParaDocumento(response, numeroDocumento);
                 }
                 else
@@ -584,7 +622,7 @@ namespace ConsultaDocumentos.Application.Services.External
                 if (usarMock)
                 {
                     // Usar Mock
-                    var response = await _serasaServiceMock.ConsultarCNPJAsync(numeroDocumento, "COMPLETA", cancellationToken);
+                    var response = await _serasaServiceMock.ConsultarCNPJAsync(numeroDocumento, tipoConsultaStr, cancellationToken);
                     return ConverterSerasaCNPJParaDocumento(response, numeroDocumento);
                 }
                 else
@@ -599,6 +637,19 @@ namespace ConsultaDocumentos.Application.Services.External
                     return ConverterSerasaCNPJRealParaDocumento(response, numeroDocumento);
                 }
             }
+        }
+
+        // Método auxiliar para mapear TipoConsulta enum para string Serasa
+        private string MapearTipoConsulta(TipoConsulta tipoConsulta)
+        {
+            return tipoConsulta switch
+            {
+                TipoConsulta.ConsultaCompleta => "COMPLETA",
+                TipoConsulta.ConsultaSimples => "SIMPLES",
+                TipoConsulta.ConsultaValidade => "VALIDADE",
+                TipoConsulta.ConsultaSocio => "SOCIO",
+                _ => "COMPLETA"
+            };
         }
 
         // Métodos de conversão (SERPRO Mock -> Documento)

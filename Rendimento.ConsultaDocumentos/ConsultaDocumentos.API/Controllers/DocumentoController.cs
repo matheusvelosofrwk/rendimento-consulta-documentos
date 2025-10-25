@@ -67,19 +67,28 @@ namespace ConsultaDocumentos.API.Controllers
         /// </summary>
         /// <param name="cpf">CPF a ser consultado (com ou sem formatação)</param>
         /// <param name="aplicacaoId">ID da aplicação que está realizando a consulta</param>
+        /// <param name="tipoConsulta">Tipo de consulta: 1=Completa, 2=Simples, 3=Validade, 4=Sócio</param>
+        /// <param name="origemConsulta">Origem: 1=Repositório e Hubs, 2=Apenas Repositório, 3=Apenas Hubs</param>
+        /// <param name="consultarVencidos">Se true, aceita documentos vencidos do cache</param>
         /// <param name="ct">Cancellation token</param>
         /// <returns>Dados do documento consultado</returns>
         [HttpGet("consultar/cpf/{cpf}")]
         public async Task<IActionResult> ConsultarCPF(
             [FromRoute] string cpf,
             [FromQuery] Guid aplicacaoId,
+            [FromQuery] int tipoConsulta = 1,
+            [FromQuery] int origemConsulta = 1,
+            [FromQuery] bool consultarVencidos = false,
             CancellationToken ct = default)
         {
             var request = new ConsultaDocumentoRequest
             {
                 NumeroDocumento = cpf,
                 TipoDocumento = TipoDocumento.CPF,
-                AplicacaoId = aplicacaoId
+                AplicacaoId = aplicacaoId,
+                TipoConsulta = (TipoConsulta)tipoConsulta,
+                OrigemConsulta = (OrigemConsulta)origemConsulta,
+                ConsultarVencidos = consultarVencidos
             };
 
             var response = await _externalConsultaService.ConsultarDocumentoAsync(request, ct);
@@ -98,6 +107,9 @@ namespace ConsultaDocumentos.API.Controllers
         /// <param name="cnpj">CNPJ a ser consultado (com ou sem formatação)</param>
         /// <param name="aplicacaoId">ID da aplicação que está realizando a consulta</param>
         /// <param name="perfil">Perfil de consulta (1=Básico, 2=Completo, 3=Com Sócios). Padrão: 3</param>
+        /// <param name="tipoConsulta">Tipo de consulta: 1=Completa, 2=Simples, 3=Validade, 4=Sócio</param>
+        /// <param name="origemConsulta">Origem: 1=Repositório e Hubs, 2=Apenas Repositório, 3=Apenas Hubs</param>
+        /// <param name="consultarVencidos">Se true, aceita documentos vencidos do cache</param>
         /// <param name="ct">Cancellation token</param>
         /// <returns>Dados do documento consultado</returns>
         [HttpGet("consultar/cnpj/{cnpj}")]
@@ -105,6 +117,9 @@ namespace ConsultaDocumentos.API.Controllers
             [FromRoute] string cnpj,
             [FromQuery] Guid aplicacaoId,
             [FromQuery] int perfil = 3,
+            [FromQuery] int tipoConsulta = 1,
+            [FromQuery] int origemConsulta = 1,
+            [FromQuery] bool consultarVencidos = false,
             CancellationToken ct = default)
         {
             if (perfil < 1 || perfil > 3)
@@ -117,7 +132,10 @@ namespace ConsultaDocumentos.API.Controllers
                 NumeroDocumento = cnpj,
                 TipoDocumento = TipoDocumento.CNPJ,
                 PerfilCNPJ = perfil,
-                AplicacaoId = aplicacaoId
+                AplicacaoId = aplicacaoId,
+                TipoConsulta = (TipoConsulta)tipoConsulta,
+                OrigemConsulta = (OrigemConsulta)origemConsulta,
+                ConsultarVencidos = consultarVencidos
             };
 
             var response = await _externalConsultaService.ConsultarDocumentoAsync(request, ct);
