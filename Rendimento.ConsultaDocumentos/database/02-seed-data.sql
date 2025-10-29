@@ -196,18 +196,34 @@ DECLARE @SitSuspensa UNIQUEIDENTIFIER = NEWID();
 DECLARE @SitInapta UNIQUEIDENTIFIER = NEWID();
 DECLARE @SitBaixada UNIQUEIDENTIFIER = NEWID();
 
-INSERT INTO SituacaoCadastral (Id, Descricao, Ativo, DataCriacao)
-VALUES
-    (@SitRegular, 'Regular', 1, GETUTCDATE()),
-    (@SitSuspensa, 'Suspensa', 1, GETUTCDATE()),
-    (@SitInapta, 'Inapta', 1, GETUTCDATE()),
-    (@SitBaixada, 'Baixada', 1, GETUTCDATE()),
-    (NEWID(), 'Cancelada', 1, GETUTCDATE()),
-    (NEWID(), 'Nula', 1, GETUTCDATE()),
-    (NEWID(), 'Ativa', 1, GETUTCDATE()),
-    (NEWID(), 'Inativa', 1, GETUTCDATE());
+-- Situações com TipoPessoa e IdSerpro
+-- TipoPessoa: 'F' = Pessoa Física, 'J' = Pessoa Jurídica, 'A' = Ambos
+-- IdSerpro: Código retornado pelo Serpro (0, 2, 3, 4, 5, 8, 9)
 
-PRINT '  - 8 Situações Cadastrais inseridas';
+INSERT INTO SituacaoCadastral (Id, Descricao, Ativo, TipoPessoa, IdSerpro, DataCriacao)
+VALUES
+    -- Situações para CPF (Pessoa Física)
+    (NEWID(), 'Ativa - CPF', 1, 'F', '0', GETUTCDATE()), -- Código Serpro: 0
+    (NEWID(), 'Suspensa - CPF', 1, 'F', '2', GETUTCDATE()), -- Código Serpro: 2
+    (NEWID(), 'Titular Falecido - CPF', 1, 'F', '3', GETUTCDATE()), -- Código Serpro: 3
+    (NEWID(), 'Pendente de Regularização - CPF', 1, 'F', '4', GETUTCDATE()), -- Código Serpro: 4
+    (NEWID(), 'Cancelada por Multiplicidade - CPF', 1, 'F', '5', GETUTCDATE()), -- Código Serpro: 5
+    (NEWID(), 'Nula - CPF', 1, 'F', '8', GETUTCDATE()), -- Código Serpro: 8
+    (NEWID(), 'Cancelada de Ofício - CPF', 1, 'F', '9', GETUTCDATE()), -- Código Serpro: 9
+
+    -- Situações para CNPJ (Pessoa Jurídica)
+    (@SitRegular, 'Ativa - CNPJ', 1, 'J', '02', GETUTCDATE()), -- Código Serpro: 02
+    (@SitSuspensa, 'Suspensa - CNPJ', 1, 'J', '03', GETUTCDATE()), -- Código Serpro: 03
+    (@SitInapta, 'Inapta - CNPJ', 1, 'J', '04', GETUTCDATE()), -- Código Serpro: 04
+    (@SitBaixada, 'Baixada - CNPJ', 1, 'J', '08', GETUTCDATE()), -- Código Serpro: 08
+    (NEWID(), 'Nula - CNPJ', 1, 'J', '01', GETUTCDATE()), -- Código Serpro: 01
+
+    -- Situações genéricas (Ambos)
+    (NEWID(), 'Regular', 1, 'A', NULL, GETUTCDATE()),
+    (NEWID(), 'Cancelada', 1, 'A', NULL, GETUTCDATE()),
+    (NEWID(), 'Inativa', 1, 'A', NULL, GETUTCDATE());
+
+PRINT '  - 15 Situações Cadastrais inseridas (com TipoPessoa e IdSerpro)';
 GO
 
 -- =============================================
@@ -637,7 +653,7 @@ PRINT '  - viewer@test.com (senha: Viewer@123) - Role: User';
 PRINT '';
 PRINT 'Dados inseridos:';
 PRINT '  - 10 Nacionalidades';
-PRINT '  - 8 Situações Cadastrais';
+PRINT '  - 15 Situações Cadastrais (com TipoPessoa e IdSerpro)';
 PRINT '  - 3 Aplicações';
 PRINT '  - 2 Provedores';
 PRINT '  - 5 Pessoas Físicas (CPF)';

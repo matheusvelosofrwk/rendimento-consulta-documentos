@@ -32,6 +32,17 @@ namespace ConsultaDocumentos.Application.Services.External
             _logger = logger;
         }
 
+        /// <summary>
+        /// Consulta CPF utilizando o protocolo REST/JSON do Serpro
+        /// </summary>
+        /// <remarks>
+        /// PROTOCOLO: REST
+        /// - Content-Type: application/json
+        /// - Método: POST (HttpWebRequest)
+        /// - Request: JSON (SerprocCPFRequest)
+        /// - Response: JSON (SerprocCPFResponse)
+        /// - Autenticação: Certificado Digital (.pfx)
+        /// </remarks>
         public async Task<SerprocCPFResponse> ConsultarCPFAsync(
             string cpf,
             CancellationToken cancellationToken = default)
@@ -171,6 +182,19 @@ namespace ConsultaDocumentos.Application.Services.External
             return await ConsultarCNPJAsync<SerprocCNPJPerfil7Response>(cnpj, 7, sistemaConvenente, cancellationToken);
         }
 
+        /// <summary>
+        /// Consulta CNPJ utilizando o protocolo SOAP/XML do Serpro
+        /// </summary>
+        /// <remarks>
+        /// PROTOCOLO: SOAP
+        /// - Content-Type: text/xml; charset=utf-8
+        /// - Método: POST (HttpWebRequest)
+        /// - Request: XML SOAP Envelope (gerado via SoapHelper)
+        /// - Response: XML SOAP (parseado via XmlDocument)
+        /// - Autenticação: Certificado Digital (.pfx)
+        /// - SOAPAction Header: Obrigatório (namespace + operação)
+        /// - Perfis Disponíveis: 1 (Básico), 2 (Completo), 3 (Com Sócios), 7 (Detalhado)
+        /// </remarks>
         private async Task<T> ConsultarCNPJAsync<T>(
             string cnpj,
             int perfil,

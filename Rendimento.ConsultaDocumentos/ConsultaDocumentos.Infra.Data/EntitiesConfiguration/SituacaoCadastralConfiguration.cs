@@ -22,11 +22,18 @@ namespace ConsultaDocumentos.Infra.Data.EntitiesConfiguration
                 .IsRequired()
                 .HasDefaultValue('A'); // Default: Ambos
 
+            builder.Property(x => x.IdSerpro)
+                .HasMaxLength(10)
+                .IsRequired(false);
+
             builder.Property(x => x.DataCriacao)
                 .IsRequired();
 
             // Índice para filtro por tipo de pessoa
             builder.HasIndex(x => x.TipoPessoa);
+
+            // Índice para busca rápida por ID do Serpro
+            builder.HasIndex(x => x.IdSerpro);
         }
     }
 }

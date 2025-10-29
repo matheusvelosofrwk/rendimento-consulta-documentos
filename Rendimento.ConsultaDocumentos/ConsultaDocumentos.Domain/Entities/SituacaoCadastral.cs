@@ -10,6 +10,8 @@ namespace ConsultaDocumentos.Domain.Entities
 
         public char TipoPessoa { get; set; } // 'F' = Pessoa Física, 'J' = Pessoa Jurídica, 'A' = Ambos
 
+        public string? IdSerpro { get; set; } // Código de situação cadastral retornado pelo Serpro (ex: "0", "2", "3")
+
         public DateTime DataCriacao { get; set; }
 
         // Método de validação

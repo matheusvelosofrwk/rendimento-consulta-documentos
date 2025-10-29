@@ -91,6 +91,69 @@
 
                     <div class="divider my-4"></div>
 
+                    <!-- Seção de Certificado Digital -->
+                    <h6 class="mb-3">
+                        <i class="fas fa-certificate text-primary me-2"></i>Certificado Digital (Opcional)
+                    </h6>
+
+                    <div class="row">
+                        <!-- Caminho do Certificado -->
+                        <div class="col-md-6 form-group mb-4">
+                            <label asp-for="CertificadoCaminho" class="form-label">
+                                <i class="fas fa-folder text-primary me-2"></i>Caminho do Certificado
+                            </label>
+                            <div class="input-group input-group-modern">
+                                <span class="input-group-text">
+                                    <i class="fas fa-file"></i>
+                                </span>
+                                <input asp-for="CertificadoCaminho" class="form-control" placeholder="Ex: C:\certificados\aplicacao.pfx" />
+                            </div>
+                            <span asp-validation-for="CertificadoCaminho" class="text-danger small"></span>
+                            <small class="form-text text-muted">
+                                <i class="fas fa-info-circle me-1"></i>
+                                Caminho completo do arquivo .pfx do certificado digital
+                            </small>
+                        </div>
+
+                        <!-- Data de Expiração do Certificado -->
+                        <div class="col-md-6 form-group mb-4">
+                            <label asp-for="CertificadoDataExpiracao" class="form-label">
+                                <i class="fas fa-calendar text-primary me-2"></i>Data de Expiração
+                            </label>
+                            <div class="input-group input-group-modern">
+                                <span class="input-group-text">
+                                    <i class="fas fa-calendar-alt"></i>
+                                </span>
+                                <input asp-for="CertificadoDataExpiracao" class="form-control" type="date" />
+                            </div>
+                            <span asp-validation-for="CertificadoDataExpiracao" class="text-danger small"></span>
+                            <small class="form-text text-muted">
+                                <i class="fas fa-info-circle me-1"></i>
+                                Data de validade do certificado digital
+                            </small>
+                        </div>
+                    </div>
+
+                    <!-- Senha do Certificado -->
+                    <div class="form-group mb-4">
+                        <label asp-for="CertificadoSenha" class="form-label">
+                            <i class="fas fa-key text-primary me-2"></i>Senha do Certificado
+                        </label>
+                        <div class="input-group input-group-modern">
+                            <span class="input-group-text">
+                                <i class="fas fa-lock"></i>
+                            </span>
+                            <input asp-for="CertificadoSenha" class="form-control" type="password" placeholder="Digite a senha do certificado" />
+                        </div>
+                        <span asp-validation-for="CertificadoSenha" class="text-danger small"></span>
+                        <small class="form-text text-muted">
+                            <i class="fas fa-info-circle me-1"></i>
+                            A senha será criptografada antes de ser armazenada. Deixe em branco para manter a senha atual.
+                        </small>
+                    </div>
+
+                    <div class="divider my-4"></div>
+
                     <!-- Botões de Ação -->
                     <div class="d-flex gap-3 justify-content-between">
                         <button type="button" onclick="openDeleteConfirmation('@Model.Id', 'Aplicacao', '@Model.Nome')" class="btn btn-danger btn-modern btn-icon">

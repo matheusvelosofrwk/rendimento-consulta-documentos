@@ -19,6 +19,22 @@ namespace ConsultaDocumentos.Infra.Data.EntitiesConfiguration
             builder.Property(x => x.Serpro)
                 .IsRequired()
                 .HasDefaultValue(false);
+
+            // Configurações do Certificado Digital
+            builder.Property(x => x.CertificadoCaminho)
+                .HasMaxLength(500)
+                .IsRequired(false);
+
+            builder.Property(x => x.CertificadoSenha)
+                .HasMaxLength(100)
+                .IsRequired(false);
+
+            builder.Property(x => x.CertificadoSenhaCriptografada)
+                .HasMaxLength(500)
+                .IsRequired(false);
+
+            builder.Property(x => x.CertificadoDataExpiracao)
+                .IsRequired(false);
         }
     }
 }

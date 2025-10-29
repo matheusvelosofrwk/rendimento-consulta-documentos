@@ -69,6 +69,24 @@
                         </small>
                     </div>
 
+                    <!-- ID Serpro -->
+                    <div class="form-group mb-4">
+                        <label asp-for="IdSerpro" class="form-label">
+                            <i class="fas fa-barcode text-primary me-2"></i>ID Serpro
+                        </label>
+                        <div class="input-group input-group-modern">
+                            <span class="input-group-text">
+                                <i class="fas fa-barcode"></i>
+                            </span>
+                            <input asp-for="IdSerpro" class="form-control" placeholder="Digite o código do Serpro (ex: 0, 2, 3)" />
+                        </div>
+                        <span asp-validation-for="IdSerpro" class="text-danger small"></span>
+                        <small class="form-text text-muted">
+                            <i class="fas fa-info-circle me-1"></i>
+                            Código de situação cadastral retornado pelo Serpro (opcional)
+                        </small>
+                    </div>
+
                     <!-- Ativo -->
                     <div class="form-group mb-4">
                         <label class="form-label">

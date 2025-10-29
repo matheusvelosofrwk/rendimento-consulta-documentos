@@ -9,5 +9,14 @@ namespace ConsultaDocumentos.Application.DTOs
         public string Status { get; set; }
 
         public bool Serpro { get; set; }
+
+        // Configurações do Certificado Digital
+        public string? CertificadoCaminho { get; set; }
+
+        public string? CertificadoSenha { get; set; }
+
+        public string? CertificadoSenhaCriptografada { get; set; }
+
+        public DateTime? CertificadoDataExpiracao { get; set; }
     }
 }
